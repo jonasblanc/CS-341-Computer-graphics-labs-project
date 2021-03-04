@@ -197,7 +197,7 @@ bool ray_plane_intersection(
 		return false;
 	}
 
-	t = plane_offset - (dot(plane_normal, ray_origin)/dot(plane_normal, ray_direction));
+	t = (dot(plane_normal, plane_center) - dot(plane_normal, ray_origin))/dot(plane_normal, ray_direction);
 	
 	if(t>MAX_RANGE || t<=0.){
 		return false;
