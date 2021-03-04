@@ -203,7 +203,7 @@ bool ray_plane_intersection(
 		return false;
 	}
 	else{
-		normal = dot(ray_direction, plane_normal) >= 0. ? -plane_normal : plane_normal;
+		normal = dot(ray_direction, plane_normal) >= 0. ? -normalize(plane_normal) : normalize(plane_normal);
 		return true;
 	}
 
