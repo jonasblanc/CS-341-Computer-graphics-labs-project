@@ -163,6 +163,15 @@ bool ray_sphere_intersection(
 }
 
 /*
+	Check whether 2 vectors are parralel
+*/
+bool is_vector_parrallel_to_plan(vec3 vect, vec3 plane_normal){
+
+	return abs(dot(vect, plane_normal)) < 1e-12;
+	
+}
+
+/*
 	Check for intersection of the ray with a given plane in the scene.
 */
 bool ray_plane_intersection(
@@ -183,9 +192,23 @@ bool ray_plane_intersection(
 	// can use the plane center if you need it
 	vec3 plane_center = plane_normal * plane_offset;
 	t = MAX_RANGE + 10.;
-	//normal = ...;
-	return false;
+
+	if(is_vector_parrallel_to_plan(ray_direction, plane_normal)){
+		return false;
+	}
+
+	t = plane_offset - (dot(plane_normal, ray_origin)/dot(plane_normal, ray_direction));
+	
+	if(t>MAX_RANGE || t<=0.){
+		return false;
+	}
+	else{
+		normal = dot(ray_direction, plane_normal) >= 0. ? -plane_normal : plane_normal;
+		return true;
+	}
+
 }
+
 
 /*
 	Check for intersection of the ray with a given cylinder in the scene.
