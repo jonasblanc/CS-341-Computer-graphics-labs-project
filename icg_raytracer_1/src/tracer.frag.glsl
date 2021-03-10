@@ -255,6 +255,7 @@ bool ray_cylinder_intersection(
 		t = solutions[0];
 	}
 	
+	
 	if (num_solutions >= 2  && solutions[1] < t  && solutions[1] > 0. ){
 		t = solutions[1];
 	}
