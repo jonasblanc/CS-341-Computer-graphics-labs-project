@@ -10,4 +10,9 @@ Finally, we have to return the right direction of the normal (the one pointing t
 
 **Task 1.2.1: Derive the expression for a Ray-Cylinder intersection**
 
+Please see TheoryExercise.pdf for the derivation. To get the idea of where to start was the more difficult part.
+
 **Task 1.2.2: Implement Ray-Cylinder intersections**
+
+We implemented the result of our derivation with only one difficulty:
+We had one bug that took us some long debugging sessions to find: we disregarded the first intersection if the second was closer, before checking that the second was actually in the finite cylinder. 
