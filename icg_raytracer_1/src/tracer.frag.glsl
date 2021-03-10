@@ -168,7 +168,13 @@ bool ray_sphere_intersection(
 bool is_vector_parrallel_to_plan(vec3 vect, vec3 plane_normal){
 
 	return abs(dot(vect, plane_normal)) < 1e-12;
-	
+}
+
+/*
+	Return the normal which points towards the viewer.
+*/
+vec3 normal_towards_viewer(vec3 normal, vec3 ray_direction){
+	return normalize(dot(ray_direction, normal) >= 0. ? -normal : normal);
 }
 
 /*
@@ -203,13 +209,24 @@ bool ray_plane_intersection(
 		return false;
 	}
 	else{
-		normal = dot(ray_direction, plane_normal) >= 0. ? -normalize(plane_normal) : normalize(plane_normal);
+		normal = normal_towards_viewer(plane_normal, ray_direction);
 		return true;
 	}
 
 }
 
+/*
+	Check that a solution found by the intersection between a ray and an infinite cylinder
+	is inside the corresponding finite cylinder.
+*/
+bool is_inside_finite_cylinder(vec3 ray_origin, vec3 ray_direction, Cylinder cyl, float solution){
+	
+	vec3 intersection_point = ray_origin + ray_direction * solution;
+	vec3 center_intersection = intersection_point - cyl.center;
 
+	return dot(center_intersection, center_intersection) <= (cyl.height / 2.) * (cyl.height / 2.) + cyl.radius * cyl.radius;
+
+}
 /*
 	Check for intersection of the ray with a given cylinder in the scene.
 */
@@ -227,58 +244,41 @@ bool ray_cylinder_intersection(
 	- return whether there is an intersection with t > 0
 	*/
 
-	/*
- 	ray_origin[0] = 0.05;
-	ray_origin[1] = 0.;
-	ray_origin[2] = 0.;
-
-	ray_direction[0] = 0.5;
-	ray_direction[0] = 0.3;
-	ray_direction[0] = 1.0;
-	ray_direction = normalize(ray_direction);
-	*/
 	vec3 intersection_point;
 	t = MAX_RANGE + 10.;
 
-	vec3 normalizedAxis = normalize(cyl.axis);
-	vec3 v = cross(ray_direction, normalizedAxis);
-	vec3 w = cross((ray_origin - cyl.center), normalizedAxis);
+	//Solve the equations of the infinite cylinder-ray intersection
+	vec3 v = cross(ray_direction, cyl.axis);
+	vec3 w = cross((ray_origin - cyl.center), cyl.axis);
 	float a = dot(v,v);
 	float b = 2. * dot(v, w);
-	float c = dot(w,w) - (dot(normalizedAxis, normalizedAxis) * cyl.radius * cyl.radius);
+	float c = dot(w,w) - (cyl.radius * cyl.radius) * dot(cyl.axis, cyl.axis);
 
+	
 	vec2 solutions; // solutions will be stored here
 
 	int num_solutions = solve_quadratic(a, b, c, solutions);
-
-	if (num_solutions >= 1 && solutions[0] > 0.) {
+	
+	if (num_solutions >= 1 && solutions[0] > 0. && is_inside_finite_cylinder(ray_origin, ray_direction, cyl, solutions[0])) {
 		t = solutions[0];
 	}
 	
-	
-	if (num_solutions >= 2  && solutions[1] < t  && solutions[1] > 0. ){
+	if (num_solutions >= 2  && solutions[1] < t  && solutions[1] > 0. && is_inside_finite_cylinder(ray_origin, ray_direction, cyl, solutions[1])){
 		t = solutions[1];
 	}
-
+	
+	
 	if (t < MAX_RANGE) {
 		
 		vec3 intersection_point = ray_origin + ray_direction * t;
+		vec3 proj = (dot((intersection_point-cyl.center), cyl.axis)/dot(cyl.axis, cyl.axis))*cyl.axis;
+		normal = (intersection_point - cyl.center) - proj;
 
+		normal = normal_towards_viewer(normal, ray_direction);
 
-		if(length(intersection_point - cyl.center) - sqrt((cyl.height / 2.) * (cyl.height / 2.) + cyl.radius * cyl.radius) > 0.){
-			return false;
-		}
-	
-		normal = normalize(((intersection_point - cyl.center) - (dot(normalizedAxis, intersection_point - cyl.center)) * normalizedAxis));
-		normal = dot(ray_direction, normal) >= 0. ? -normal : normal;
-
-		/*
-		if(t != 0.68){
-			return false;
-		}
-		*/
 		return true;
-	} else {
+	} 
+	else {
 		return false;
 	}	
 
