@@ -504,19 +504,26 @@ void main() {
 
 		if(ray_intersection(ray_origin, ray_direction, col_distance, col_normal, mat_id)){
 			Material mat = get_mat2(mat_id);
-			pix_color += mat.color * mat.ambient * light_color_ambient;
 
 			vec3 intersectionPoint = ray_origin + col_distance * ray_direction;
 			
+
 			#if NUM_LIGHTS != 0
 			for(int i = 0; i < NUM_LIGHTS; ++i){
-				pix_color += reflection_weight * lighting(intersectionPoint, col_normal, -ray_direction, lights[i], mat);
+				vec3 ambient_light = mat.color * mat.ambient * light_color_ambient;
+				vec3 lights_effect = lighting(intersectionPoint, col_normal, -ray_direction, lights[i], mat);
+				if(i_reflection == 0){
+					pix_color += (ambient_light + lights_effect);
+				}else{
+					pix_color += (1.- mat.mirror) * reflection_weight * (ambient_light + lights_effect);
+				}
+				
 			}
 			#endif
 
-			ray_origin = intersectionPoint + 0.0001 * col_normal;
-			ray_direction = reflect(ray_direction, col_normal);
 			reflection_weight *= mat.mirror;
+			ray_origin = intersectionPoint + 0.001 * col_normal;
+			ray_direction = reflect(ray_direction, col_normal);
 		}
 	}
 
