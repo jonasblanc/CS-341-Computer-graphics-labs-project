@@ -116,7 +116,7 @@ int solve_quadratic(float a, float b, float c, out vec2 solutions) {
 	} 
 }
 
-*
+/*
 	Check for intersection of the ray with a given sphere in the scene.
 */
 bool ray_sphere_intersection(
