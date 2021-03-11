@@ -427,15 +427,24 @@ vec3 lighting(
 	- return the ouput color
 	*/
 
-	vec3 l = normalize(object_point - light.position)
+	direction_to_camera = normalize(direction_to_camera);
+	object_normal = normalize(object_normal);
 
-	vec3 diffuse 
-	if(dot(object_normal, l) > 0){
-		diffuse =  light.color * mat.ambiant * dot(object_normal, l)
-	}else{
-		diffuse = vec3(0.,0.,0.)
+	vec3 l = normalize(light.position - object_point);
+
+	vec3 diffuse = vec3(0.,0.,0.);
+	vec3 specular = vec3(0.,0.,0.);
+
+	if(dot(object_normal, l) > 0.){
+		diffuse =  light.color * mat.color * mat.diffuse * dot(object_normal, l);
+		
+		vec3 r = reflect(-l, object_normal);
+		vec3 v = direction_to_camera;
+
+		if(dot(r, direction_to_camera) >0.){
+			specular = light.color * mat.color * mat.specular * pow(dot(r, v), mat.shininess);
+		}
 	}
-
 
 	/** TODO 2.2: 
 	- shoot a shadow ray from the intersection point to the light
@@ -443,8 +452,20 @@ vec3 lighting(
 	- update the lighting accordingly
 	*/
 
+	vec3 ray_direction = normalize(light.position - object_point);
+	vec3 ray_origin = object_point + 0.0001 * object_normal;
+	float col_distance;
+	vec3 col_normal = vec3(0.);
+	int mat_id = 0;
 
-	return diffsue;
+	if(ray_intersection(ray_origin, ray_direction, col_distance, col_normal, mat_id)){
+		if( col_distance < length(light.position - object_point)){
+			return vec3(0.);
+		}
+	}
+
+	
+	return  diffuse + specular;
 }
 
 /*
@@ -474,6 +495,32 @@ void main() {
 	- compute the intensity contribution from each light in the scene and store the sum in pix_color
 	*/
 
+	float reflection_weight = 1.;
+
+	for(int i_reflection = 0; i_reflection < NUM_REFLECTIONS+1; i_reflection++) {
+		float col_distance;
+		vec3 col_normal = vec3(0.);
+		int mat_id = 0;
+
+		if(ray_intersection(ray_origin, ray_direction, col_distance, col_normal, mat_id)){
+			Material mat = get_mat2(mat_id);
+			pix_color += mat.color * mat.ambient * light_color_ambient;
+
+			vec3 intersectionPoint = ray_origin + col_distance * ray_direction;
+			
+			#if NUM_LIGHTS != 0
+			for(int i = 0; i < NUM_LIGHTS; ++i){
+				pix_color += reflection_weight * lighting(intersectionPoint, col_normal, -ray_direction, lights[i], mat);
+			}
+			#endif
+
+			ray_origin = intersectionPoint + 0.0001 * col_normal;
+			ray_direction = reflect(ray_direction, col_normal);
+			reflection_weight *= mat.mirror;
+		}
+	}
+
+
 	/** TODO 2.3.2: 
 	- create an outer loop on the number of reflections (see below for a suggested structure)
 	- compute lighting with the current ray (might be reflected)
@@ -500,11 +547,8 @@ void main() {
 	}
 	*/
 
-	float col_distance;
-	vec3 col_normal = vec3(0.);
-	int mat_id      = 0;
-	ray_intersection(ray_origin, ray_direction, col_distance, col_normal, mat_id);
-
-	gl_FragColor = vec4(0.5+0.5*col_normal, 1.);
+	
+	gl_FragColor = vec4(pix_color, 1.);
+	//gl_FragColor = vec4(0.5+0.5*col_normal, 1.);
 	//gl_FragColor *= sin(5.*col_distance);
 }
