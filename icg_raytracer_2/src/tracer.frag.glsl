@@ -410,6 +410,7 @@ bool ray_intersection(
 	return col_distance < MAX_RANGE;
 }
 
+
 /*
 	Return the color at an intersection point given a light and a material, exluding the contribution
 	of potential reflected rays.
@@ -426,13 +427,24 @@ vec3 lighting(
 	- return the ouput color
 	*/
 
+	vec3 l = normalize(object_point - light.position)
+
+	vec3 diffuse 
+	if(dot(object_normal, l) > 0){
+		diffuse =  light.color * mat.ambiant * dot(object_normal, l)
+	}else{
+		diffuse = vec3(0.,0.,0.)
+	}
+
+
 	/** TODO 2.2: 
 	- shoot a shadow ray from the intersection point to the light
 	- check whether it intersects an object from the scene
 	- update the lighting accordingly
 	*/
 
-	return vec3(0.);
+
+	return diffsue;
 }
 
 /*
