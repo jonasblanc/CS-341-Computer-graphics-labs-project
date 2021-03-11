@@ -453,13 +453,14 @@ vec3 lighting(
 	*/
 
 	vec3 ray_direction = normalize(light.position - object_point);
-	vec3 ray_origin = object_point + 0.0001 * object_normal;
+	vec3 ray_origin = object_point + 0.001 * object_normal;
 	float col_distance;
 	vec3 col_normal = vec3(0.);
 	int mat_id = 0;
 
+	
 	if(ray_intersection(ray_origin, ray_direction, col_distance, col_normal, mat_id)){
-		if( col_distance < length(light.position - object_point)){
+		if(col_distance + 0.001  <= length(light.position - object_point)){
 			return vec3(0.);
 		}
 	}
@@ -512,12 +513,15 @@ void main() {
 			for(int i = 0; i < NUM_LIGHTS; ++i){
 				vec3 ambient_light = mat.color * mat.ambient * light_color_ambient;
 				vec3 lights_effect = lighting(intersectionPoint, col_normal, -ray_direction, lights[i], mat);
-				if(i_reflection == 0){
+				
+				// Uncomment and comment below to take first screenshot
+				/*
+				if(NUM_REFLECTIONS == 0){
 					pix_color += (ambient_light + lights_effect);
 				}else{
 					pix_color += (1.- mat.mirror) * reflection_weight * (ambient_light + lights_effect);
-				}
-				
+				}*/
+				pix_color += (1.- mat.mirror) * reflection_weight * (ambient_light + lights_effect);
 			}
 			#endif
 

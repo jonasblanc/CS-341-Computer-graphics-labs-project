@@ -9,6 +9,8 @@
 
 **Task 2.3.2: Implement reflections**
 
+Mirror1 = level 1 reflection
+Mirror2 = level 3 reflection
 
 Workload:
 
