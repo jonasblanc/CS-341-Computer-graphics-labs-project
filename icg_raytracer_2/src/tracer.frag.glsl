@@ -419,52 +419,41 @@ vec3 lighting(
 		vec3 object_point, vec3 object_normal, vec3 direction_to_camera, 
 		Light light, Material mat) {
 
-	/** TODO 2.1: 
-	- compute the diffuse component
-	- make sure that the light is located in the correct side of the object
-	- compute the specular component 
-	- make sure that the reflected light shines towards the camera
-	- return the ouput color
-	*/
 
 	direction_to_camera = normalize(direction_to_camera);
 	object_normal = normalize(object_normal);
 
+	// 2.2: Implement shadows
+	float ANTI_ACNEE_FACTOR = 0.001;	
+	vec3 ray_direction = normalize(light.position - object_point);
+	vec3 ray_origin = object_point + ANTI_ACNEE_FACTOR * object_normal;
+	float col_distance;
+	vec3 col_normal = vec3(0.);
+	int mat_id = 0;
+
+	if(ray_intersection(ray_origin, ray_direction, col_distance, col_normal, mat_id)){
+		if(col_distance + ANTI_ACNEE_FACTOR  <= length(light.position - object_point)){
+			return vec3(0.);
+		}
+	}
+
+	// 2.1: Implement Phong Lighting
 	vec3 l = normalize(light.position - object_point);
 
 	vec3 diffuse = vec3(0.,0.,0.);
 	vec3 specular = vec3(0.,0.,0.);
 
+	// Positive only if the normal pointing toward the camera point toward the light as well
+	// meaning that the light shine on the visible side of the surface
 	if(dot(object_normal, l) > 0.){
 		diffuse =  light.color * mat.color * mat.diffuse * dot(object_normal, l);
 		
-		vec3 r = reflect(-l, object_normal);
-		vec3 v = direction_to_camera;
+		vec3 r = normalize(reflect(-l, object_normal));
 
 		if(dot(r, direction_to_camera) >0.){
-			specular = light.color * mat.color * mat.specular * pow(dot(r, v), mat.shininess);
+			specular = mat.color * mat.specular * pow(dot(r, direction_to_camera), mat.shininess);
 		}
 	}
-
-	/** TODO 2.2: 
-	- shoot a shadow ray from the intersection point to the light
-	- check whether it intersects an object from the scene
-	- update the lighting accordingly
-	*/
-
-	vec3 ray_direction = normalize(light.position - object_point);
-	vec3 ray_origin = object_point + 0.001 * object_normal;
-	float col_distance;
-	vec3 col_normal = vec3(0.);
-	int mat_id = 0;
-
-	
-	if(ray_intersection(ray_origin, ray_direction, col_distance, col_normal, mat_id)){
-		if(col_distance + 0.001  <= length(light.position - object_point)){
-			return vec3(0.);
-		}
-	}
-
 	
 	return  diffuse + specular;
 }
@@ -489,13 +478,35 @@ void main() {
 	vec3 ray_direction = normalize(v2f_ray_direction);
 
 	vec3 pix_color = vec3(0.);
+	
+	// 2.1: 
+	// Before reflexion
+	/*
+	float col_distance;
+	vec3 col_normal = vec3(0.);
+	int mat_id = 0;
 
-	/** TODO 2.1: 
-	- check whether the ray intersects an object in the scene
-	- if it does, compute the ambient contribution to the total intensity
-	- compute the intensity contribution from each light in the scene and store the sum in pix_color
+
+	if(ray_intersection(ray_origin, ray_direction, col_distance, col_normal, mat_id)){
+		Material mat = get_mat2(mat_id);
+
+		vec3 intersectionPoint = ray_origin + col_distance * ray_direction;
+		
+		vec3 ambient_light = mat.color * mat.ambient * light_color_ambient;
+		pix_color += ambient_light;
+
+		#if NUM_LIGHTS != 0
+		for(int i = 0; i < NUM_LIGHTS; ++i){
+			vec3 lights_effect = lighting(intersectionPoint, col_normal, -ray_direction, lights[i], mat);			
+			
+			pix_color += lights_effect;
+		}
+		#endif
+	}
 	*/
 
+	// 2.3.2: 
+	float ANTI_ACNEE_FACTOR = 0.001;	
 	float reflection_weight = 1.;
 
 	for(int i_reflection = 0; i_reflection < NUM_REFLECTIONS+1; i_reflection++) {
@@ -506,60 +517,27 @@ void main() {
 		if(ray_intersection(ray_origin, ray_direction, col_distance, col_normal, mat_id)){
 			Material mat = get_mat2(mat_id);
 
+			vec3 ci = vec3(0.);
+
 			vec3 intersectionPoint = ray_origin + col_distance * ray_direction;
-			
+			vec3 ambient_light = mat.color * mat.ambient * light_color_ambient;
+
+			ci += ambient_light;
 
 			#if NUM_LIGHTS != 0
 			for(int i = 0; i < NUM_LIGHTS; ++i){
-				vec3 ambient_light = mat.color * mat.ambient * light_color_ambient;
 				vec3 lights_effect = lighting(intersectionPoint, col_normal, -ray_direction, lights[i], mat);
-				
-				// Uncomment and comment below to take first screenshot
-				/*
-				if(NUM_REFLECTIONS == 0){
-					pix_color += (ambient_light + lights_effect);
-				}else{
-					pix_color += (1.- mat.mirror) * reflection_weight * (ambient_light + lights_effect);
-				}*/
-				pix_color += (1.- mat.mirror) * reflection_weight * (ambient_light + lights_effect);
+				ci += lights_effect;
 			}
 			#endif
+			
+			pix_color += (1.- mat.mirror) * reflection_weight * ci;
 
 			reflection_weight *= mat.mirror;
-			ray_origin = intersectionPoint + 0.001 * col_normal;
-			ray_direction = reflect(ray_direction, col_normal);
+			ray_origin = intersectionPoint + ANTI_ACNEE_FACTOR * col_normal;
+			ray_direction = normalize(reflect(ray_direction, col_normal));
 		}
 	}
-
-
-	/** TODO 2.3.2: 
-	- create an outer loop on the number of reflections (see below for a suggested structure)
-	- compute lighting with the current ray (might be reflected)
-	- use the above formula for blending the current pixel color with the reflected one
-	- update ray origin and direction
-
-	We suggest you structure your code in the following way:
-
-	vec3 pix_color          = vec3(0.);
-	float reflection_weight = ...;
-
-	for(int i_reflection = 0; i_reflection < NUM_REFLECTIONS+1; i_reflection++) {
-		float col_distance;
-		vec3 col_normal = vec3(0.);
-		int mat_id      = 0;
-
-		...
-
-		Material m = get_mat2(mat_id); // get material of the intersected object
-
-		ray_origin        = ...;
-		ray_direction     = ...;
-		reflection_weight = ...;
-	}
-	*/
-
 	
 	gl_FragColor = vec4(pix_color, 1.);
-	//gl_FragColor = vec4(0.5+0.5*col_normal, 1.);
-	//gl_FragColor *= sin(5.*col_distance);
 }
