@@ -514,9 +514,11 @@ void main() {
 		vec3 col_normal = vec3(0.);
 		int mat_id = 0;
 
+		// For NUM_REFLECTIONS times we compute the next intersection
 		if(ray_intersection(ray_origin, ray_direction, col_distance, col_normal, mat_id)){
 			Material mat = get_mat2(mat_id);
 
+			// Color of the current pixel (without further reflexion)
 			vec3 ci = vec3(0.);
 
 			vec3 intersectionPoint = ray_origin + col_distance * ray_direction;
@@ -531,8 +533,10 @@ void main() {
 			}
 			#endif
 			
+			// Add the weighted pixel color
 			pix_color += (1.- mat.mirror) * reflection_weight * ci;
 
+			// Update for the next reflexion point
 			reflection_weight *= mat.mirror;
 			ray_origin = intersectionPoint + ANTI_ACNEE_FACTOR * col_normal;
 			ray_direction = normalize(reflect(ray_direction, col_normal));

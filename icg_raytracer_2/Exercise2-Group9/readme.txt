@@ -28,7 +28,11 @@ See TheoryExercise.pdf for full derivation.
 
 **Task 2.3.2: Implement reflections**
 
+As suggested we iterate over the number of reflexions.
+We compute for each reflexion the color of the intersection point by summing the ambiant, diffuse and specular term. Then we multiply it by (1-alpha) and the product of all previous alpha before adding it to the pixel_color.
+We finally set up the parameters for the next iteration.
 
+We had an hard time understanding the algorithm at first but once it was done it went well.
 
 
 Mirror1 = level 1 reflection
