@@ -316,26 +316,24 @@ bool ray_AABB_filter(
 	
 	float tMin = 0.;
 	float tMax = MAX_RANGE + 10.;
-	vec3 OMin = aabb.corner_min-ray_origin;
-	vec3 OMax = aabb.corner_max-ray_origin;
+
+	vec3 OMin = aabb.corner_min - ray_origin;
+	vec3 OMax = aabb.corner_max - ray_origin;
 
 
 	for(int i = 0; i < 3; ++i){
 		if(abs(ray_direction[i]) < 1e-12){
 			if(OMin[i] > 0. || OMax[i] < 0.){
 				return false;
-			}else{
-				continue;
 			}
 		}else{
 			tMax = min(OMax[i] / ray_direction[i], tMax);
-			tMin = max(OMax[i] / ray_direction[i], tMin);
+			tMin = max(OMin[i] / ray_direction[i], tMin);
 		}
 	}
 
 	return tMin <= tMax;
 }
-
 
 #if NUM_TRIANGLES != 0
 Triangle get_triangle(int idx) {
