@@ -442,6 +442,11 @@ bool ray_triangle_intersection(
 		float alpha = x[0];
 		float beta = x[1];
 		float gamma = 1.-alpha-beta;
+		
+		if(alpha<0. || beta<0. || gamma<0.){
+			return false;
+		}
+		
 		t=x[2];
 
 		#if defined FLAT_SHADING_STRATEGY
@@ -671,21 +676,12 @@ void main() {
 			ray_direction = normalize(reflect(ray_direction, col_normal));
 		}
 	}
-	/*
-	float col_distance;
-	vec3 col_normal = vec3(0.);
-	int mat_id      = 0;
-	ray_intersection(ray_origin, ray_direction, col_distance, col_normal, mat_id);
-
-	pix_color = 0.5+0.5*col_normal;
-	*/
+	
 	#if defined F_VISUALIZE_AABB && (NUM_TRIANGLES != 0)
 	if(ray_in_AABB) {
 		pix_color = 1. - pix_color;
 	}
 	#endif
 
-	gl_FragColor = vec4(pix_color, 1.);
-	//gl_FragColor *= sin(5.*col_distance);
-	
+	gl_FragColor = vec4(pix_color, 1.);	
 }
