@@ -73,12 +73,12 @@ export function compute_vertex_normals(mesh, tri_normals, angle_weights) {
     vertex_normals[iv1][0] += tri_normals[i_face][0] * angle_weights[i_face][0];
     vertex_normals[iv1][1] += tri_normals[i_face][1] * angle_weights[i_face][0];
     vertex_normals[iv1][2] += tri_normals[i_face][2] * angle_weights[i_face][0];
-    vertex_normals[iv2][0] += tri_normals[i_face][0] * angle_weights[i_face][0];
-    vertex_normals[iv2][1] += tri_normals[i_face][1] * angle_weights[i_face][0];
-    vertex_normals[iv2][2] += tri_normals[i_face][2] * angle_weights[i_face][0];
-    vertex_normals[iv3][0] += tri_normals[i_face][0] * angle_weights[i_face][0];
-    vertex_normals[iv3][1] += tri_normals[i_face][1] * angle_weights[i_face][0];
-    vertex_normals[iv3][2] += tri_normals[i_face][2] * angle_weights[i_face][0];
+    vertex_normals[iv2][0] += tri_normals[i_face][0] * angle_weights[i_face][1];
+    vertex_normals[iv2][1] += tri_normals[i_face][1] * angle_weights[i_face][1];
+    vertex_normals[iv2][2] += tri_normals[i_face][2] * angle_weights[i_face][1];
+    vertex_normals[iv3][0] += tri_normals[i_face][0] * angle_weights[i_face][2];
+    vertex_normals[iv3][1] += tri_normals[i_face][1] * angle_weights[i_face][2];
+    vertex_normals[iv3][2] += tri_normals[i_face][2] * angle_weights[i_face][2];
 
     /*
     vertex_normals[iv1] += tri_normals[i_face] * angle_weights[i_face][0];
