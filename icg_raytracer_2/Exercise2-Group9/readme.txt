@@ -36,7 +36,7 @@ We had an hard time understanding the algorithm at first but once it was done it
 
 
 Mirror1 = level 1 reflection
-Mirror2 = level 3 reflection
+Mirror2 = level 4 reflection
 
 Workload:
 
