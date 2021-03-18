@@ -177,6 +177,21 @@ bool ray_sphere_intersection(
 }
 
 /*
+	Check whether 2 vectors are parralel
+*/
+bool is_vector_parrallel_to_plan(vec3 vect, vec3 plane_normal){
+
+	return abs(dot(vect, plane_normal)) < 1e-12;
+}
+
+/*
+	Return the normal which points towards the viewer.
+*/
+vec3 normal_towards_viewer(vec3 normal, vec3 ray_direction){
+	return normalize(dot(ray_direction, normal) >= 0. ? -normal : normal);
+}
+
+/*
 	Check for intersection of the ray with a given plane in the scene.
 */
 bool ray_plane_intersection(
@@ -197,10 +212,35 @@ bool ray_plane_intersection(
 	// can use the plane center if you need it
 	vec3 plane_center = plane_normal * plane_offset;
 	t = MAX_RANGE + 10.;
-	//normal = ...;
-	return false;
+
+	if(is_vector_parrallel_to_plan(ray_direction, plane_normal)){
+		return false;
+	}
+
+	t = (dot(plane_normal, plane_center) - dot(plane_normal, ray_origin))/dot(plane_normal, ray_direction);
+	
+	if(t>MAX_RANGE || t<=0.){
+		return false;
+	}
+	else{
+		normal = normal_towards_viewer(plane_normal, ray_direction);
+		return true;
+	}
+
 }
 
+/*
+	Check that a solution found by the intersection between a ray and an infinite cylinder
+	is inside the corresponding finite cylinder.
+*/
+bool is_inside_finite_cylinder(vec3 ray_origin, vec3 ray_direction, Cylinder cyl, float solution){
+	
+	vec3 intersection_point = ray_origin + ray_direction * solution;
+	vec3 center_intersection = intersection_point - cyl.center;
+
+	return dot(center_intersection, center_intersection) <= (cyl.height / 2.) * (cyl.height / 2.) + cyl.radius * cyl.radius;
+
+}
 /*
 	Check for intersection of the ray with a given cylinder in the scene.
 */
@@ -221,8 +261,45 @@ bool ray_cylinder_intersection(
 	vec3 intersection_point;
 	t = MAX_RANGE + 10.;
 
+	//Solve the equations of the infinite cylinder-ray intersection
+	vec3 v = cross(ray_direction, cyl.axis);
+	vec3 w = cross((ray_origin - cyl.center), cyl.axis);
+	float a = dot(v,v);
+	float b = 2. * dot(v, w);
+	float c = dot(w,w) - (cyl.radius * cyl.radius) * dot(cyl.axis, cyl.axis);
+
+	
+	vec2 solutions; // solutions will be stored here
+
+	int num_solutions = solve_quadratic(a, b, c, solutions);
+	
+	if (num_solutions >= 1 && solutions[0] > 0. && is_inside_finite_cylinder(ray_origin, ray_direction, cyl, solutions[0])) {
+		t = solutions[0];
+	}
+	
+	if (num_solutions >= 2  && solutions[1] < t  && solutions[1] > 0. && is_inside_finite_cylinder(ray_origin, ray_direction, cyl, solutions[1])){
+		t = solutions[1];
+	}
+	
+	
+	if (t < MAX_RANGE) {
+		
+		vec3 intersection_point = ray_origin + ray_direction * t;
+		vec3 proj = (dot((intersection_point-cyl.center), cyl.axis)/dot(cyl.axis, cyl.axis))*cyl.axis;
+		normal = (intersection_point - cyl.center) - proj;
+
+		normal = normal_towards_viewer(normal, ray_direction);
+
+		return true;
+	} 
+	else {
+		return false;
+	}	
+
+
 	return false;
 }
+
 
 
 bool ray_AABB_filter(
@@ -402,21 +479,43 @@ vec3 lighting(
 		vec3 object_point, vec3 object_normal, vec3 direction_to_camera, 
 		Light light, Material mat) {
 
-	/** TODO 2.1: 
-	- compute the diffuse component
-	- make sure that the light is located in the correct side of the object
-	- compute the specular component 
-	- make sure that the reflected light shines towards the camera
-	- return the ouput color
-	*/
 
-	/** TODO 2.2: 
-	- shoot a shadow ray from the intersection point to the light
-	- check whether it intersects an object from the scene
-	- update the lighting accordingly
-	*/
+	direction_to_camera = normalize(direction_to_camera);
+	object_normal = normalize(object_normal);
 
-	return vec3(0.);
+	// 2.2: Implement shadows
+	float ANTI_ACNEE_FACTOR = 0.001;	
+	vec3 ray_direction = normalize(light.position - object_point);
+	vec3 ray_origin = object_point + ANTI_ACNEE_FACTOR * object_normal;
+	float col_distance;
+	vec3 col_normal = vec3(0.);
+	int mat_id = 0;
+
+	if(ray_intersection(ray_origin, ray_direction, col_distance, col_normal, mat_id)){
+		if(col_distance + ANTI_ACNEE_FACTOR  <= length(light.position - object_point)){
+			return vec3(0.);
+		}
+	}
+
+	// 2.1: Implement Phong Lighting
+	vec3 l = normalize(light.position - object_point);
+
+	vec3 diffuse = vec3(0.,0.,0.);
+	vec3 specular = vec3(0.,0.,0.);
+
+	// Positive only if the normal pointing toward the camera point toward the light as well
+	// meaning that the light shine on the visible side of the surface
+	if(dot(object_normal, l) > 0.){
+		diffuse =  light.color * mat.color * mat.diffuse * dot(object_normal, l);
+		
+		vec3 r = normalize(reflect(-l, object_normal));
+
+		if(dot(r, direction_to_camera) >0.){
+			specular = mat.color * mat.specular * pow(dot(r, direction_to_camera), mat.shininess);
+		}
+	}
+	
+	return  diffuse + specular;
 }
 
 /*
@@ -444,37 +543,68 @@ void main() {
 
 	vec3 pix_color = vec3(0.);
 
-	/** TODO 2.1: 
-	- check whether the ray intersects an object in the scene
-	- if it does, compute the ambient contribution to the total intensity
-	- compute the intensity contribution from each light in the scene and store the sum in pix_color
+	// 2.1: 
+	// Before reflexion
+	/*
+	float col_distance;
+	vec3 col_normal = vec3(0.);
+	int mat_id = 0;
+
+
+	if(ray_intersection(ray_origin, ray_direction, col_distance, col_normal, mat_id)){
+		Material mat = get_mat2(mat_id);
+
+		vec3 intersectionPoint = ray_origin + col_distance * ray_direction;
+		
+		vec3 ambient_light = mat.color * mat.ambient * light_color_ambient;
+		pix_color += ambient_light;
+
+		#if NUM_LIGHTS != 0
+		for(int i = 0; i < NUM_LIGHTS; ++i){
+			vec3 lights_effect = lighting(intersectionPoint, col_normal, -ray_direction, lights[i], mat);			
+			
+			pix_color += lights_effect;
+		}
+		#endif
+	}
 	*/
 
-	/** TODO 2.3.2: 
-	- create an outer loop on the number of reflections (see below for a suggested structure)
-	- compute lighting with the current ray (might be reflected)
-	- use the above formula for blending the current pixel color with the reflected one
-	- update ray origin and direction
-
-	We suggest you structure your code in the following way:
-
-	vec3 pix_color          = vec3(0.);
-	float reflection_weight = ...;
+	// 2.3.2: 
+	float ANTI_ACNEE_FACTOR = 0.001;	
+	float reflection_weight = 1.;
 
 	for(int i_reflection = 0; i_reflection < NUM_REFLECTIONS+1; i_reflection++) {
 		float col_distance;
 		vec3 col_normal = vec3(0.);
-		int mat_id      = 0;
+		int mat_id = 0;
 
-		...
+		// For NUM_REFLECTIONS times we compute the next intersection
+		if(ray_intersection(ray_origin, ray_direction, col_distance, col_normal, mat_id)){
+			Material mat = get_mat2(mat_id);
 
-		Material m = get_mat2(mat_id); // get material of the intersected object
+			// Color of the current pixel (without further reflexion)
+			vec3 ci = vec3(0.);
 
-		ray_origin        = ...;
-		ray_direction     = ...;
-		reflection_weight = ...;
-	}
-	*/
+			vec3 intersectionPoint = ray_origin + col_distance * ray_direction;
+			vec3 ambient_light = mat.color * mat.ambient * light_color_ambient;
+
+			ci += ambient_light;
+
+			#if NUM_LIGHTS != 0
+			for(int i = 0; i < NUM_LIGHTS; ++i){
+				vec3 lights_effect = lighting(intersectionPoint, col_normal, -ray_direction, lights[i], mat);
+				ci += lights_effect;
+			}
+			#endif
+			
+			// Add the weighted pixel color
+			pix_color += (1.- mat.mirror) * reflection_weight * ci;
+
+			// Update for the next reflexion point
+			reflection_weight *= mat.mirror;
+			ray_origin = intersectionPoint + ANTI_ACNEE_FACTOR * col_normal;
+			ray_direction = normalize(reflect(ray_direction, col_normal));
+		}
 
 	float col_distance;
 	vec3 col_normal = vec3(0.);
