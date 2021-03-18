@@ -335,6 +335,50 @@ Triangle get_triangle(int idx) {
 }
 #endif
 
+
+
+/*
+	Compute the determinant of a 3x3 matrix.
+*/
+float compute_det(mat3 A){
+
+	//In openGL, rows and columns are inverted
+	vec3 a = vec3(A[0][0], A[1][0], A[2][0]); // The first row
+	vec3 b = vec3(A[0][1], A[1][1], A[2][1]); // The middle row
+	vec3 c = vec3(A[0][2], A[1][2], A[2][2]); //The last row
+
+	return dot(a, cross(b, c));
+}
+
+/*
+	Solve a linear algebra system with 3 unknowns of the form Ax = b,
+	where x is the vector of unknown, using Cramer's formula. Return false
+	if the system doesn't have a unique solution and true if it does.
+	If the system has a unique solution, return it in x.
+*/
+bool solve_with_cramer(mat3 A, vec3 b, out vec3 x){
+
+	float detA = compute_det(A);
+	
+	if(abs(detA) > 1e-12){ //The system has a unique solution
+		
+		mat3 A1 = mat3(b, A[1], A[2]);
+		mat3 A2 = mat3(A[0], b, A[2]);
+		mat3 A3 = mat3(A[0], A[1], b);
+
+		float x1 = compute_det(A1)/detA;
+		float x2 = compute_det(A2)/detA;
+		float x3 = compute_det(A3)/detA;
+
+		x = vec3(x1,x2,x3);
+		return true;
+	}
+	else{//The system doesn't have a unique solution
+		return false;
+	}
+	
+}
+
 bool ray_triangle_intersection(
 		vec3 ray_origin, vec3 ray_direction, 
 		Triangle tri,
@@ -363,7 +407,34 @@ bool ray_triangle_intersection(
 	vec3 intersection_point;
 	t = MAX_RANGE + 10.;
 
-	return false;
+	
+	mat3 A = mat3(p0-p2, p1-p2, -ray_direction);
+	vec3 b = ray_origin - p2;
+	vec3 x = vec3(0.);
+
+	if(!solve_with_cramer(A,b,x)){//The system doesn't have a unique solution
+		return false;
+	}
+	else{
+		if(x[2]<0.){
+			return false;
+		}
+		float alpha = x[0];
+		float beta = x[1];
+		float gamma = 1.-alpha-beta;
+		t=x[2];
+
+		#if defined FLAT_SHADING_STRATEGY
+		normal = normal_towards_viewer(cross(p1-p0, p2-p0), ray_direction);
+		#endif
+
+		#if defined PHONG_SHADING_STRATEGY
+		normal = normalize(alpha*tri.vertex_normals[0] + beta* tri.vertex_normals[1] + gamma * tri.vertex_normals[2]);
+		#endif
+
+
+		return true;
+	}
 }
 
 
@@ -605,7 +676,8 @@ void main() {
 			ray_origin = intersectionPoint + ANTI_ACNEE_FACTOR * col_normal;
 			ray_direction = normalize(reflect(ray_direction, col_normal));
 		}
-
+	}
+	
 	float col_distance;
 	vec3 col_normal = vec3(0.);
 	int mat_id      = 0;
@@ -621,4 +693,5 @@ void main() {
 
 	gl_FragColor = vec4(pix_color, 1.);
 	//gl_FragColor *= sin(5.*col_distance);
+	
 }
