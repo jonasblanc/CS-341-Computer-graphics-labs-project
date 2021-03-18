@@ -302,6 +302,7 @@ bool ray_cylinder_intersection(
 
 
 
+
 bool ray_AABB_filter(
 	vec3 ray_origin, vec3 ray_direction, AABB aabb)
 {
@@ -311,7 +312,25 @@ bool ray_AABB_filter(
 	- return whether the bounding box is intersected by the ray or not
 	*/
 
-	return true;
+	ray_direction = normalize(ray_direction);
+	
+	float tMin = 0;
+	float tMax = MAX_RANGE + 10.;
+
+	for(int i = 0; i < 3; ++i){
+		if(ray_direction[i] == 0){
+			if(OMin[0] > 0 || OMax[0] < 0)){
+				return false;
+			}else{
+				continue;
+			}
+		}else{
+			tMax = min(OMax[i] / ray_direction[i], tMax);
+			tMin = max(OMax[i] / ray_direction[i], tMin);
+		}
+	}
+
+	return tMin <= tMax;
 }
 
 
@@ -543,32 +562,6 @@ void main() {
 
 	vec3 pix_color = vec3(0.);
 
-	// 2.1: 
-	// Before reflexion
-	/*
-	float col_distance;
-	vec3 col_normal = vec3(0.);
-	int mat_id = 0;
-
-
-	if(ray_intersection(ray_origin, ray_direction, col_distance, col_normal, mat_id)){
-		Material mat = get_mat2(mat_id);
-
-		vec3 intersectionPoint = ray_origin + col_distance * ray_direction;
-		
-		vec3 ambient_light = mat.color * mat.ambient * light_color_ambient;
-		pix_color += ambient_light;
-
-		#if NUM_LIGHTS != 0
-		for(int i = 0; i < NUM_LIGHTS; ++i){
-			vec3 lights_effect = lighting(intersectionPoint, col_normal, -ray_direction, lights[i], mat);			
-			
-			pix_color += lights_effect;
-		}
-		#endif
-	}
-	*/
-
 	// 2.3.2: 
 	float ANTI_ACNEE_FACTOR = 0.001;	
 	float reflection_weight = 1.;
@@ -605,6 +598,7 @@ void main() {
 			ray_origin = intersectionPoint + ANTI_ACNEE_FACTOR * col_normal;
 			ray_direction = normalize(reflect(ray_direction, col_normal));
 		}
+	}
 
 	float col_distance;
 	vec3 col_normal = vec3(0.);
