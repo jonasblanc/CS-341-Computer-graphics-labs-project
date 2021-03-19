@@ -7,7 +7,7 @@ function get_vert(mesh, vert_id) {
     .map(function (x) {
       return mesh.scale * x;
     });
-  return vec3.add([0, 0, 0], scaled_vertex, mesh.offset);
+  return vec3.add([0., 0., 0.], scaled_vertex, mesh.offset);
 }
 
 export function compute_triangle_normals_and_angle_weights(mesh) {
@@ -31,19 +31,19 @@ export function compute_triangle_normals_and_angle_weights(mesh) {
 
     // Compute normal
 
-    const E13 = vec3.subtract([0, 0, 0], vert3, vert1);
-    const E12 = vec3.subtract([0, 0, 0], vert2, vert1);
-    const normal = vec3.normalize([0, 0, 0], vec3.cross([0, 0, 0], E12, E13));
+    const E13 = vec3.subtract([0., 0., 0.], vert3, vert1);
+    const E12 = vec3.subtract([0., 0., 0.], vert2, vert1);
+    const normal = vec3.normalize([0., 0., 0.], vec3.cross([0., 0., 0.], E12, E13));
 
     // Compute weight
     const w1 = vec3.angle(E13, E12);
     const w2 = vec3.angle(
-      vec3.subtract([0, 0, 0], vert1, vert2),
-      vec3.subtract([0, 0, 0], vert3, vert2)
+      vec3.subtract([0., 0., 0.], vert1, vert2),
+      vec3.subtract([0., 0., 0.], vert3, vert2)
     );
     const w3 = vec3.angle(
-      vec3.subtract([0, 0, 0], vert1, vert3),
-      vec3.subtract([0, 0, 0], vert2, vert3)
+      vec3.subtract([0., 0., 0.], vert1, vert3),
+      vec3.subtract([0., 0., 0.], vert2, vert3)
     );
 
     // Modify the way triangle normals and angle_weights are computed
@@ -62,7 +62,7 @@ export function compute_vertex_normals(mesh, tri_normals, angle_weights) {
 
   const num_faces = (mesh.tris.indices.length / 3) | 0;
   const num_vertices = (mesh.tris.vertices.length / 3) | 0;
-  let vertex_normals = Array(num_vertices).fill([0, 0, 0]);
+  let vertex_normals = Array(num_vertices).fill([0., 0., 0.]);
 
   for (let i_face = 0; i_face < num_faces; i_face++) {
     const iv1 = mesh.tris.indices[3 * i_face + 0];
@@ -91,7 +91,7 @@ export function compute_vertex_normals(mesh, tri_normals, angle_weights) {
     // Normalize the vertices
 
     vertex_normals[i_vertex] = vec3.normalize(
-      [0, 0, 0],
+      [0., 0., 0.],
       vertex_normals[i_vertex]
     );
   }

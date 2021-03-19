@@ -438,11 +438,12 @@ bool ray_triangle_intersection(
 		float beta = x[1];
 		float gamma = 1. - alpha - beta;
 		
-		if(alpha < 0. || beta < 0. || gamma < 0.){
+		if(alpha < 0. || beta < 0. || gamma < 0. || alpha > 1. || beta > 1. || gamma > 1.){
 			return false;
 		}
 		
 		t = x[2];
+		// intersection_point =  ray_origin + ray_direction * t;
 
 		#if defined FLAT_SHADING_STRATEGY
 		normal = normal_towards_viewer(cross(p1-p0, p2-p0), ray_direction);
