@@ -314,25 +314,52 @@ bool ray_AABB_filter(
 
 	ray_direction = normalize(ray_direction);
 	
-	float tMin = 0.;
-	float tMax = MAX_RANGE + 10.;
+	// float tMin = 0.;
+	// float tMax = MAX_RANGE + 10.;
 
-	vec3 OMin = aabb.corner_min - ray_origin;
-	vec3 OMax = aabb.corner_max - ray_origin;
+	// vec3 OMin = aabb.corner_min - ray_origin;
+	// vec3 OMax = aabb.corner_max - ray_origin;
+
+	vec3 t_min = vec3(0.);
+	vec3 t_max = vec3(0.);
 
 
 	for(int i = 0; i < 3; ++i){
-		if(abs(ray_direction[i]) < 1e-12){
-			if(OMin[i] > 0. || OMax[i] < 0.){
-				return false;
-			}
-		}else{
-			tMax = min(OMax[i] / ray_direction[i], tMax);
-			tMin = max(OMin[i] / ray_direction[i], tMin);
+		t_min[i] = max(0.,(aabb.corner_min[i] - ray_origin[i])/ray_direction[i]);
+		t_max[i] = max(0.,(aabb.corner_max[i] - ray_origin[i])/ray_direction[i]);
+
+		if (t_min[i]>t_max[i]){ // should be useless
+			float tmp = t_min[i];
+			t_min[i] = t_max[i];
+			t_max[i] = tmp;
 		}
+		if(abs(t_max[i]-t_min[i]) < 1e-12 ){ //abs is useless || t_min <= t_max is useless
+			return false;
+		}
+
+		// if(abs(ray_direction[i]) < 1e-12){
+		// 	if(OMin[i] > 0. || OMax[i] < 0.){
+		// 		return false;
+		// 	}
+		// }else{
+		// 	tMax = min(OMax[i] / ray_direction[i], tMax);
+		// 	tMin = max(OMin[i] / ray_direction[i], tMin);
+		// }
+
 	}
 
-	return tMin <= tMax;
+	// if (t_min[0] <= ray_origin[0] && ray_origin[0] <= t_max[0]
+	// 	&& t_min[1] <= ray_origin[1] && ray_origin[1] <= t_max[1]
+	// 	&& t_min[2] <= ray_origin[2] && ray_origin[2] <= t_max[2]){
+	// 		return false;
+	// 	}
+
+	// return tMin <= tMax;
+	// return max(max(t_min[0],t_min[1]),t_min[2]) <= min(min(t_max[0],t_max[1]),t_max[2]);
+	//make sure intuition is right
+	//take 2 perpendicular sides of a cube, ray can intersect different sides at different times t
+
+	return true;
 }
 
 #if NUM_TRIANGLES != 0
@@ -438,11 +465,13 @@ bool ray_triangle_intersection(
 		float beta = x[1];
 		float gamma = 1. - alpha - beta;
 		
-		if(alpha < 0. || beta < 0. || gamma < 0.){
+		// useless to check if alpha > 1. || beta > 1. || gamma > 1. (it is done implicitly)
+		if(alpha < 0. || beta < 0. || gamma < 0. ){
 			return false;
 		}
 		
 		t = x[2];
+		// intersection_point =  ray_origin + ray_direction * t;
 
 		#if defined FLAT_SHADING_STRATEGY
 		normal = normal_towards_viewer(cross(p1-p0, p2-p0), ray_direction);
@@ -450,6 +479,7 @@ bool ray_triangle_intersection(
 
 		#if defined PHONG_SHADING_STRATEGY
 		normal = normalize(alpha * tri.vertex_normals[0] + beta * tri.vertex_normals[1] + gamma * tri.vertex_normals[2]);
+		// normal = alpha * normalize(tri.vertex_normals[0]) + beta * normalize(tri.vertex_normals[1])+ gamma * normalize(tri.vertex_normals[2]);
 		#endif
 
 
