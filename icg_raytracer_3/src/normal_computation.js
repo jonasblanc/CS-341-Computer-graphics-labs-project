@@ -37,14 +37,14 @@ export function compute_triangle_normals_and_angle_weights(mesh) {
 
     // Compute weight
     const w1 = vec3.angle(E13, E12);
-    const w2 = vec3.angle(
-      vec3.subtract([0., 0., 0.], vert1, vert2),
-      vec3.subtract([0., 0., 0.], vert3, vert2)
-    );
-    const w3 = vec3.angle(
-      vec3.subtract([0., 0., 0.], vert1, vert3),
-      vec3.subtract([0., 0., 0.], vert2, vert3)
-    );
+
+    const E21 = vec3.subtract([0., 0., 0.], vert1, vert2);
+    const E23 = vec3.subtract([0., 0., 0.], vert3, vert2);
+    const w2 = vec3.angle(E21, E23);
+
+    const E31 = vec3.subtract([0., 0., 0.], vert1, vert3);
+    const E32 = vec3.subtract([0., 0., 0.], vert2, vert3);
+    const w3 = vec3.angle(E32, E31);
 
     // Modify the way triangle normals and angle_weights are computed
     tri_normals.push(normal);
@@ -68,8 +68,6 @@ export function compute_vertex_normals(mesh, tri_normals, angle_weights) {
     const iv1 = mesh.tris.indices[3 * i_face + 0];
     const iv2 = mesh.tris.indices[3 * i_face + 1];
     const iv3 = mesh.tris.indices[3 * i_face + 2];
-
-
 
     // vec3.add(vertex_normals[iv1], vertex_normals[iv1], tri_normals[i_face].map(function(x) { return x * angle_weights[i_face][0]; } ))
     // vec3.add(vertex_normals[iv2], vertex_normals[iv2], tri_normals[i_face].map(function(x) { return x * angle_weights[i_face][1]; } ))
