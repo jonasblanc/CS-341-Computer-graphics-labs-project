@@ -338,7 +338,7 @@ bool ray_AABB_filter(
 			t_min[i] = t_max[i];
 			t_max[i] = tmp;
 		}
-		if(abs(t_max[i]-t_min[i]) < 1e-12 ){ /
+		if(abs(t_max[i]-t_min[i]) < 1e-12 ){
 			return false;
 		}
 	}
@@ -451,13 +451,11 @@ bool ray_triangle_intersection(
 		float beta = x[1];
 		float gamma = 1. - alpha - beta;
 		
-		// useless to check if alpha > 1. || beta > 1. || gamma > 1. (it is done implicitly)
 		if(alpha < 0. || beta < 0. || gamma < 0. ){
 			return false;
 		}
 		
 		t = x[2];
-		// intersection_point =  ray_origin + ray_direction * t;
 
 		#if defined FLAT_SHADING_STRATEGY
 		normal = normal_towards_viewer(cross(p1-p0, p2-p0), ray_direction);
