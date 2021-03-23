@@ -1,14 +1,14 @@
 **Task 3.1.1: Compute triangle normals and opening angles**
 
-We used vec3 substract and angle methode to first compute the vectors between the vertices and then the corresponding angles. 
+We used vec3 substract and angle methods to first compute the vectors between the vertices and then the corresponding angles. 
 The normal was obtained by a cross product of two of those vectors.
 
 **Task 3.1.2: Compute vertex normals**
 
-We added the contribution of each faces to each vertex linked to that triangles weighted by the openning angle.
-Our very first version had the right "idea" but because of broken arithmetic with js and vec3 we had weird results.
+We added the contribution of each face to each vertex (of to the corresponding triangle) weighted by the opening angle.
+Our very first version had the right "idea" but didn't provide the correct results due to broken arithmetics with js and vec3.
 We spent hours trying to understand where the bug was coming from, reading our code again and again.
-We did as much version of the same computation as we could imagine, until this one which apparently is finally fully correctly undertsood. 
+We tried doing the same computations in as many different ways as we could come up with, all to no avail. Finally, we found out that the operator += wasn't doing what we supposed it would do. Therefore we were able to fix our implementation ang get the correct results.
 
 **Task 3.2.1: Implement ray-triangle intersection**
 
@@ -19,7 +19,7 @@ After having solved the equation, we check that t is bigger or equal to 0, so th
 
 **Task 3.2.2: Implement flat and Phong shading strategies**
 
-To implement flat and Phong shading, we just had to first chech which mode was used (#if defined). Then we computed the normal either by taking the cross product between two side of the triangle (which will give the vector perpendicular to both sides, i.e. the normal) and normalizing it in case of flat shading, or by adding the 3 vertex normals using alpha, beta and gamma as weights in case of Phong shading.
+To implement flat and Phong shading, we just had to first check which mode was used (#if defined). Then we computed the normal either by taking the cross product between two side of the triangle (which will give the vector perpendicular to both sides, i.e. the normal) and normalizing it in case of flat shading, or by adding the 3 vertex normals using alpha, beta and gamma as weights in case of Phong shading.
 
 **Task 3.3: Implement Bounding Box intersection""
 
