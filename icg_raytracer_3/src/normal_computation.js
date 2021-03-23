@@ -77,6 +77,16 @@ export function compute_vertex_normals(mesh, tri_normals, angle_weights) {
     // vertex_normals[iv3] += tri_normals[i_face].map(function(x) { return x * angle_weights[i_face][2]; });
 
     // Add your code for adding the contribution of the current triangle to its vertices' normals
+    const v1n = [tri_normals[i_face][0] * angle_weights[i_face][0], tri_normals[i_face][1] * angle_weights[i_face][0], tri_normals[i_face][2] * angle_weights[i_face][0]];
+    const v2n = [tri_normals[i_face][0] * angle_weights[i_face][1], tri_normals[i_face][1] * angle_weights[i_face][1], tri_normals[i_face][2] * angle_weights[i_face][1]];
+    const v3n = [tri_normals[i_face][0] * angle_weights[i_face][2], tri_normals[i_face][1] * angle_weights[i_face][2], tri_normals[i_face][2] * angle_weights[i_face][2]];
+
+    vertex_normals[iv1] = vec3.add([0.,0.,0.], vertex_normals[iv1], v1n);
+    vertex_normals[iv2] = vec3.add([0.,0.,0.], vertex_normals[iv2], v2n);
+    vertex_normals[iv3] = vec3.add([0.,0.,0.], vertex_normals[iv3], v3n);
+
+    
+    /*
     vertex_normals[iv1][0] += tri_normals[i_face][0] * angle_weights[i_face][0];
     vertex_normals[iv1][1] += tri_normals[i_face][1] * angle_weights[i_face][0];
     vertex_normals[iv1][2] += tri_normals[i_face][2] * angle_weights[i_face][0];
@@ -86,7 +96,7 @@ export function compute_vertex_normals(mesh, tri_normals, angle_weights) {
     vertex_normals[iv3][0] += tri_normals[i_face][0] * angle_weights[i_face][2];
     vertex_normals[iv3][1] += tri_normals[i_face][1] * angle_weights[i_face][2];
     vertex_normals[iv3][2] += tri_normals[i_face][2] * angle_weights[i_face][2];
-
+  */
     // vertex_normals[iv1] += tri_normals[i_face] * angle_weights[i_face][0];
     // vertex_normals[iv2] += tri_normals[i_face] * angle_weights[i_face][1];
     // vertex_normals[iv3] += tri_normals[i_face] * angle_weights[i_face][2];
