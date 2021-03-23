@@ -27,8 +27,8 @@ Basically we want to check the equation p_m <= x <= p_M component wise, where p_
 In our case x = o + td, where o is the ray_origin  and d the ray_direction.
 The above equation becomes (p_m - o)/d <= t <= (p_M - o)/d, which we are still computing component wise.
 The first if-else statement is there to treat the case of a division by zero when one of the components of the ray_direction is 0.
-Then, we make sur t_min <= t_max (component wise), otherwise we swap them.
-At this point, we have three diffrenet intervals for t, (one for each component). And we make sure that the intersection of these 3 intervals is not empty.
+Then, we make sure t_min <= t_max (component wise), otherwise we swap them.
+At this point, we have three different intervals for t, (one for each component). And we make sure that the intersection of these 3 intervals is not empty.
 In other words, that the range of the ray parameter (`t`) values which are included in the bounding box is not empty.
 
 
