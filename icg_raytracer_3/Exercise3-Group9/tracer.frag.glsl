@@ -338,9 +338,6 @@ bool ray_AABB_filter(
 			t_min[i] = t_max[i];
 			t_max[i] = tmp;
 		}
-		if(abs(t_max[i]-t_min[i]) < 1e-12 ){
-			return false;
-		}
 	}
 	float totalMax = min(t_max[0], min (t_max[1], t_max[2]));
 	float totalMin = max(t_min[0], max (t_min[1], t_min[2]));
