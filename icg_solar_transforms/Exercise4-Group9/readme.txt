@@ -25,6 +25,12 @@ To compute the view matrix, we first had to compute the look_at matrix. To creat
 
 **Task 4.2.3: Model matrix**
 
+To implement the solar system, we had to add a few transformations. The first that we apply is a scaling to have each planet with the right size. Then we apply a rotation so that each body rotates on itself. For this purpose, we used the sim_time that we multiplied by the rotation speed to obtain the angle. After that we translated each body by the radius of its orbit. Then, we added a rotation, so that each planet rotates around its orbit. Finally, we translated every planet that have a parent which had been translated (only the moon here), so that it lies at the right place in space. For this, we used the method getTranslation on the model_to_world matrix from the parent, which will only give us the translation vector. To apply all this transformations one after the other, we again used the given method mat4_matmul_many to multiply them all.
+
+**Remark**
+
+The 4 screenshots were taken with different zoom values and their name correspond to the planet on which the focus was.
+
 Workload:
 
 Zad: 1/3
