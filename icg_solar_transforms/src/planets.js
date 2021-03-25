@@ -1,4 +1,7 @@
 import {vec2, vec3, vec4, mat3, mat4} from "../lib/gl-matrix_3.3.0/esm/index.js"
+import { fromTranslation, translate } from "../lib/gl-matrix_3.3.0/esm/mat2d.js";
+import { fromRotationTranslation, fromZRotation } from "../lib/gl-matrix_3.3.0/esm/mat4.js";
+import { rotateAroundAxis } from "../lib/gl-matrix_3.3.0/esm/quat2.js";
 import {mat4_matmul_many} from "./icg_math.js"
 
 const PIPELINE_CACHE = {};
@@ -96,17 +99,32 @@ export class PlanetActor extends Actor {
 			mat4.fromScaling takes a 3D vector!
 		*/
 
-		//const M_orbit = mat4.create();
+		// const M_orbit = mat4.create();
+		let translated = mat4.identity(mat4.create());
+		let rotated = mat4.identity(mat4.create());
+		let parent_translation_v = mat4.identity(mat4.create());
 
 		if(this.orbits !== null) {
 			// Parent's translation
-			const parent_translation_v = mat4.getTranslation([0, 0, 0], this.orbits.mat_model_to_world);
-
+			parent_translation_v = mat4.getTranslation([0, 0, 0], this.orbits.mat_model_to_world);		
 			// Orbit around the parent
+			let radius = [this.orbit_radius, 0,0];
+			let angle = sim_time * this.orbit_speed + this.orbit_phase;
+			translated = fromTranslation(mat4.create(), radius);
+			rotated = fromZRotation(mat4.create(), angle);
+
 		} 
+		const angle = sim_time * this.rotation_speed; //check if is radians
+		const self_rotation = mat4.fromZRotation(mat4.create(), angle);
+
+		// let scale = vec3(this.size);
+		let scale = [this.size, this.size, this.size];
+		const scaled = mat4.fromScaling(mat4.create(), scale);
+
 		
 		// Store the combined transform in this.mat_model_to_world
-		//mat4_matmul_many(this.mat_model_to_world, ...);
+		// mat4_matmul_many(this.mat_model_to_world, parent_translation_v, rotated,translated, self_rotation, scaled);
+		mat4_matmul_many(this.mat_model_to_world,parent_translation_v, rotated,translated, self_rotation, scaled);
 
 	}
 
