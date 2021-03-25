@@ -81,8 +81,8 @@ async function main() {
 
 		void main() {
 			// TODO 4.1.1.1 Edit the vertex shader to apply mouse_offset translation to the vertex position.
-			// We have to return a vec4, because homogenous coordinates are being used.
-			gl_Position = vec4(position, 0, 1);
+			// We have to return a vec4, because homogenous coordinates are being used.;
+			gl_Position = vec4(position + mouse_offset, 0, 1);
 		}`,
 			
 		/* 
@@ -125,7 +125,9 @@ async function main() {
 
 		void main() {
 			// TODO 4.1.2.1 Edit the vertex shader to apply mat_transform to the vertex position.
-			gl_Position = vec4(position, 0, 1);
+			
+			vec4 hom_pos = vec4(position, 0.0, 1.0);
+			gl_Position = vec4(mat_transform * hom_pos);
 		}`,
 		
 		frag: `
@@ -183,6 +185,7 @@ async function main() {
 	const mat_translation = mat4.create();
 
 
+
 	// Function run to render a new frame
 	// This is the "arrow" syntax of defining a function https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions
 	regl.frame((frame) => {
@@ -195,8 +198,8 @@ async function main() {
 		// TODO 4.1.1.2 Draw the blue triangle translated by mouse_offset
 		
 		draw_triangle_with_offset({
-			mouse_offset: [0, 0],
-			color: [0.5, 0.5, 0.5],
+			mouse_offset: mouse_offset,
+			color: color_blue,
 		});
 
 		/*
@@ -208,15 +211,20 @@ async function main() {
 				* a red triangle spinning at [0.5, 0, 0]
 			You do not have to apply the mouse_offset to them.
 		*/
-		//draw_triangle_with_transform({
-		//	mat_transform: mat_transform,
-		//	color: [0.5, 0.5, 0.5],
-		//});
 
-		//draw_triangle_with_transform({
-		//	mat_transform: mat_transform,
-		//	color: [0.5, 0.5, 0.5],
-		//});
+		mat4.fromZRotation(mat_rotation, sim_time * 30 * Math.PI / 180);
+		mat4.fromTranslation(mat_translation, [0.5, 0, 0]);
+		
+
+		draw_triangle_with_transform({
+			mat_transform: mat4_matmul_many(mat_transform, mat_rotation, mat_translation),
+			color: color_green,
+		});
+
+		draw_triangle_with_transform({
+			mat_transform: mat4_matmul_many(mat_transform, mat_translation, mat_rotation),
+			color: color_red,
+		});
 
 		// You can write whatever you need in the debug box
 		debug_text.textContent = `
