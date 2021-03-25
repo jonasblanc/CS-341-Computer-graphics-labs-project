@@ -99,19 +99,22 @@ export class PlanetActor extends Actor {
 			mat4.fromScaling takes a 3D vector!
 		*/
 
-		// const M_orbit = mat4.create();
-		let translated = mat4.identity(mat4.create());
-		let rotated = mat4.identity(mat4.create());
+		//const M_orbit = mat4.create();
+		let parent_orbit_translate = mat4.identity(mat4.create());
+		let orbit_translate = mat4.identity(mat4.create());
+		let orbit_rotate = mat4.identity(mat4.create());
 		let parent_translation_v = mat4.identity(mat4.create());
 
 		if(this.orbits !== null) {
 			// Parent's translation
 			parent_translation_v = mat4.getTranslation([0, 0, 0], this.orbits.mat_model_to_world);		
+			parent_orbit_translate = mat4.fromTranslation(mat4.create(), parent_translation_v);
+
 			// Orbit around the parent
-			let radius = [this.orbit_radius, 0,0];
-			let angle = sim_time * this.orbit_speed + this.orbit_phase;
-			translated = fromTranslation(mat4.create(), radius);
-			rotated = fromZRotation(mat4.create(), angle);
+			orbit_translate = mat4.fromTranslation(mat4.create(), [this.orbit_radius, 0, 0]);
+
+			const angle = sim_time * this.orbit_speed + this.orbit_phase;
+			orbit_rotate = mat4.fromZRotation(mat4.create(), angle);
 
 		} 
 		const angle = sim_time * this.rotation_speed; //check if is radians
@@ -123,8 +126,8 @@ export class PlanetActor extends Actor {
 
 		
 		// Store the combined transform in this.mat_model_to_world
-		// mat4_matmul_many(this.mat_model_to_world, parent_translation_v, rotated,translated, self_rotation, scaled);
-		mat4_matmul_many(this.mat_model_to_world,parent_translation_v, rotated,translated, self_rotation, scaled);
+		mat4_matmul_many(this.mat_model_to_world, parent_orbit_translate, orbit_rotate, orbit_translate, self_rotation, scaled);
+
 
 	}
 
