@@ -16,8 +16,12 @@ For the red triangle, we first want to rotate the triangle and then to translate
 For the green triangle, we first want to translate the triangle and then to rotate it.
 
 **Task 4.2.1: MVP matrix**
+To apply the mvp matrix, we just had to multiply our position vector by the mvp matrix.
+To compute the mvp matrix, we just had to multiply the matrixes for the projection, the view and the model using the given method mat4_matmul_many.
 
 **Task 4.2.2: View matrix**
+
+To compute the view matrix, we first had to compute the look_at matrix. To create it, we placed on the first row the vector which corresponds to the camera postion which is on the x axis at a distance -r from the origin, then the view target which is the origin as second row and finally the up vector which must be perpendicular to the vector going from the camera to the origin watching up, thus along the z axis for the last row. To combine it with the rotations created by the mouse, we just had to multiply it with two rotations matrixes, one around y from cam_angle_y degree and one around z from cam_angle_z.
 
 **Task 4.2.3: Model matrix**
 
