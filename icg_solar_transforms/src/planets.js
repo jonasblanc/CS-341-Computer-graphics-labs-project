@@ -119,6 +119,7 @@ export class PlanetActor extends Actor {
 			mat_mvp: this.mat_mvp,
 			tex_base_color: this.texture,
 		});
+		mat4_matmul_many(this.mat_mvp, mat_projection, mat_view, this.mat_model_to_world);		
 	}
 }
 
