@@ -25,4 +25,24 @@ void main() {
     * value
      */
 	gl_FragColor = vec4(light_color, 1.); // output: RGBA in 0..1 range
+
+    vec3 m_ambient_diffuse_specular = texture(texture_base_color, v2f_tex_coord).rgb;
+
+	vec3 l = normalize(v2f_dir_to_light);
+    vec3 diffuse_factor = dot(v2f_normal, l); //n*l
+    vec3 r = normalize(reflect(-l, v2f_normal));
+    vec3 v = -normalize(v2f_dir_from_view);
+    vec3 specular_factor = dot(r, v);
+
+    vec3 Ia = ambient * light_color;
+
+    color = Ia * m_ambient_diffuse_specular;
+
+    if(diffuse_factor>0.0){
+        color += light_color * m_ambient_diffuse_specular * diffuse_factor
+        if(specular_factor>0.0){
+            color += light_color * m_ambient_diffuse_specular * pow(specular_factor, shininess)
+        }
+    }
+
 }
