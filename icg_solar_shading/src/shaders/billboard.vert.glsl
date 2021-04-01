@@ -12,4 +12,6 @@ void main() {
 	// TODO 4.2.1.1: Edit the vertex shader to apply mat_mvp to the vertex position.
 	// Copy your from your previous homework
 	gl_Position = vec4(position, 1);
+	gl_Position = mat_mvp * gl_Position;
+
 }

@@ -109,15 +109,18 @@ async function main() {
 		* cam_angle_y - camera ray's angle around the Y axis
 		*/
 
-		// Example camera matrix, looking along forward-X, edit this
+		let r = cam_distance_base * cam_distance_factor;
 		const look_at = mat4.lookAt(mat4.create(), 
-			[-5, 0, 0], // camera position in world coord
-			[0, 0, 0], // view target point
-			[0, 0, 1], // up vector
+			[-r,0,0], // camera position in world coord
+			[0,0,0], // view target point
+			[0,0,1], // up vector
 		);
+		let rotatedY = mat4.fromYRotation(mat4.create(), cam_angle_y);
+		let rotatedZ = mat4.fromZRotation(mat4.create(), cam_angle_z);
+
 		// Store the combined transform in mat_world_to_cam
 		// mat_world_to_cam = A * B * ...
-		mat4_matmul_many(mat_world_to_cam, look_at); // edit this
+		mat4_matmul_many(mat_world_to_cam,  look_at, rotatedY, rotatedZ); // edit this
 	}
 
 	update_cam_transform();
@@ -278,7 +281,7 @@ async function main() {
 	// List of objects to draw
 	const draw_list = actors_list.slice();
 	draw_list.push(grid_actor_interface);
-	//draw_list.push(billboard); //add the billboard object
+	draw_list.push(billboard); //add the billboard object
 
 	// Consider the sun, which locates at [0, 0, 0], as the only light source
 	const light_position_world = [0, 0, 0, 1];
