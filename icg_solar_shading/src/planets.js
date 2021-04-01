@@ -198,7 +198,7 @@ export class PhongActor extends PlanetActor {
 	// }
 
 	draw({mat_projection, mat_view, light_position_cam, sim_time}) {
-		super.calculate_model_matrix({sim_time})
+		super.calculate_model_matrix({sim_time:sim_time});
 
 		mat3.fromMat4(this.mat_normals, this.mat_model_view);
 		mat3.transpose(this.mat_normals, this.mat_normals);

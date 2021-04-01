@@ -24,25 +24,30 @@ void main() {
     * `texture(...).r` to get just the red component or `texture(...).rgb` to get a vec3 color
     * value
      */
-	gl_FragColor = vec4(light_color, 1.); // output: RGBA in 0..1 range
     
 	vec3 m_ambient_diffuse_specular = texture2D(texture_base_color, v2f_tex_coord).rgb;
 
 	vec3 l = normalize(v2f_dir_to_light);
-    float diffuse_factor = dot(v2f_normal, l); //n*l
     vec3 r = normalize(reflect(-l, v2f_normal));
     vec3 v = -normalize(v2f_dir_from_view);
-    float specular_factor = dot(r, v);
+    
+    float nl = dot(v2f_normal, l);
+    float rv = dot(r, v);
 
-    vec3 Ia = ambient * light_color;
+    vec3 ambiant = ambient * light_color * m_ambient_diffuse_specular;
+    vec3 diffuse = light_color * m_ambient_diffuse_specular * nl;
+    vec3 specular = light_color * m_ambient_diffuse_specular * pow(rv, shininess);
 
-    color = Ia * m_ambient_diffuse_specular;
+    vec3 color = ambiant;
 
-    if(diffuse_factor>0.0){
-        color += light_color * m_ambient_diffuse_specular * diffuse_factor
-        if(specular_factor>0.0){
-            color += light_color * m_ambient_diffuse_specular * pow(specular_factor, shininess)
+    if(nl > 0.0){
+        color += diffuse;
+        if(rv > 0.0){
+            color += specular;
         }
     }
+
+    gl_FragColor = vec4(color, 1.); // output: RGBA in 0..1 range
+
 
 }

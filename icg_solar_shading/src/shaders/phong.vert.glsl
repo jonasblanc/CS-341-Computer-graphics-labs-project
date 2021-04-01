@@ -31,18 +31,18 @@ void main() {
 	
 	// viewing vector (from camera to vertex in view coordinates), camera is at vec3(0, 0, 0) in cam coords
 	//v2f_dir_from_view = vec3(1, 0, 0); // TODO calculate
+
 	vec4 dir_from_view_4D = mat_model_view * vec4(position, 1);//It is just the position in view system since the camera is at origin
-	v2f_dir_from_view = dir_from_view_4D.xyz();
+	v2f_dir_from_view = vec3(dir_from_view_4D);
 
 	// direction to light source
 	//v2f_dir_to_light = vec3(0, 1, 0); // TODO calculate
-	v2f_dir_to_light = light_position.xyz()-v2f_dir_from_view;//Vector from vertex to light
+	v2f_dir_to_light = vec3(light_position) - v2f_dir_from_view;//Vector from vertex to light
 	
 	// transform normal to camera coordinates
-	v2f_normal = normal; // TODO apply normal transformation
-	v2f_normal = normalize(mat_normals * v2f_normal);
+	v2f_normal = normalize(mat_normals * normal);
 	
-	gl_Position = vec4(position, 1); // TODO apply mvp matrix
-	gl_Position = mat_mvp * gl_Position;
+	// TODO apply mvp matrix
+	gl_Position = mat_mvp * vec4(position, 1);
 
 }
