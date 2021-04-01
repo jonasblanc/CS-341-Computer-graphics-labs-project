@@ -365,7 +365,7 @@ async function main() {
 			try {
 				actor.draw(draw_info)
 			} catch (e) {
-				console.error('Error when rendering actor:', actor);
+				console.error('Error when rendering actor: ', actor);
 				throw e;
 			}
 

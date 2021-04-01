@@ -344,8 +344,20 @@ export class SunBillboardActor extends Actor {
 			// For rendering transparent objects and blending it with the background color, please refer to https://learnopengl.com/Advanced-OpenGL/Blending
 			// For using the regl blending API, please refer to https://github.com/regl-project/regl/blob/master/API.md#blending
 			blend : {
-
+				enable: true,
+				func: {
+					srcRGB: 'src alpha',
+					srcAlpha: 1,
+					dstRGB: 'one minus src alpha',
+					dstAlpha: 1
+				  },
+				  equation: {
+					rgb: 'add',
+					alpha: 'add'
+				  },
+				  color: [0, 0, 0, 0]
 			}
+		
 		}));
 	}
 
@@ -359,16 +371,25 @@ export class SunBillboardActor extends Actor {
 	calculate_model_matrix({camera_position}) {
 
 		// TODO 5.1.1: Compute the this.mat_model_to_world, which makes the normal of the billboard always point to our eye.
-		mat4.identity(this.mat_model_to_world)
+		mat4.identity(this.mat_model_to_world);
+		
+		const z_axis = [0.,0.,1.];
+		const angle = vec3.angle(z_axis, camera_position);
+		const axis = vec3.cross([0., 0., 0.], z_axis, camera_position);
+
+		const scaleMatrix = mat4.fromScaling(mat4.create(), [this.size, this.size, this.size])
+		const rotationMatrix = mat4.fromRotation(mat4.create(), angle, axis);
+		mat4_matmul_many(this.mat_model_to_world, rotationMatrix, scaleMatrix);
 
 	}
 
 	draw({mat_projection, mat_view}) {
 		//mat4_matmul_many(this.mat_mvp, ...);
 
+		mat4_matmul_many(this.mat_mvp, mat_projection, mat_view, this.mat_model_to_world);
+
 		this.pipeline({
 			mat_mvp: this.mat_mvp,
 		});
-		mat4_matmul_many(this.mat_mvp, mat_projection, mat_view, this.mat_model_to_world);
 	}
 }
