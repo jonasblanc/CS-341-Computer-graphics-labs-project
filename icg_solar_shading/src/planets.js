@@ -124,8 +124,6 @@ export class PlanetActor extends Actor {
 		
 		// Store the combined transform in this.mat_model_to_world
 		mat4_matmul_many(this.mat_model_to_world, parent_orbit_translate, orbit_rotate, orbit_translate, self_rotation, scaled);
-
-
 	}
 
 	draw({mat_projection, mat_view}) {
@@ -133,12 +131,12 @@ export class PlanetActor extends Actor {
 		// Calculate mat_mvp: model-view-projection matrix
 		//mat4_matmul_many(this.mat_mvp, ...);
 
+		mat4_matmul_many(this.mat_mvp, mat_projection, mat_view, this.mat_model_to_world);
+
 		this.pipeline({
 			mat_mvp: this.mat_mvp,
 			tex_base_color: this.texture,
 		});
-		mat4_matmul_many(this.mat_mvp, mat_projection, mat_view, this.mat_model_to_world); //copied that from prev execise (should we do it?)
-
 	}
 }
 
@@ -200,10 +198,14 @@ export class PhongActor extends PlanetActor {
 	// }
 
 	draw({mat_projection, mat_view, light_position_cam, sim_time}) {
+		super.calculate_model_matrix({sim_time})
 
 		mat3.fromMat4(this.mat_normals, this.mat_model_view);
 		mat3.transpose(this.mat_normals, this.mat_normals);
 		mat3.invert(this.mat_normals, this.mat_normals);
+
+
+		mat4_matmul_many(this.mat_mvp, mat_projection, mat_view, this.mat_model_to_world);
 
 		this.pipeline({
 			mat_mvp: this.mat_mvp,
@@ -377,9 +379,8 @@ export class SunBillboardActor extends Actor {
 		const angle = vec3.angle(z_axis, camera_position);
 		const axis = vec3.cross([0., 0., 0.], z_axis, camera_position);
 
-		const scaleMatrix = mat4.fromScaling(mat4.create(), [this.size, this.size, this.size])
 		const rotationMatrix = mat4.fromRotation(mat4.create(), angle, axis);
-		mat4_matmul_many(this.mat_model_to_world, rotationMatrix, scaleMatrix);
+		mat4_matmul_many(this.mat_model_to_world, rotationMatrix, this.mat_scale);
 
 	}
 
