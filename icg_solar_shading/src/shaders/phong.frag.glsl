@@ -35,14 +35,14 @@ void main() {
     float rv = dot(r, v);
 
     vec3 ambiant = ambient * light_color * m_ambient_diffuse_specular;
-    vec3 diffuse = light_color * m_ambient_diffuse_specular * nl;
-    vec3 specular = light_color * m_ambient_diffuse_specular * pow(rv, shininess);
 
     vec3 color = ambiant;
 
     if(nl > 0.0){
+        vec3 diffuse = light_color * m_ambient_diffuse_specular * nl;
         color += diffuse;
         if(rv > 0.0){
+            vec3 specular = light_color * m_ambient_diffuse_specular * pow(rv, shininess);
             color += specular;
         }
     }
