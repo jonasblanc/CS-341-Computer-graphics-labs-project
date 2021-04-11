@@ -8,6 +8,12 @@
 
 **Task 5.2: Implement Phong Lighting**
 
+In planet.js, we simply computed mat_mvp and mat_model_view using matrix multiplication between the different matrices (projection, view, model) like last week.
+
+In phong.vert.glsl, we simply computed the different useful vectors. First, we compute the direction (camera to vertex in view coordinates) by multiplying the position by the model_view matrix. Since the camera is at origin, we don’t need to substract it and thus directly have the right vector. We then compute the direction to light by taking the light position minus the vector we computed before. We finally compute the normal in camera coordinates using the mat_normals matrix and the position by multiplying it the mvp matrix to have it in the right coordinates.
+
+In phong.frag.glsl, we use the vectors computed before to implement the phong lightning model. We first extract M_[a,d,s] from the texture. We then compute l, r and v as we did in the previous week and take care to normalize them. Then, we compute the ambiant term. If nl is bigger than 0 (light in front of the object), we add the diffuse term and if rv is bigger than 0, we also add the specular term to the color.
+
 **Task 5.3.1/2: Specularity & Colors**
 
 We start by extracting the color from the texture for these 3 textures:
