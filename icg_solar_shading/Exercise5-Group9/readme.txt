@@ -1,10 +1,31 @@
 **Task 5.1.0: Copy from Previous Homework**
 
+Since we are expert in "copy and paste" this part was trivial for us.
+
 **Task 5.1.1: Compute Billboard’s “model-to-world” matrix**
+
+In this part we want to scale and rotate the billboard normal toward the camera.
+Since the normal is initially along the z-axis we compute: 
+- the angle between the Z-axis and vector toward the camera
+- the axis of the rotation
+Then we create a rotation matrix with the angle and the axis.
+Finally we multiple a identity matrix by the rotation and then the scaling matrix.
+
+No problem on that part.
 
 **Task 5.1.2: Billboard Shader**
 
+In this part we need to decrease the opacity of the billboard exponentially outside the sun.
+We use a negative exponential in that regard. 
+We added the size of the sun to be able to decrease the intensity from the border of the sun and not from its center.
+We had to hardcode it since there no way of obtaining it.
+We added a factor to be able to modify the speed of the decreasing opacity.
+
 **Task 5.1.3: Blending the Color of Billboard and Background**
+
+We enabled the blending.
+We set the color and alpha of the destination and source.
+Finnally we choosed the "add" equations for both RGB and alpha.
 
 **Task 5.2: Implement Phong Lighting**
 

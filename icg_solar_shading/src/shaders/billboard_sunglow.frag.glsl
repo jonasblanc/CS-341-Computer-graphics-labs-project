@@ -15,9 +15,8 @@ void main()
 	if(distanceToBorder < 0.){
 		distanceToBorder = 0.;
 	}
+
 	float alpha = exp(-(distanceToBorder * factor));
-	
-	// Hardcode pour decrease à partir de l'exterieur du soleil
-	
+		
 	gl_FragColor = vec4(glow_color, alpha);
 }
