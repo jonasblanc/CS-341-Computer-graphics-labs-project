@@ -61,9 +61,9 @@ void main()
     if(nl > 0.0){
         color_day += diffuse_day;
         if(rv > 0.0){
-            if (texture2D(texture_gloss, v2f_tex_coord).r >= 0.5){
-                color_day = mix(color_day, specular_day, texture2D(texture_clouds, v2f_tex_coord).r);
-            }
+           if (texture2D(texture_gloss, v2f_tex_coord).r > 0.5){
+                color_day += mix(specular_day, color_day, texture2D(texture_clouds, v2f_tex_coord).r);
+           } 
         }
     }
 
@@ -80,6 +80,6 @@ void main()
     
     //-------Night------
     vec3 color_night = mix(m_ambient_diffuse_specular_night_light, vec3(0.0), texture2D(texture_clouds, v2f_tex_coord).r);
-    vec3 color = mix(color_day,color_night,(nl+1.0)/2.0);
-    gl_FragColor = vec4(color_day, 1.); // output: RGBA in 0..1 range
+    vec3 color = mix(color_night, color_day, (nl+1.0)/2.0);
+    gl_FragColor = vec4(color, 1.); // output: RGBA in 0..1 range
 }
