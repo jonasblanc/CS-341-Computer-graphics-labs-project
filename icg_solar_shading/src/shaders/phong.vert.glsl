@@ -38,9 +38,9 @@ void main() {
 	// direction to light source
 	//v2f_dir_to_light = vec3(0, 1, 0); // TODO calculate
 	v2f_dir_to_light = vec3(light_position) - v2f_dir_from_view;//Vector from vertex to light
-	
+
 	// transform normal to camera coordinates
-	v2f_normal = normalize(mat_normals * normal);
+	v2f_normal = normalize(mat_normals * normal); // TODO apply normal transformation
 	
 	// TODO apply mvp matrix
 	gl_Position = mat_mvp * vec4(position, 1);
