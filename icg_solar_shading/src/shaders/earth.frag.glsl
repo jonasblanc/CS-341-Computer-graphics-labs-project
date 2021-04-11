@@ -40,6 +40,46 @@ void main()
     * value
     * - use mix(vec3 a,vec3 b, s) = a*(1-s) + b*s for linear interpolation of two colors
      */
-	vec3 color_from_texture = texture2D(texture_surface_day, v2f_tex_coord).rgb;
-	gl_FragColor = vec4(color_from_texture, 1.); // output: RGBA in 0..1 range
+    vec3 m_ambient_diffuse_specular_day_light = texture2D(texture_surface_day,v2f_tex_coord).rgb;
+    vec3 m_ambient_diffuse_specular_night_light = texture2D(texture_surface_night,v2f_tex_coord).rgb;
+    vec3 m_ambient_diffuse_specular_cloud_light = texture2D(texture_clouds, v2f_tex_coord).rgb;
+    
+	vec3 l = normalize(v2f_dir_to_light);
+    vec3 r = normalize(reflect(-l, v2f_normal));
+    vec3 v = -normalize(v2f_dir_from_view);
+    
+    float nl = dot(v2f_normal, l);
+    float rv = dot(r, v);
+
+    //-------Day------
+    vec3 ambiant_day = ambient * light_color * m_ambient_diffuse_specular_day_light;
+    vec3 diffuse_day = light_color * m_ambient_diffuse_specular_day_light * nl;
+    vec3 specular_day = light_color * vec3(1.0) * pow(rv, shininess);
+
+    vec3 color_day = ambiant_day;
+
+    if(nl > 0.0){
+        color_day += diffuse_day;
+        if(rv > 0.0){
+            if (texture2D(texture_gloss, v2f_tex_coord).r >= 0.5){
+                color_day = mix(color_day, specular_day, texture2D(texture_clouds, v2f_tex_coord).r);
+            }
+        }
+    }
+
+    //-------Cloud------
+    vec3 ambiant_cloud = ambient * light_color * m_ambient_diffuse_specular_cloud_light;
+    vec3 diffuse_cloud = light_color * m_ambient_diffuse_specular_cloud_light * nl;
+
+    vec3 color_cloud = ambiant_cloud;
+    if(nl > 0.0){
+        color_cloud += diffuse_cloud;
+    }
+
+    color_day = mix(color_day, color_cloud, texture2D(texture_clouds, v2f_tex_coord).r);
+    
+    //-------Night------
+    vec3 color_night = mix(m_ambient_diffuse_specular_night_light, vec3(0.0), texture2D(texture_clouds, v2f_tex_coord).r);
+    vec3 color = mix(color_day,color_night,(nl+1.0)/2.0);
+    gl_FragColor = vec4(color_day, 1.); // output: RGBA in 0..1 range
 }
