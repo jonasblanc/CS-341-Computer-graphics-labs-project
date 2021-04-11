@@ -41,8 +41,8 @@ void main()
     * - use mix(vec3 a,vec3 b, s) = a*(1-s) + b*s for linear interpolation of two colors
      */
     vec3 m_ambient_diffuse_specular_day_light = texture2D(texture_surface_day,v2f_tex_coord).rgb;
-    vec3 m_ambient_diffuse_specular_night_light = texture2D(texture_surface_night,v2f_tex_coord).rgb;
     vec3 m_ambient_diffuse_specular_cloud_light = texture2D(texture_clouds, v2f_tex_coord).rgb;
+    vec3 m_ambient_diffuse_specular_night_light = texture2D(texture_surface_night,v2f_tex_coord).rgb;
     
 	vec3 l = normalize(v2f_dir_to_light);
     vec3 r = normalize(reflect(-l, v2f_normal));
@@ -52,11 +52,11 @@ void main()
     float rv = dot(r, v);
 
     //-------Day------
-    vec3 ambiant_day = ambient * light_color * m_ambient_diffuse_specular_day_light;
+    vec3 ambient_day = ambient * light_color * m_ambient_diffuse_specular_day_light;
     vec3 diffuse_day = light_color * m_ambient_diffuse_specular_day_light * nl;
     vec3 specular_day = light_color * vec3(1.0) * pow(rv, shininess);
 
-    vec3 color_day = ambiant_day;
+    vec3 color_day = ambient_day;
 
     if(nl > 0.0){
         color_day += diffuse_day;
@@ -68,10 +68,10 @@ void main()
     }
 
     //-------Cloud------
-    vec3 ambiant_cloud = ambient * light_color * m_ambient_diffuse_specular_cloud_light;
+    vec3 ambient_cloud = ambient * light_color * m_ambient_diffuse_specular_cloud_light;
     vec3 diffuse_cloud = light_color * m_ambient_diffuse_specular_cloud_light * nl;
 
-    vec3 color_cloud = ambiant_cloud;
+    vec3 color_cloud = ambient_cloud;
     if(nl > 0.0){
         color_cloud += diffuse_cloud;
     }
