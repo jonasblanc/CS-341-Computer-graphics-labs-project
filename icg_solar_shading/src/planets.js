@@ -198,14 +198,17 @@ export class PhongActor extends PlanetActor {
 	// }
 
 	draw({mat_projection, mat_view, light_position_cam, sim_time}) {
-		super.calculate_model_matrix({sim_time:sim_time});
+		// super.calculate_model_matrix({sim_time:sim_time});
+
+		mat4_matmul_many(this.mat_model_view, mat_view, this.mat_model_to_world);
+		mat4_matmul_many(this.mat_mvp, mat_projection, mat_view, this.mat_model_to_world);
 
 		mat3.fromMat4(this.mat_normals, this.mat_model_view);
 		mat3.transpose(this.mat_normals, this.mat_normals);
 		mat3.invert(this.mat_normals, this.mat_normals);
 
 
-		mat4_matmul_many(this.mat_mvp, mat_projection, mat_view, this.mat_model_to_world);
+		// mat4_matmul_many(this.mat_mvp, mat_projection, mat_view, this.mat_model_to_world);
 
 		this.pipeline({
 			mat_mvp: this.mat_mvp,
