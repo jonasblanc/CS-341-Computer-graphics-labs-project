@@ -65,7 +65,7 @@ We use the diffuse component coefficient  from the Phong lighting model to deter
 
 **Task 5.4: Custom mesh**
 
-We created a (beatiful) sculpture from scratch, exported it to the correct format and used it in the project.
+We created a (beautiful) sculpture from scratch, exported it to the correct format and used it in the project.
 
 Workload:
 
