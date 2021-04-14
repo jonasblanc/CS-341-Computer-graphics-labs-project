@@ -61,7 +61,7 @@ We then proceed to mix, the day color and cloud color with the weight taken from
 For the night, we only need to mix the color extracted from texture_surface_night and pure black with the weight take  from texture cloud.
 
 Finally, in order to get the final color, we mix the day color (which is already a mix of initial day color and cloud color) and the night color. 
-We use the diffuse component coefficient  from the Phong lighting model to determine the amount of daylight. We rely on a mapping (f(nl) = (nl+1)/2) to change the domaine of nl from [-1,1] to [1,1].
+We use the diffuse component coefficient  from the Phong lighting model to determine the amount of daylight. We rely on a mapping (f(nl) = (nl+1)/2) to change the domaine of nl from [-1,1] to [0,1].
 
 **Task 5.4: Custom mesh**
 
