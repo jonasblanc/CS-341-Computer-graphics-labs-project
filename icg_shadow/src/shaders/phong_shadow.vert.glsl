@@ -25,7 +25,7 @@ void main() {
 
 	// viewing vector (from camera to vertex in view coordinates), camera is at vec3(0, 0, 0) in cam coords
 	//v2f_position_view = vec3(1, 0, 0); // TODO calculate
-	vec4 dir_from_view_4D = mat_model_view * vec4(position, 1);
+	vec4 dir_from_view_4D = mat_model_view * position_v4;
 	v2f_position_view = vec3(dir_from_view_4D);
 
 	//v2f_normal = normal; // TODO apply normal transformation
