@@ -30,14 +30,14 @@ void main() {
     float distance_light_vertex = length(light_position - v2f_position_view);
 
     // scale the light color by the inverse distance squared to the point being lit 
-    light_color = light_color / distance_light_vertex * distance_light_vertex;
+    vec3 scaled_light_color = light_color / distance_light_vertex * distance_light_vertex;
 
     if (textureCube(shadow_cubemap, -l).r * 1.01 > distance_light_vertex){
         if(nl > 0.0){
-            vec3 diffuse = light_color * v2f_diffuse_color * nl;
+            vec3 diffuse = scaled_light_color * v2f_diffuse_color * nl;
             color += diffuse;
             if(rv > 0.0){
-                vec3 specular = light_color * v2f_specular_color * pow(rv, shininess);
+                vec3 specular = scaled_light_color * v2f_specular_color * pow(rv, shininess);
                 color += specular;
             }
         }
