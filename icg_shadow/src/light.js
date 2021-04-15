@@ -169,38 +169,47 @@ export function init_light(regl, resources) {
 				and when `side_idx = 5`, we should return the -z one.
 			 */
 
-			let lookTo = vec3(0.);
-			let up = vec3(0.);
+			let lookTo = [0., 0., 0.];
+			let up = [0., 0., 0.];
 			switch(side_idx){
 				case 0:
-					lookTo = vec3(1, 0, 0);
-					up = vec3(0, 1, 0);
+					lookTo = [1., 0., 0.];
+					up = [0., 1., 0.];
 					break;
 				case 1:
-					lookTo = vec3(-1, 0, 0);
-					up = vec3(0, 1, 0);
+					lookTo = [-1., 0., 0.];
+					up = [0., 1., 0.];
 					break;
 				case 2:
-					lookTo = vec3(0, 1, 0);
-					up = vec3(0, 0, -1);
+					lookTo = [0., 1., 0.];
+					up = [0., 0., -1.];
 					break;
 				case 3:
-					lookTo = vec3(0, -1, 0);
-					up = vec3(0, 0, 1);
+					lookTo = [0., -1., 0.];
+					up = [0., 0., 1.];
 					break;
 				case 4:
-					lookTo = vec3(0, 0, 1);
-					up = vec3(0, 1, 0);
+					lookTo = [0., 0., 1.];
+					up = [0., 1., 0.];
 					break;
 				case 5:
-					lookTo = vec3(0, 0, -1);
-					up = vec3(0, 1, 0);
+					lookTo = [0., 0., -1.];
+					up = [0., 1., 0.];
 					break;
 			}
 
-			let light_position_in_camera_coord = vec3((scene_view * vec4(this.position, 0.)));
+			let l1 = [scene_view[0], scene_view[1], scene_view[2]];
+			let l2 = [scene_view[4], scene_view[5], scene_view[6]];
+			let l3 = [scene_view[8], scene_view[9], scene_view[10]];
+			let c1 = vec3.dot(vec3.create(),scene_view[0],  this.position);
+			let c2 = vec3.dot(vec3.create(),scene_view[1],  this.position);
+			let c3 = vec3.dot(vec3.create(),scene_view[2],  this.position);
+			
+			//let light_position_in_camera_coord_v4 = mat4.mul(mat4.create(),scene_view, [this.position[0], this.position[1],  this.position[2], 0.]);
+			let light_position_in_camera_coord = [c1, c2, c3];
 
-			let lookAt = mat4.lookAt(mat4.create(), vec3(0.), light_position_in_camera_coord + lookTo, up);
+
+			let lookAt = mat4.lookAt(mat4.create(), [0.,0.,0.], vec3.add([0.,0.,0.], light_position_in_camera_coord, lookTo), up);
 
 			return 	mat4_matmul_many(mat4.create(), lookAt, scene_view);
 			
