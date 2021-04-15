@@ -201,9 +201,9 @@ export function init_light(regl, resources) {
 			let l1 = [scene_view[0], scene_view[1], scene_view[2]];
 			let l2 = [scene_view[4], scene_view[5], scene_view[6]];
 			let l3 = [scene_view[8], scene_view[9], scene_view[10]];
-			let c1 = vec3.dot(vec3.create(),scene_view[0],  this.position);
-			let c2 = vec3.dot(vec3.create(),scene_view[1],  this.position);
-			let c3 = vec3.dot(vec3.create(),scene_view[2],  this.position);
+			let c1 = vec3.dot(vec3.create(),l1,  this.position);
+			let c2 = vec3.dot(vec3.create(),l2,  this.position);
+			let c3 = vec3.dot(vec3.create(),l3,  this.position);
 			
 			//let light_position_in_camera_coord_v4 = mat4.mul(mat4.create(),scene_view, [this.position[0], this.position[1],  this.position[2], 0.]);
 			let light_position_in_camera_coord = [c1, c2, c3];
