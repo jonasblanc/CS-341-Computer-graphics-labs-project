@@ -22,12 +22,19 @@ void main() {
 	Adapt implementation from assignment 5 to calculate the `varying` outputs
 	of this shader (v2f_position_view and v2f_normal) and the gl_Position.
     */
-	// viewing vector (from camera to vertex in view coordinates), camera is at vec3(0, 0, 0) in cam coords
-	v2f_position_view = vec3(1, 0, 0); // TODO calculate
-	// transform normal to camera coordinates
-	v2f_normal = normal; // TODO apply normal transformation
-	gl_Position = vec4(0., 0., 0., 1.); // TODO apply mvp matrix to position
 
-	v2f_diffuse_color = diffuse_color;
+	// viewing vector (from camera to vertex in view coordinates), camera is at vec3(0, 0, 0) in cam coords
+	//v2f_position_view = vec3(1, 0, 0); // TODO calculate
+	vec4 dir_from_view_4D = mat_model_view * vec4(position, 1);
+	v2f_position_view = vec3(dir_from_view_4D);
+
+	//v2f_normal = normal; // TODO apply normal transformation
+	v2f_normal = normalize(mat_normals * normal);
+
+	// transform normal to camera coordinates
+	//gl_Position = vec4(0., 0., 0., 1.); // TODO apply mvp matrix to position
+	gl_Position = mat_mvp * vec4(position, 1);
+
+	v2f_diffuse_color = diffuse_color;		
 	v2f_specular_color = specular_color;
 }

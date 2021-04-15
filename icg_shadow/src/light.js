@@ -143,7 +143,7 @@ export function init_light(regl, resources) {
 		please use the function perspective, see https://stackoverflow.com/questions/28286057/trying-to-understand-the-math-behind-the-perspective-matrix-in-webgl
 		Note: this is the same for all point lights/cube faces!
 	*/
-	const cube_camera_projection = mat4.create(); // please use mat4.perspective(mat4.create(), fovy, aspect, near, far);
+	const cube_camera_projection = mat4.perspective(mat4.create(), Math.PI / 2.0 , 1, 0.1, 100);//  mat4.create(); // please use mat4.perspective(mat4.create(), fovy, aspect, near, far);
 
 	class Light {
 		constructor({position, color, intensity, update} = {color: [1., 0.5, 0.], intensity: 5, update: null}) {
@@ -169,7 +169,41 @@ export function init_light(regl, resources) {
 				and when `side_idx = 5`, we should return the -z one.
 			 */
 
-			return mat4.create();
+			let lookTo = vec3(0.);
+			let up = vec3(0.);
+			switch(side_idx){
+				case 0:
+					lookTo = vec3(1, 0, 0);
+					up = vec3(0, 1, 0);
+					break;
+				case 1:
+					lookTo = vec3(-1, 0, 0);
+					up = vec3(0, 1, 0);
+					break;
+				case 2:
+					lookTo = vec3(0, 1, 0);
+					up = vec3(0, 0, -1);
+					break;
+				case 3:
+					lookTo = vec3(0, -1, 0);
+					up = vec3(0, 0, 1);
+					break;
+				case 4:
+					lookTo = vec3(0, 0, 1);
+					up = vec3(0, 1, 0);
+					break;
+				case 5:
+					lookTo = vec3(0, 0, -1);
+					up = vec3(0, 1, 0);
+					break;
+			}
+
+			let light_position_in_camera_coord = vec3((scene_view * vec4(this.position, 0.)));
+
+			let lookAt = mat4.lookAt(mat4.create(), vec3(0.), light_position_in_camera_coord + lookTo, up);
+
+			return 	mat4_matmul_many(mat4.create(), lookAt, scene_view);
+			
 		}
 
 		get_cube_camera_projection() {

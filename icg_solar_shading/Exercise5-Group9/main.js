@@ -1,7 +1,7 @@
 
 import {createREGL} from "../lib/regljs_2.1.0/regl.module.js"
 
-import {vec2, vec3, vec4, mat3, mat4} from "../lib/gl-matrix_3.3.0/esm/index.js"
+import {vec2, vec3, vec4, mat2, mat3, mat4} from "../lib/gl-matrix_3.3.0/esm/index.js"
 
 import {DOM_loaded_promise, load_text, load_texture, register_keyboard_action} from "./icg_web.js"
 import {deg_to_rad, mat4_to_string, vec_to_string, mat4_matmul_many} from "./icg_math.js"

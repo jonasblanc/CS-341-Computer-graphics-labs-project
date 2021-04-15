@@ -18,7 +18,34 @@ void main() {
     vec3 N = -sign(dot(v2f_normal, v2f_position_view)) *  // Orient the normal so it always points opposite the camera rays (for backfaces)
              normalize(v2f_normal);
 
+    vec3 l = normalize(light_position - v2f_position_view);
+    vec3 r = normalize(reflect(-l, N));
+    vec3 v = -normalize(-v2f_position_view); // Guessing that the camera is at (0,0,0) in camera coordinates
+
+    float nl = dot(N, l);
+    float rv = dot(r, v);
+
     vec3 color = vec3(0.0);
+
+    float distance_light_vertex = length(light_position - v2f_position_view);
+
+    // scale the light color by the inverse distance squared to the point being lit 
+    vec3 scaled_light_color = light_color / distance_light_vertex * distance_light_vertex;
+
+    if (textureCube(shadow_cubemap, -l).r * 1.01 > distance_light_vertex){
+        if(nl > 0.0){
+            vec3 diffuse = scaled_light_color * v2f_diffuse_color * nl;
+            color += diffuse;
+            if(rv > 0.0){
+                vec3 specular = scaled_light_color * v2f_specular_color * pow(rv, shininess);
+                color += specular;
+            }
+        }
+    }
+    
+
+    
+
     /** Todo 6.2.2
     * Compute this light's diffuse and specular contributions.
     * You should be able to copy your phong lighting code from assignment 5 mostly as-is,
