@@ -2,6 +2,10 @@
 
 **TASK 6.1.1 and 6.1.2 Construct Transformation Matrix for Shadow Mapping**
 
+To construct the cube_camera_projection matrix, we used the method perspective. For the arguments, we gave pi/2 for the fovy since we are in the middle of a cube and the fovy represent half of the total angle. For the ratio, we used 1 since a cube has the same height and width. Finally, we used 0.1 and 100 as values for near and far, which serve as boundaries for the distance at which we compute the shadow ray intersections.
+
+
+
 **TASK 6.2.1: Light Depth Fragment Shader**
 
 **TASK 6.2.2: Phong Lighting Shader with Shadows**
