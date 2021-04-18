@@ -3,6 +3,7 @@
 **TASK 6.1.1 and 6.1.2 Construct Transformation Matrix for Shadow Mapping**
 
 **TASK 6.2.1: Light Depth Fragment Shader**
+To compute the Euclidean Distance,  we use the length function. 
 
 **TASK 6.2.2: Phong Lighting Shader with Shadows**
 
