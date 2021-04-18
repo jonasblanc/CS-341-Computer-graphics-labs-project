@@ -10,7 +10,7 @@ For the arguments, we gave pi/2 for the fovy since we are in the middle of a cub
 For the ratio, we used 1 since a cube has the same height and width. 
 Finally, we used 0.1 and 100 as values for near and far, which serve as boundaries for the distance at which we compute the shadow ray intersections.
 
-For the cube camera_camera, view we did a switch on the different cube faces to set the up and lookTo vector (as in fig. 2).
+For the cube cube_camera_view, we first did a switch on the different cube faces to set the up and lookTo vector (as in fig. 2).
 Then we get the light position in the camera coordinates. 
 At first we didn't see the the icg_math.js file so we did the computation component by component which took quite some time.
 Then to get the point we want to look to we add the light position and the lookTo vector (Both are in camera coordinates).
