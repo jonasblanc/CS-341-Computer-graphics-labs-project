@@ -123,14 +123,12 @@ async function main() {
 		let r = cam_distance_base * cam_distance_factor;
 		const look_at = mat4.lookAt(mat4.create(), 
 			[-r,0,0], // camera position in world coord
-			cam_target, //[0,0,0], // view target point
+			cam_target, // view target point
 			[0,0,1], // up vector
 		);
 		let rotatedY = mat4.fromYRotation(mat4.create(), cam_angle_y);
 		let rotatedZ = mat4.fromZRotation(mat4.create(), cam_angle_z);
-		let translate = mat4.fromTranslation(mat4.create(), cam_target)
-
-		//mat4_matmul_many(mat_world_to_cam, look_at, translate, rotatedY, rotatedZ); // edit this
+		
 		mat4_matmul_many(mat_world_to_cam, look_at, rotatedY, rotatedZ); // edit this
 
 	}
