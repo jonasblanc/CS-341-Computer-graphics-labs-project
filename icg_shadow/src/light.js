@@ -77,7 +77,12 @@ export function init_light(regl, resources) {
 		    change the blend options
 		*/
 		blend: {
-		},
+			enable: true,
+            func: {
+                src: sfactor,
+                dst: dfactor,
+            },
+        },
 
 		depth: {
 			enable: true,
@@ -218,7 +223,6 @@ export function init_light(regl, resources) {
 			let light_position_in_camera_coord = transform3DPoint(scene_view, this.position);
 
 			let translated_lookTo = vec3.add([0.,0.,0.], light_position_in_camera_coord, lookTo);
-			let translated_up = vec3.add([0.,0.,0.], light_position_in_camera_coord, up);
 
 			let lookAt = mat4.lookAt(mat4.create(), light_position_in_camera_coord, translated_lookTo, up);
 
