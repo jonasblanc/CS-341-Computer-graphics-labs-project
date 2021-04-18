@@ -7,6 +7,7 @@ To construct the cube_camera_projection matrix, we used the method perspective. 
 
 
 **TASK 6.2.1: Light Depth Fragment Shader**
+To compute the Euclidean Distance,  we use the length function. 
 
 **TASK 6.2.2: Phong Lighting Shader with Shadows**
 
