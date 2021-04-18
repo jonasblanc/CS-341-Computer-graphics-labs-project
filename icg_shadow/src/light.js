@@ -198,18 +198,29 @@ export function init_light(regl, resources) {
 					break;
 			}
 
-			let l1 = [scene_view[0], scene_view[1], scene_view[2]];
-			let l2 = [scene_view[4], scene_view[5], scene_view[6]];
-			let l3 = [scene_view[8], scene_view[9], scene_view[10]];
-			let c1 = vec3.dot(vec3.create(),l1,  this.position);
-			let c2 = vec3.dot(vec3.create(),l2,  this.position);
-			let c3 = vec3.dot(vec3.create(),l3,  this.position);
-			
+			/*
+			let l1 = [scene_view[0], scene_view[1], scene_view[2], scene_view[3]];
+			let l2 = [scene_view[4], scene_view[5], scene_view[6], scene_view[7]];
+			let l3 = [scene_view[8], scene_view[9], scene_view[10], scene_view[11]];
+			let l4 = [scene_view[12], scene_view[13], scene_view[14], scene_view[15]];
+
+			let position_vec4 = [this.position[0], this.position[1],  this.position[2], 1.];
+
+			let c1 = vec4.dot(vec4.create(),l1, position_vec4);
+			let c2 = vec4.dot(vec4.create(),l2, position_vec4);
+			let c3 = vec4.dot(vec4.create(),l3, position_vec4);
+			let c4 = vec4.dot(vec4.create(),l4, position_vec4);
+
 			//let light_position_in_camera_coord_v4 = mat4.mul(mat4.create(),scene_view, [this.position[0], this.position[1],  this.position[2], 0.]);
-			let light_position_in_camera_coord = [c1, c2, c3];
+			let light_position_in_camera_coord = [c1 / c4, c2 / c4, c3 / c4];
+			*/
 
+			let light_position_in_camera_coord = transform3DPoint(scene_view, this.position);
 
-			let lookAt = mat4.lookAt(mat4.create(), [0.,0.,0.], vec3.add([0.,0.,0.], light_position_in_camera_coord, lookTo), up);
+			let translated_lookTo = vec3.add([0.,0.,0.], light_position_in_camera_coord, lookTo);
+			let translated_up = vec3.add([0.,0.,0.], light_position_in_camera_coord, up);
+
+			let lookAt = mat4.lookAt(mat4.create(), light_position_in_camera_coord, translated_lookTo, up);
 
 			return 	mat4_matmul_many(mat4.create(), lookAt, scene_view);
 			
