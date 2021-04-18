@@ -27,7 +27,7 @@ void main() {
     //vec3 scaled_light_color = light_color;
 
     
-    if (textureCube(shadow_cubemap, -l).r * 1.01 > distance_light_vertex){
+    if (textureCube(shadow_cubemap, -l).r * 1.01 > distance_light_vertex ){
 
         vec3 r = normalize(reflect(-l, N));
         vec3 v = normalize(-v2f_position_view); // Guessing that the camera is at (0,0,0) in camera coordinates
@@ -35,7 +35,7 @@ void main() {
         float rv = dot(r, v);
 
         if(nl > 0.0){
-            vec3 scaled_light_color = light_color / distance_light_vertex * distance_light_vertex;
+            vec3 scaled_light_color = light_color / (distance_light_vertex * distance_light_vertex);
             vec3 diffuse = scaled_light_color * v2f_diffuse_color * nl;
             color += diffuse;
             if(rv > 0.0){

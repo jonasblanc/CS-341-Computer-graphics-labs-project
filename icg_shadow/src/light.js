@@ -79,9 +79,14 @@ export function init_light(regl, resources) {
 		blend: {
 			enable: true,
             func: {
-                src: sfactor,
-                dst: dfactor,
+                src: 'constant alpha',
+                dst: 'constant alpha',
             },
+			equation: {
+				rgb: 'add',
+				alpha: 'add'
+			},
+			color: [0, 0, 0, 1.0]
         },
 
 		depth: {
