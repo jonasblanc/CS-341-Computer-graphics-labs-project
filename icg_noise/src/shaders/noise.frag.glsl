@@ -259,7 +259,15 @@ vec3 tex_map(vec2 point) {
 	Implement your map texture evaluation routine as described in the handout. 
 	You will need to use your perlin_fbm routine and the terrain color constants described above.
 	*/
-	return vec3(0.);
+	float noise_val = perlin_fbm(point);
+	vec3 color_map = vec3(0.);
+	if(noise_val < terrain_water_level){
+		color_map = terrain_color_water;
+	}else{
+		color_map = mix(terrain_color_grass, terrain_color_mountain, noise_val - terrain_water_level);
+	}
+	
+	return color_map;
 }
 
 // ==============================================================

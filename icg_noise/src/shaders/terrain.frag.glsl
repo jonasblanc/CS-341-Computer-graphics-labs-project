@@ -18,6 +18,17 @@ void main()
 	const vec3 ambient = 0.2 * light_color; // Ambient light intensity
 	float height = v2f_height;
 
+	vec3 color_map = vec3(0.0);
+	float shininess = 0.0;
+
+	if(height < terrain_water_level){
+		color_map = terrain_color_water;
+		shininess = 8.0;
+	}else{
+		color_map = mix(terrain_color_grass, terrain_color_mountain, (height - terrain_water_level)*2.0);
+	 	shininess = 0.5;
+	}
+
 	/* TODO
 	Compute the terrain color ("material") and shininess based on the height as
 	described in the handout.
@@ -26,17 +37,32 @@ void main()
 			color = terrain_color_water
 			shininess = 8.0
 	Ground:
-			color = interpolate between terrain_color_grass and terrain_color_mountain, weight is (height - terrain_water_level)*2
-	 		shininess = 0.5
+			
 	*/
-	vec3 material_color = terrain_color_grass;
-	float shininess = 0.5;
 
 	/* TODO 3.2: apply the phong lighting model
     	Implement the Phong shading model by using the passed variables and write the resulting color to `color`.
     	`material_color should be used as material parameter for ambient, diffuse and specular lighting.
     	Hints:
 	*/
-	vec3 color = material_color * light_color;
+
+	vec3 l = normalize(v2f_dir_to_light);
+    vec3 r = normalize(reflect(-l, v2f_normal));
+    vec3 v = -normalize(v2f_dir_from_view);
+    
+    float nl = dot(v2f_normal, l);
+    float rv = dot(r, v);
+
+    vec3 color = ambient;
+
+    if(nl > 0.0){
+        vec3 diffuse = light_color * color_map * nl;
+        color += diffuse;
+        if(rv > 0.0){
+            vec3 specular = light_color * color_map * pow(rv, shininess);
+            color += specular;
+        }
+    }
+
 	gl_FragColor = vec4(color, 1.); // output: RGBA in 0..1 range
 }
