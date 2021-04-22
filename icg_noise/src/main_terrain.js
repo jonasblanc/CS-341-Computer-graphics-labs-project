@@ -113,7 +113,7 @@ async function main() {
 		let r = cam_distance_base * cam_distance_factor;
 		const look_at = mat4.lookAt(mat4.create(), 
 			[-r,0,0], // camera position in world coord
-			[0,0,0], // view target point
+			cam_target, // view target point
 			[0,0,1], // up vector
 		);
 		let rotatedY = mat4.fromYRotation(mat4.create(), cam_angle_y);

@@ -65,7 +65,7 @@ function terrain_build_mesh(height_map) {
 			The XY coordinates are calculated so that the full grid covers the square [-0.5, 0.5]^2 in the XY plane.
 			*/
 			const mapped_X = gx / grid_width - 0.5;
-			const mapped_Y = gx / grid_width - 0.5;
+			const mapped_Y = gy / grid_height - 0.5;
 			if(elevation < WATER_LEVEL){
 				elevation = WATER_LEVEL;
 				normals[idx] = [0, 0, 1];
