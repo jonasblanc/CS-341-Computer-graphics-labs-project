@@ -14,6 +14,9 @@ We compute the different valeus as shown in the handout. For the gradients, sinc
 For the World Map, we set the color to the water one if the height is below the water level.
 Otherwise we interpolated the color between the grass color and the mountain color.
 
+For the wood, we compute alpha as mentionned in the read me and we use the turbulence function that we coded in the previous step. We then mix the light brown and dark brown colors using alpha.
+
+For the marble, we compute q and alpha as mentionned in the handout using the perlin_fbm function. We then mix the with and dark brown colors using alpha. 
 ** Task 6.1 **
 
 We copied the update_cam_transform from assignement 5 in main_terrain and the phong shading pipeline in terrain.frag with no problem.
