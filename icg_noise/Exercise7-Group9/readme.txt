@@ -1,5 +1,8 @@
 ** Task 2.1: 1D noise **
-We compute the different valeus as shown in the handout. For the gradients, since we're in 1d we use gradients(hash_func(vec2(c_0,0.))).x. The hash_func takes a vec2, so we augment the c_0 and c_1 into vec2's with 0 as the second value.  And we only take the first value of the gradient that we get (gradients.x)
+We compute the different valeus as shown in the handout. 
+For the gradients, since we're in 1d we use gradients(hash_func(vec2(c_0,0.))).x. 
+The hash_func takes a vec2, so we augment the c_0 and c_1 into vec2's with 0 as the second value.
+And we only take the first value of the gradient that we get (gradients.x)
 
 ** Task 3.1: FBM 1D **
 
@@ -14,7 +17,8 @@ We compute the different valeus as shown in the handout. For the gradients, sinc
 For the World Map, we set the color to the water one if the height is below the water level.
 Otherwise we interpolated the color between the grass color and the mountain color.
 
-For the wood, we compute alpha as mentionned in the read me and we use the turbulence function that we coded in the previous step. We then mix the light brown and dark brown colors using alpha.
+For the wood, we compute alpha as mentionned in the read me and we use the turbulence function that we coded in the previous step. 
+We then mix the light brown and dark brown colors using alpha.
 
 For the marble, we compute q and alpha as mentionned in the handout using the perlin_fbm function. We then mix the with and dark brown colors using alpha. 
 ** Task 6.1 **
