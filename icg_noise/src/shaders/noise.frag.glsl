@@ -90,9 +90,14 @@ float perlin_fbm_1d(float x) {
 	
 	Note: the GLSL `for` loop may be useful.
 	*/
-	float fbm = 0.;
+	float fbm = 0.0;
+	float freqi = 1.0;
+	float ampi = 1.0;
+
 	for (int i = 0; i < num_octaves; ++i ){
-		fbm += pow(ampl_multiplier,float(i)) + perlin_noise_1d(x * pow(freq_multiplier,float(i))); //can make more efficient by using multiplier instead of pow
+		fbm += ampi * perlin_noise_1d(x * freqi);
+		freqi = freqi*freq_multiplier;
+		ampi = ampi*ampl_multiplier;
 	}
 	return fbm;
 }
@@ -192,7 +197,15 @@ float perlin_fbm(vec2 point) {
 	Implement 2D fBm as described in the handout. Like in the 1D case, you
 	should use the constants num_octaves, freq_multiplier, and ampl_multiplier. 
 	*/
-	return 0.;
+	float fbm = 0.0;
+	float freqi = 1.0;
+	float ampi = 1.0;
+	for (int i = 0; i < num_octaves; ++i ){
+		fbm +=  ampi * perlin_noise(vec2(point.x * freqi, point.y * freqi));
+		freqi = freqi*freq_multiplier;
+		ampi = ampi*ampl_multiplier;
+	}
+	return fbm;
 }
 
 vec3 tex_fbm(vec2 point) {
@@ -216,7 +229,15 @@ float turbulence(vec2 point) {
 	Implement the 2D turbulence function as described in the handout.
 	Again, you should use num_octaves, freq_multiplier, and ampl_multiplier.
 	*/
-	return 0.;
+	float turb = 0.0;
+	float freqi = 1.0;
+	float ampi = 1.0;
+	for (int i = 0; i < num_octaves; ++i ){
+		turb +=  ampi * abs(perlin_noise(vec2(point.x * freqi, point.y * freqi)));
+		freqi = freqi*freq_multiplier;
+		ampi = ampi*ampl_multiplier;
+	}
+	return turb;
 }
 
 vec3 tex_turbulence(vec2 point) {
