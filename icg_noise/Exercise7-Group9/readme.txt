@@ -7,9 +7,15 @@ And we only take the first value of the gradient that we get (gradients.x).
 
 ** Task 4.1 **
 
+To implement the 2D Perlin noise, we first computed the 4 corners around the point. Then we took the right gradient at each of these corners using the hash function. We then computed the vector from the corners to the point and computed the dot product with the corresponding gradient to obtain the contribution s,t,u and v. Then we computed the weight in the interpolation using the function blending _weight with the difference between our point and the corner along axis x and y respectively. Finally, we used this values and the mix function to compute st and uv and then the end result.
+
 ** Task 4.2 **
 
+2D fBm works just like 1D FBM except that we multiplied each component by the frequency of the corresponding octave.
+
 ** Task 4.3 **
+
+Turbulence is implemented the same ways as the 2D FBM except that we use the absolute value of the noise.
 
 ** Task 5.1 **
 
