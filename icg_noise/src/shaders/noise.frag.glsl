@@ -281,7 +281,8 @@ vec3 tex_wood(vec2 point) {
 	Implement your wood texture evaluation routine as described in thE handout. 
 	You will need to use your 2d turbulence routine and the wood color constants described above.
 	*/
-	return vec3(0.);
+	float alpha = .5 * (1. + sin(100. * (length(point) + .15 * turbulence(point))));
+    return mix(brown_light, brown_dark, alpha);
 }
 
 
@@ -295,7 +296,10 @@ vec3 tex_marble(vec2 point) {
 	Implement your marble texture evaluation routine as described in the handout.
 	You will need to use your 2d fbm routine and the marble color constants described above.
 	*/
-	return vec3(0.);
+
+	vec2 q = vec2(perlin_fbm(point), perlin_fbm(point + vec2(1.7, 4.6)));
+    float alpha = .5 * (1. + perlin_fbm(point + 4.*q));
+    return mix(white,brown_dark,alpha);
 }
 
 
