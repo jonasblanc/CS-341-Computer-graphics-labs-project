@@ -66,7 +66,19 @@ float perlin_noise_1d(float x) {
 	
 	Note: gradients in the gradient lookup table are 2D, 
 	 */
-	return 0.;
+
+	float c_0 = floor(x);
+	float c_1 = c_0 + 1.;
+
+	float g_0 = gradients(hash_func(vec2(c_0,0.))).x;
+	float g_1 = gradients(hash_func(vec2(c_1,0.))).x;
+
+	float phi_0 = g_0 * (x-c_0);
+	float phi_1 = g_1 * (x-c_1);
+	
+	float t = x - c_0;
+	
+	return mix(phi_0, phi_1, blending_weight_poly(t));
 }
 
 float perlin_fbm_1d(float x) {
