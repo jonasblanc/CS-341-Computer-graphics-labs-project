@@ -1,9 +1,10 @@
 ** Task 2.1: 1D noise **
-We compute the different valeus as shown in the handout. For the gradients, since we're in 1d we use gradients(hash_func(vec2(c_0,0.))).x. 
+We compute the different values as shown in the handout. For the gradients, since we're in 1d we use gradients(hash_func(vec2(c_0,0.))).x. 
 The hash_func takes a vec2, so we augment the c_0 and c_1 into vec2's with 0 as the second value. 
 And we only take the first value of the gradient that we get (gradients.x).
 
 ** Task 3.1: FBM 1D **
+To compute the 1D fbm, we need to iterate over the number of octaves and compute the sum. Instead of computing the power of the freq_multiplier and the ampl_multiplier at each iteration using the pow() function, which is computationally expensive, we created 2 variables freqi and ampi to reduce computations by multiplying these variables by freq_multiplier and ampl_multiplier respecttively at each iteration.
 
 ** Task 4.1 **
 
@@ -19,7 +20,7 @@ Turbulence is implemented the same ways as the 2D FBM except that we use the abs
 
 ** Task 5.1 **
 
-For the World Map, we set the color to the water one if the height is below the water level.
+For the World Map, we set the color of the water to one if the height is below the water level.
 Otherwise we interpolated the color between the grass color and the mountain color.
 
 For the wood, we compute alpha as mentionned in the read me and we use the turbulence function that we coded in the previous step. 
