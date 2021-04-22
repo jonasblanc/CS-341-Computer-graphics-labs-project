@@ -66,7 +66,19 @@ float perlin_noise_1d(float x) {
 	
 	Note: gradients in the gradient lookup table are 2D, 
 	 */
-	return 0.;
+
+	float c_0 = floor(x);
+	float c_1 = c_0 + 1.;
+
+	float g_0 = gradients(hash_func(vec2(c_0,0.))).x;
+	float g_1 = gradients(hash_func(vec2(c_1,0.))).x;
+
+	float phi_0 = g_0 * (x-c_0);
+	float phi_1 = g_1 * (x-c_1);
+	
+	float t = x - c_0;
+	
+	return mix(phi_0, phi_1, blending_weight_poly(t));
 }
 
 float perlin_fbm_1d(float x) {
@@ -78,7 +90,11 @@ float perlin_fbm_1d(float x) {
 	
 	Note: the GLSL `for` loop may be useful.
 	*/
-	return 0.;
+	float fbm = 0.;
+	for (int i = 0; i < num_octaves; ++i ){
+		fbm += pow(ampl_multiplier,float(i)) + perlin_noise_1d(x * pow(freq_multiplier,float(i))); //can make more efficient by using multiplier instead of pow
+	}
+	return fbm;
 }
 
 // ----- plotting -----
@@ -131,7 +147,34 @@ float perlin_noise(vec2 point) {
 	Implement 2D perlin noise as described in the handout.
 	You may find a glsl `for` loop useful here, but it's not necessary.
 	*/
-	return 0.;
+
+	vec2 c00 = vec2(floor(point.x), floor(point.y));
+	vec2 c10 = vec2(c00.x+1.0, c00.y);
+	vec2 c01 = vec2(c00.x, c00.y+1.0);
+	vec2 c11 = vec2(c00.x+1.0, c00.y+1.0);
+
+	vec2 gradient00 = gradients(hash_func(c00));
+	vec2 gradient10 = gradients(hash_func(c10));
+	vec2 gradient01 = gradients(hash_func(c01));
+	vec2 gradient11 = gradients(hash_func(c11));
+
+	vec2 a = point-c00;
+	vec2 b = point-c10;
+	vec2 c = point-c01;
+	vec2 d = point-c11;
+
+	float s = dot(gradient00, a);
+	float t = dot(gradient10, b);
+	float u = dot(gradient01, c);
+	float v = dot(gradient11, d);
+
+	float tx = point.x - c00.x;
+	float ty = point.y - c00.y;
+	
+	float st = mix(s, t, blending_weight_poly(tx));
+	float uv = mix(u, v, blending_weight_poly(tx));
+
+	return mix(st, uv, blending_weight_poly(ty));
 }
 
 vec3 tex_perlin(vec2 point) {
