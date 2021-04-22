@@ -83,13 +83,13 @@ function terrain_build_mesh(height_map) {
 			You will need to create two triangles to fill each square.
 			*/
 
-			const va = vertices[xy_to_v_index(gx, gy)];
-			const vb = vertices[xy_to_v_index(gx + 1, gy)];
-			const vc = vertices[xy_to_v_index(gx, gy + 1)];
-			const vd = vertices[xy_to_v_index(gx + 1, gy + 1)];
+			const va = xy_to_v_index(gx, gy);
+			const vb = xy_to_v_index(gx + 1, gy);
+			const vc = xy_to_v_index(gx, gy + 1);
+			const vd = xy_to_v_index(gx + 1, gy + 1);
 
-			faces.push([va, vb, vc])
-			faces.push([vb, vd, vc])
+			faces.push([va, vb, vc]);
+			faces.push([vb, vd, vc]);
 
 			// faces.push([v1, v2, v3]) // adds a triangle on vertex indices v1, v2, v3
 		}
