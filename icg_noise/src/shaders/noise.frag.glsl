@@ -144,28 +144,33 @@ float perlin_noise(vec2 point) {
 	You may find a glsl `for` loop useful here, but it's not necessary.
 	*/
 
-	vec2 c00 = vec2(Math.floor(point.x), Math.floor(point.y))
-	vec2 c10 = vec2(c00.x+1, c00.y)
-	vec2 c01 = vec2(c00.x, c00.y+1)
-	vec2 c11 = vec2(c00.x+1, c00.y+1)
+	vec2 c00 = vec2(floor(point.x), floor(point.y));
+	vec2 c10 = vec2(c00.x+1.0, c00.y);
+	vec2 c01 = vec2(c00.x, c00.y+1.0);
+	vec2 c11 = vec2(c00.x+1.0, c00.y+1.0);
 
-	vec2 gradient00 = gradients(hash_func(c00))
-	vec2 gradient10 = gradients(hash_func(c10))
-	vec2 gradient01 = gradients(hash_func(c01))
-	vec2 gradient11 = gradients(hash_func(c11))
+	vec2 gradient00 = gradients(hash_func(c00));
+	vec2 gradient10 = gradients(hash_func(c10));
+	vec2 gradient01 = gradients(hash_func(c01));
+	vec2 gradient11 = gradients(hash_func(c11));
 
-	vec2 a = point-c00
-	vec2 b = point-c10
-	vec2 c = point-c01
-	vec2 d = point-c11
+	vec2 a = point-c00;
+	vec2 b = point-c10;
+	vec2 c = point-c01;
+	vec2 d = point-c11;
 
-	float s = dot(gradient00, a)
-	float t = dot(gradient10, b)
-	float u = dot(gradient01, c)
-	float v = dot(gradient11, d)
+	float s = dot(gradient00, a);
+	float t = dot(gradient10, b);
+	float u = dot(gradient01, c);
+	float v = dot(gradient11, d);
 
+	float tx = point.x - c00.x;
+	float ty = point.y - c00.y;
+	
+	float st = mix(s, t, blending_weight_poly(tx));
+	float uv = mix(u, v, blending_weight_poly(tx));
 
-	return 0.;
+	return mix(st, uv, blending_weight_poly(ty));
 }
 
 vec3 tex_perlin(vec2 point) {
