@@ -29,23 +29,6 @@ void main()
 	 	shininess = 0.5;
 	}
 
-	/* TODO
-	Compute the terrain color ("material") and shininess based on the height as
-	described in the handout.
-	
-	Water:
-			color = terrain_color_water
-			shininess = 8.0
-	Ground:
-			
-	*/
-
-	/* TODO 3.2: apply the phong lighting model
-    	Implement the Phong shading model by using the passed variables and write the resulting color to `color`.
-    	`material_color should be used as material parameter for ambient, diffuse and specular lighting.
-    	Hints:
-	*/
-
 	vec3 l = normalize(v2f_dir_to_light);
     vec3 r = normalize(reflect(-l, v2f_normal));
     vec3 v = -normalize(v2f_dir_from_view);
