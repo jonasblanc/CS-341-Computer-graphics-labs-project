@@ -246,6 +246,23 @@ vec3 tex_turbulence(vec2 point) {
 	return vec3(noise_val);
 }
 
+vec3 basic_sphere_noise(vec2 point){
+	float y_centered = point.y + 8.4;
+	float x_centered = point.x - 12.3;
+	float value = x_centered * x_centered + y_centered * y_centered;
+	
+	if(value < 0.5){
+		return vec3(0.8);
+	}else{
+		return vec3(0.0);
+	}
+}
+
+vec3 basic_sphere_texture(vec2 point){
+	return vec3(1.0);
+}
+
+
 // ==============================================================
 // Procedural "map" texture
 
