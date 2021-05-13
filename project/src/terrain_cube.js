@@ -12,7 +12,7 @@ const NUMBER_CUBE_X = 10;
 const NUMBER_CUBE_Y = 10;
 const NUMBER_CUBE_Z = 10;
 
-// Map a 3D grid index (x, y, z) into a 1D index into the output vertex array.
+// Map a 3D grid index (x, y, z) into a 1D index array.
 function xyz_to_cube_index(x, y, z) {
   return (
     x + y * (NUMBER_CUBE_X + 1) + z * (NUMBER_CUBE_X + 1) * (NUMBER_CUBE_Y + 1)
@@ -20,10 +20,11 @@ function xyz_to_cube_index(x, y, z) {
 }
 
 function terrain_build_mesh() {
-  const halfEdges = [];
+  const halfEdgePoints = [];
+  const faces = [];
+
   // TODO
   const halfEdgesNormals = [];
-  const faces = [];
 
   // TODO DELETE
   //const test_vertices = [];
@@ -36,14 +37,6 @@ function terrain_build_mesh() {
       for (let gz = 0; gz <= NUMBER_CUBE_Z; gz++) {
         const idx_corner = xyz_to_cube_index(gx, gy, gz);
         cornersInObject[idx_corner] = noise3D(gx, gy, gz) >= 0.5;
-
-        // TODO DELETE
-        /*
-        const mapped_X = gx / (NUMBER_CUBE_X + 1) - 0.5;
-        const mapped_Y = gy / (NUMBER_CUBE_Y + 1) - 0.5;
-        const mapped_Z = gz / (NUMBER_CUBE_Z + 1) - 0.5;
-        test_vertices[idx_corner] = [mapped_X, mapped_Y, mapped_Z];
-        */
       }
     }
   }
@@ -66,7 +59,7 @@ function terrain_build_mesh() {
           const mapped_X = (gx + vect[0]) / NUMBER_CUBE_X - 0.5;
           const mapped_Y = (gy + vect[1]) / NUMBER_CUBE_Y - 0.5;
           const mapped_Z = (gz + vect[2]) / NUMBER_CUBE_Z - 0.5;
-          halfEdges[idx + i] = [mapped_X, mapped_Y, mapped_Z];
+          halfEdgePoints[idx + i] = [mapped_X, mapped_Y, mapped_Z];
           // TODO FIX normal
           halfEdgesNormals[idx + i] = [0, 0, 1];
         }
@@ -82,7 +75,7 @@ function terrain_build_mesh() {
          */
         // we put the value between 0...1 so that it could be stored in a non-float texture on older browsers/GLES3, the -0.5 brings it back to -0.5 ... 0.5
 
-        const areCornersInObject = getIsInObjectCube(
+        const areCornersInObject = getAreCubeCornersInObject(
           gx,
           gy,
           gz,
@@ -92,62 +85,36 @@ function terrain_build_mesh() {
         if (isOnSurface(areCornersInObject)) {
           const halfEdgePointsIndexes = getIndexHalfEdgePoints(gx, gy, gz);
 
-          const test_face = [
-            11, 8, 9, 11, 10, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-          ];
           const LUTEntry =
             LOOK_UP_TABLE[get_binary_idx_from_corners(areCornersInObject)];
-          const trianglesIndexE = translateTableEntryToNumE(LUTEntry);
+          //const LUTEntry = test_face;
+          const trianglesIndexInCube =
+            translateLUTEntryToIndexOfHalfEdgePointInTheCube(LUTEntry);
 
-          for (let i = 0; i < trianglesIndexE.length; ++i) {
-            const triangleIndexE = trianglesIndexE[i];
-            const p1 = halfEdgePointsIndexes[triangleIndexE[0]];
-            const p2 = halfEdgePointsIndexes[triangleIndexE[1]];
-            const p3 = halfEdgePointsIndexes[triangleIndexE[2]];
+          for (let i = 0; i < trianglesIndexInCube.length; ++i) {
+            const triangle = trianglesIndexInCube[i];
+            const p1 = halfEdgePointsIndexes[triangle[0]];
+            const p2 = halfEdgePointsIndexes[triangle[1]];
+            const p3 = halfEdgePointsIndexes[triangle[2]];
             faces.push(p1, p2, p3);
           }
-
-          /*
-          const v000 = xyz_to_cube_index(gx, gy, gz);
-          const v001 = xyz_to_cube_index(gx, gy, gz + 1);
-          const v010 = xyz_to_cube_index(gx, gy + 1, gz);
-          const v011 = xyz_to_cube_index(gx, gy + 1, gz + 1);
-          const v100 = xyz_to_cube_index(gx + 1, gy, gz);
-          const v101 = xyz_to_cube_index(gx + 1, gy, gz + 1);
-          const v110 = xyz_to_cube_index(gx + 1, gy + 1, gz);
-          const v111 = xyz_to_cube_index(gx + 1, gy + 1, gz + 1);
-
-          faces.push([v000, v001, v010]);
-          faces.push([v011, v010, v001]);
-
-          faces.push([v000, v100, v001]);
-          faces.push([v101, v001, v100]);
-
-          faces.push([v000, v010, v100]);
-          faces.push([v110, v100, v010]);
-
-          faces.push([v111, v011, v101]);
-          faces.push([v001, v101, v011]);
-
-          faces.push([v111, v110, v011]);
-          faces.push([v010, v011, v110]);
-
-          faces.push([v111, v101, v110]);
-          faces.push([v100, v110, v101]);
-          */
         }
       }
     }
   }
 
   return {
-    vertex_positions: halfEdges,
+    vertex_positions: halfEdgePoints,
     vertex_normals: halfEdgesNormals,
     faces: faces,
   };
 }
 
-function getIsInObjectCube(gx, gy, gz, cornersInObject) {
+/**
+ *  Compute for the current cube corners if they are in the object
+ *  Order based on drawing below
+ */
+function getAreCubeCornersInObject(gx, gy, gz, cornersInObject) {
   const v0_corner = xyz_to_cube_index(gx, gy, gz);
   const v1_corner = xyz_to_cube_index(gx, gy + 1, gz);
   const v2_corner = xyz_to_cube_index(gx + 1, gy + 1, gz);
@@ -187,6 +154,14 @@ function getIsInObjectCube(gx, gy, gz, cornersInObject) {
 //              |/_____________________|/
 //              v0         e0          v1
 
+/**
+ * Create the list of the index of the e0..e11 in "halfEdgePoints"
+ * Order based on the drawing above
+ * @param {*} x
+ * @param {*} y
+ * @param {*} z
+ * @returns
+ */
 function getIndexHalfEdgePoints(x, y, z) {
   function getIndexHalfEdgePoint(x, y, z, numberE) {
     switch (numberE) {
@@ -224,28 +199,43 @@ function getIndexHalfEdgePoints(x, y, z) {
   return points;
 }
 
-function get_binary_idx_from_corners(corners) {
+/**
+ * Translate a list of boolean (true if the corner is in the object) to a index in the LUT
+ * @param {*} corners
+ * @returns
+ */
+function get_binary_idx_from_corners(areCornersInTheObject) {
   let idx = 0;
-  for (let i = 0; i < corners.length; ++i) {
+  for (let i = areCornersInTheObject.length - 1; i >= 0; --i) {
     //maybe have to reverse traversal order
     idx *= 2;
-    if (corners[i]) {
+    if (areCornersInTheObject[i]) {
       idx += 1;
     }
   }
   return idx;
 }
 
-function translateTableEntryToNumE(arr) {
+/**
+ * Translate from a LUT entry to index of the half edge point in the cube
+ * @param {*} arr
+ * @returns
+ */
+function translateLUTEntryToIndexOfHalfEdgePointInTheCube(LUTEntry) {
   let i = 0;
   let triangles = [];
-  while (i < 16 && arr[i] != -1) {
-    triangles.push([arr[i], arr[i + 1], arr[i + 2]]);
+  while (i < 16 && LUTEntry[i] != -1) {
+    triangles.push([LUTEntry[i], LUTEntry[i + 1], LUTEntry[i + 2]]);
     i += 3;
   }
   return triangles;
 }
 
+/**
+ * Return if a cube is on the surface based on a list of boolean (true if the corner is in the object)
+ * @param {*} areCornersInObject
+ * @returns
+ */
 function isOnSurface(areCornersInObject) {
   let atLeatOneCornerInObject = false;
   let allCornersInObject = true;
@@ -317,6 +307,7 @@ export function init_terrain(regl, resources, height_map_buffer) {
   return new TerrainActor();
 }
 
+// Table staken from: http://paulbourke.net/geometry/polygonise/
 const LOOK_UP_TABLE = [
   [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
   [0, 8, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
