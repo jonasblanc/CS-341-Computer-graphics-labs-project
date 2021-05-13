@@ -22,7 +22,7 @@ import {
 } from "./icg_math.js";
 
 import { init_noise } from "./noise.js";
-import { init_terrain } from "./terrain.js";
+import { init_terrain } from "./terrain_cube.js";
 
 async function main() {
   /* const in JS means the variable will not be bound to a new value, but the value can be modified (if its an object or array)
