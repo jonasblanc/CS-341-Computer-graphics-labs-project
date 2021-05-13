@@ -96,7 +96,7 @@ function noise3D(x, y, z) {
   x -= 4;
   y -= 4;
   z -= 4;
-  if ( x*x + y*y + z*z < 15 && x*x + y*y + z*z > 10 ){
+  if ( x*x + y*y + z*z < 15){
     return 1;
   }
   return 0;
