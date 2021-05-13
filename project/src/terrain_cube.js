@@ -93,14 +93,13 @@ function terrain_build_mesh() {
 }
 
 function noise3D(x, y, z) {
-  return 1;
-  /*
-  if (x == 0 && y == 0 && z == 0) {
+  x -= 4;
+  y -= 4;
+  z -= 4;
+  if ( x*x + y*y + z*z < 15 && x*x + y*y + z*z > 10 ){
     return 1;
-  } else {
-    return 0;
   }
-  */
+  return 0;
 }
 
 export function init_terrain(regl, resources, height_map_buffer) {
