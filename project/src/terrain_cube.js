@@ -18,6 +18,7 @@ function terrain_build_mesh() {
   const vertices = [];
   const normals = [];
   const faces = [];
+  const visibility = [];
 
   // Map a 3D grid index (x, y, z) into a 1D index into the output vertex array.
   function xyz_to_v_index(x, y, z) {
@@ -39,6 +40,7 @@ function terrain_build_mesh() {
         const mapped_Y = gy / CHUNK_Y - 0.5;
         const mapped_Z = gz / CHUNK_Z - 0.5;
         vertices[idx] = [mapped_X, mapped_Y, mapped_Z];
+        visibility[idx] = noise3D(gx, gy, gz);
       }
     }
   }
@@ -48,10 +50,29 @@ function terrain_build_mesh() {
         /*
          * We create a cube if the visibility is above 0 and nothing if it's below
          */
-        let visibility = noise3D(gx, gy, gz);
         // we put the value between 0...1 so that it could be stored in a non-float texture on older browsers/GLES3, the -0.5 brings it back to -0.5 ... 0.5
 
-        if (visibility >= 0.5) {
+        const corner_visibility = [
+          visibility[xyz_to_v_index(gx, gy, gz)],
+          visibility[xyz_to_v_index(gx, gy, gz + 1)],
+          visibility[xyz_to_v_index(gx, gy + 1, gz)],
+          visibility[xyz_to_v_index(gx, gy + 1, gz + 1)],
+          visibility[xyz_to_v_index(gx + 1, gy, gz)],
+          visibility[xyz_to_v_index(gx + 1, gy, gz + 1)],
+          visibility[xyz_to_v_index(gx + 1, gy + 1, gz)],
+          visibility[xyz_to_v_index(gx + 1, gy + 1, gz + 1)],
+        ];
+
+        let atLeatOneCornerVisible = false;
+        let allCornersVisible = true;
+        for (let i = 0; i < corner_visibility.length(); ++i) {
+          const isVisible = corner_visibility[i] >= 0.5;
+          atLeatOneCornerVisible |= isVisible;
+          allCornersVisible &= isVisible;
+        }
+        const isOnSurface = atLeatOneCornerVisible && allCornersVisible;
+
+        if (isOnSurface) {
           const v000 = xyz_to_v_index(gx, gy, gz);
           const v001 = xyz_to_v_index(gx, gy, gz + 1);
           const v010 = xyz_to_v_index(gx, gy + 1, gz);
