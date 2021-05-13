@@ -46,6 +46,6 @@ void main()
             color += specular;
         }
     }
-    color = vec3(0.5,0.5,0.5);
+    color = normalize(v2f_normal);
 	gl_FragColor = vec4(color, 1.); // output: RGBA in 0..1 range
 }

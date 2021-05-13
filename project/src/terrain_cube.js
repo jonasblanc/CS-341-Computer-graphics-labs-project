@@ -30,33 +30,6 @@ function terrain_build_mesh() {
         const idx = xyz_to_v_index(gx, gy, gz);
 
         // TODO adpat normal to cube
-        /*
-        normals[idx] = vec3.normalize(
-              [0, 0, 0],
-              [
-                -(height_map.get(gx + 1, gy, gz) - height_map.get(gx - 1, gy, gz)) /
-                  (2 / grid_width),
-                -(height_map.get(gx, gy + 1, gz) - height_map.get(gx, gy - 1, gz)) /
-                  (2 / grid_height),
-                -(height_map.get(gx, gy, gz + 1) - height_map.get(gx, gy, gz - 1)) /
-                  (2 / grid_deepness),
-              ]
-            );
-          */
-
-        /*
-        normals[idx] = vec3.normalize(
-          [0, 0, 0],
-          [
-            -(height_map.get(gx + 1, gy) - height_map.get(gx - 1, gy)) /
-              (2 / grid_width),
-            -(height_map.get(gx, gy + 1) - height_map.get(gx, gy - 1)) /
-              (2 / grid_height),
-            1,
-          ]
-        );
-		*/
-
         normals[idx] = [0, 0, 1];
 
         /*
@@ -110,13 +83,13 @@ function terrain_build_mesh() {
         }
       }
     }
-
-    return {
-      vertex_positions: vertices,
-      vertex_normals: normals,
-      faces: faces,
-    };
   }
+
+  return {
+    vertex_positions: vertices,
+    vertex_normals: normals,
+    faces: faces,
+  };
 }
 
 function noise3D(x, y, z) {
