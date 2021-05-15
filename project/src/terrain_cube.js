@@ -19,7 +19,7 @@ function xyz_to_cube_index(x, y, z) {
   );
 }
 
-function terrain_build_mesh(offset) {
+function terrain_build_mesh(offset_xyz, vertex_index_offset) {
   const halfEdgePoints = [];
   const faces = [];
 
@@ -56,9 +56,9 @@ function terrain_build_mesh(offset) {
         ];
         for (let i = 0; i < 3; i++) {
           const vect = shiftVect[i];
-          const mapped_X = offset[0] + (gx + vect[0]) / NUMBER_CUBE_X - 0.5;
-          const mapped_Y = offset[1] + (gy + vect[1]) / NUMBER_CUBE_Y - 0.5;
-          const mapped_Z = offset[2] + (gz + vect[2]) / NUMBER_CUBE_Z - 0.5;
+          const mapped_X = offset_xyz[0] + (gx + vect[0]) / NUMBER_CUBE_X - 0.5;
+          const mapped_Y = offset_xyz[1] + (gy + vect[1]) / NUMBER_CUBE_Y - 0.5;
+          const mapped_Z = offset_xyz[2] + (gz + vect[2]) / NUMBER_CUBE_Z - 0.5;
           halfEdgePoints[idx + i] = [mapped_X, mapped_Y, mapped_Z];
           // TODO FIX normal
           halfEdgesNormals[idx + i] = [0, 0, 1];
@@ -93,9 +93,9 @@ function terrain_build_mesh(offset) {
 
           for (let i = 0; i < trianglesIndexInCube.length; ++i) {
             const triangle = trianglesIndexInCube[i];
-            const p1 = halfEdgePointsIndexes[triangle[0]];
-            const p2 = halfEdgePointsIndexes[triangle[1]];
-            const p3 = halfEdgePointsIndexes[triangle[2]];
+            const p1 = halfEdgePointsIndexes[triangle[0]] + vertex_index_offset;
+            const p2 = halfEdgePointsIndexes[triangle[1]] + vertex_index_offset;
+            const p3 = halfEdgePointsIndexes[triangle[2]] + vertex_index_offset;
             faces.push(p1, p2, p3);
           }
         }
@@ -269,7 +269,7 @@ function sphere3D(x, y, z) {
   return 0;
 }
 
-var last_offset = [-1, -1, -1];
+var last_offset = [0, 0, 0];
 var last_terrain = null;
 
 export function init_terrain(regl, resources, position) {
@@ -280,59 +280,48 @@ export function init_terrain(regl, resources, position) {
   if (
     last_offset[0] == offset_x &&
     last_offset[1] == offset_y &&
-    last_offset[2] == offset_z
+    last_offset[2] == offset_z &&
+    last_terrain != null
   ) {
     return last_terrain;
   } else {
     last_offset = [offset_x, offset_y, offset_z];
 
-    const meshes = [
-      terrain_build_mesh([offset_x - 1, offset_y - 1, offset_z]),
-      terrain_build_mesh([offset_x - 1, offset_y, offset_z]),
-      terrain_build_mesh([offset_x - 1, offset_y + 1, offset_z]),
-      terrain_build_mesh([offset_x, offset_y - 1, offset_z]),
-      terrain_build_mesh([offset_x, offset_y, offset_z]),
-      terrain_build_mesh([offset_x, offset_y + 1, offset_z]),
-      terrain_build_mesh([offset_x + 1, offset_y - 1, offset_z]),
-      terrain_build_mesh([offset_x + 1, offset_y, offset_z]),
-      terrain_build_mesh([offset_x + 1, offset_y + 1, offset_z]),
+    const chunk_offset = [
+      [-1, -1, 0],
+      [-1, 0, 0],
+      [-1, 1, 0],
+      [0, -1, 0],
+      [0, 0, 0],
+      [0, 1, 0],
+      [1, -1, 0],
+      [1, 0, 0],
+      [1, 1, 0],
     ];
 
-    const vertices = [
-      /* ...meshes[0].vertex_positions,
-      ...meshes[1].vertex_positions,
-      ...meshes[2].vertex_positions,
-       ...meshes[3].vertex_positions,*/
-      ...meshes[4].vertex_positions,
-      /*...meshes[5].vertex_positions,
-      ...meshes[6].vertex_positions,
-      ...meshes[7].vertex_positions,
-      ...meshes[8].vertex_positions,*/
-    ];
+    var vertices = [];
+    var normals = [];
+    var faces = [];
 
-    const normals = [
-      /*...meshes[0].vertex_normals,
-      ...meshes[1].vertex_normals,
-      ...meshes[2].vertex_normals,
-      ...meshes[3].vertex_normals,*/
-      ...meshes[4].vertex_normals,
-      /*...meshes[5].vertex_normals,
-      ...meshes[6].vertex_normals,
-      ...meshes[7].vertex_normals,
-      ...meshes[8].vertex_normals,*/
-    ];
-
-    const faces = [
-      /*...meshes[0].faces,
-      ...meshes[1].faces,
-      ...meshes[2].faces,
-      ...meshes[3].faces,*/
-      ...meshes[4].faces,
-      /*...meshes[5].faces,
-      ...meshes[6].faces,
-      ...meshes[7].faces,
-      ...meshes[8].faces,*/
-    ];
+    // TODO be smart and not recompute the 6 chunks in common
+    for (let i = 0; i < chunk_offset.length; ++i) {
+      const mesh = terrain_build_mesh(
+        [
+          offset_x + chunk_offset[i][0],
+          offset_y + chunk_offset[i][1],
+          offset_z + chunk_offset[i][2],
+        ],
+        vertices.length
+      );
+      /*
+      vertices = [...vertices, ...mesh.vertex_positions]
+      normals = [...normals, ...mesh.vertex_positions]
+      vertices = [...vertices, ...mesh.vertex_positions]
+*/
+      vertices = vertices.concat(mesh.vertex_positions);
+      normals = normals.concat(mesh.vertex_normals);
+      faces = faces.concat(mesh.faces);
+    }
 
     const pipeline_draw_terrain = regl({
       attributes: {
