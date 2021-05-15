@@ -219,7 +219,7 @@ async function main() {
 		Actors
 	---------------------------------------------------------------*/
 
-  const terrain_actor = init_terrain(regl, resources, [0.0, 0.0, 0.0]);
+  var terrain_actor = init_terrain(regl, resources, cam_look_at);
 
   /*---------------------------------------------------------------
 		Frame render
@@ -235,6 +235,8 @@ async function main() {
   regl.frame((frame) => {
     if (update_needed) {
       update_needed = false; // do this *before* running the drawing code so we don't keep updating if drawing throws an error.
+
+      terrain_actor = init_terrain(regl, resources, cam_look_at);
 
       mat4.perspective(
         mat_projection,

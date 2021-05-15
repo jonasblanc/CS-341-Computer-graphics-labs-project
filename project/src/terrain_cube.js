@@ -56,9 +56,9 @@ function terrain_build_mesh(offset) {
         ];
         for (let i = 0; i < 3; i++) {
           const vect = shiftVect[i];
-          const mapped_X = (gx + vect[0]) / NUMBER_CUBE_X - 0.5;
-          const mapped_Y = (gy + vect[1]) / NUMBER_CUBE_Y - 0.5;
-          const mapped_Z = (gz + vect[2]) / NUMBER_CUBE_Z - 0.5;
+          const mapped_X = offset[0] + (gx + vect[0]) / NUMBER_CUBE_X - 0.5;
+          const mapped_Y = offset[1] + (gy + vect[1]) / NUMBER_CUBE_Y - 0.5;
+          const mapped_Z = offset[2] + (gz + vect[2]) / NUMBER_CUBE_Z - 0.5;
           halfEdgePoints[idx + i] = [mapped_X, mapped_Y, mapped_Z];
           // TODO FIX normal
           halfEdgesNormals[idx + i] = [0, 0, 1];
@@ -248,8 +248,8 @@ function isOnSurface(areCornersInObject) {
 }
 
 function noise3D(x, y, z) {
-  //return plan3D(x, y, z);
-  return sphere3D(x, y, z);
+  return plan3D(x, y, z);
+  //return sphere3D(x, y, z);
 }
 
 function plan3D(x, y, z) {
@@ -269,56 +269,121 @@ function sphere3D(x, y, z) {
   return 0;
 }
 
-export function init_terrain(regl, resources, offset) {
-  const meshes = [];
+var last_offset = [-1, -1, -1];
+var last_terrain = null;
 
-  const terrain_mesh = terrain_build_mesh(offset);
+export function init_terrain(regl, resources, position) {
+  const offset_x = Math.round(position[0]);
+  const offset_y = Math.round(position[1]);
+  const offset_z = Math.round(position[2]);
 
-  const pipeline_draw_terrain = regl({
-    attributes: {
-      position: terrain_mesh.vertex_positions,
-      normal: terrain_mesh.vertex_normals,
-    },
-    uniforms: {
-      mat_mvp: regl.prop("mat_mvp"),
-      mat_model_view: regl.prop("mat_model_view"),
-      mat_normals: regl.prop("mat_normals"),
+  if (
+    last_offset[0] == offset_x &&
+    last_offset[1] == offset_y &&
+    last_offset[2] == offset_z
+  ) {
+    return last_terrain;
+  } else {
+    last_offset = [offset_x, offset_y, offset_z];
 
-      light_position: regl.prop("light_position"),
-    },
-    elements: terrain_mesh.faces,
+    const meshes = [
+      terrain_build_mesh([offset_x - 1, offset_y - 1, offset_z]),
+      terrain_build_mesh([offset_x - 1, offset_y, offset_z]),
+      terrain_build_mesh([offset_x - 1, offset_y + 1, offset_z]),
+      terrain_build_mesh([offset_x, offset_y - 1, offset_z]),
+      terrain_build_mesh([offset_x, offset_y, offset_z]),
+      terrain_build_mesh([offset_x, offset_y + 1, offset_z]),
+      terrain_build_mesh([offset_x + 1, offset_y - 1, offset_z]),
+      terrain_build_mesh([offset_x + 1, offset_y, offset_z]),
+      terrain_build_mesh([offset_x + 1, offset_y + 1, offset_z]),
+    ];
 
-    vert: resources["shaders/terrain.vert.glsl"],
-    frag: resources["shaders/terrain.frag.glsl"],
-  });
+    const vertices = [
+      /* ...meshes[0].vertex_positions,
+      ...meshes[1].vertex_positions,
+      ...meshes[2].vertex_positions,
+       ...meshes[3].vertex_positions,*/
+      ...meshes[4].vertex_positions,
+      /*...meshes[5].vertex_positions,
+      ...meshes[6].vertex_positions,
+      ...meshes[7].vertex_positions,
+      ...meshes[8].vertex_positions,*/
+    ];
 
-  class TerrainActor {
-    constructor() {
-      this.mat_mvp = mat4.create();
-      this.mat_model_view = mat4.create();
-      this.mat_normals = mat3.create();
-      this.mat_model_to_world = mat4.create();
+    const normals = [
+      /*...meshes[0].vertex_normals,
+      ...meshes[1].vertex_normals,
+      ...meshes[2].vertex_normals,
+      ...meshes[3].vertex_normals,*/
+      ...meshes[4].vertex_normals,
+      /*...meshes[5].vertex_normals,
+      ...meshes[6].vertex_normals,
+      ...meshes[7].vertex_normals,
+      ...meshes[8].vertex_normals,*/
+    ];
+
+    const faces = [
+      /*...meshes[0].faces,
+      ...meshes[1].faces,
+      ...meshes[2].faces,
+      ...meshes[3].faces,*/
+      ...meshes[4].faces,
+      /*...meshes[5].faces,
+      ...meshes[6].faces,
+      ...meshes[7].faces,
+      ...meshes[8].faces,*/
+    ];
+
+    const pipeline_draw_terrain = regl({
+      attributes: {
+        position: vertices,
+        normal: normals,
+      },
+      uniforms: {
+        mat_mvp: regl.prop("mat_mvp"),
+        mat_model_view: regl.prop("mat_model_view"),
+        mat_normals: regl.prop("mat_normals"),
+
+        light_position: regl.prop("light_position"),
+      },
+      elements: faces,
+
+      vert: resources["shaders/terrain.vert.glsl"],
+      frag: resources["shaders/terrain.frag.glsl"],
+    });
+
+    class TerrainActor {
+      constructor() {
+        this.mat_mvp = mat4.create();
+        this.mat_model_view = mat4.create();
+        this.mat_normals = mat3.create();
+        this.mat_model_to_world = mat4.create();
+      }
+
+      draw({ mat_projection, mat_view, light_position_cam }) {
+        mat4_matmul_many(
+          this.mat_model_view,
+          mat_view,
+          this.mat_model_to_world
+        );
+        mat4_matmul_many(this.mat_mvp, mat_projection, this.mat_model_view);
+
+        mat3.fromMat4(this.mat_normals, this.mat_model_view);
+        mat3.transpose(this.mat_normals, this.mat_normals);
+        mat3.invert(this.mat_normals, this.mat_normals);
+
+        pipeline_draw_terrain({
+          mat_mvp: this.mat_mvp,
+          mat_model_view: this.mat_model_view,
+          mat_normals: this.mat_normals,
+
+          light_position: light_position_cam,
+        });
+      }
     }
-
-    draw({ mat_projection, mat_view, light_position_cam }) {
-      mat4_matmul_many(this.mat_model_view, mat_view, this.mat_model_to_world);
-      mat4_matmul_many(this.mat_mvp, mat_projection, this.mat_model_view);
-
-      mat3.fromMat4(this.mat_normals, this.mat_model_view);
-      mat3.transpose(this.mat_normals, this.mat_normals);
-      mat3.invert(this.mat_normals, this.mat_normals);
-
-      pipeline_draw_terrain({
-        mat_mvp: this.mat_mvp,
-        mat_model_view: this.mat_model_view,
-        mat_normals: this.mat_normals,
-
-        light_position: light_position_cam,
-      });
-    }
+    last_terrain = new TerrainActor();
+    return last_terrain;
   }
-
-  return new TerrainActor();
 }
 
 // Table staken from: http://paulbourke.net/geometry/polygonise/
