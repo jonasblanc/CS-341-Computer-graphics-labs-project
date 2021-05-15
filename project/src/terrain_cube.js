@@ -248,6 +248,18 @@ function isOnSurface(areCornersInObject) {
 }
 
 function noise3D(x, y, z) {
+  return plan3D(x, y, z);
+  //return sphere3D(x, y, z);
+}
+
+function plan3D(x, y, z) {
+  if (z < 5) {
+    return 1;
+  }
+  return 0;
+}
+
+function sphere3D(x, y, z) {
   x -= 4;
   y -= 4;
   z -= 4;

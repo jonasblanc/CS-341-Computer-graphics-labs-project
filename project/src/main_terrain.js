@@ -113,38 +113,69 @@ async function main() {
 
   let cam_target = [0, 0, 0];
 
-  let r = cam_distance_base * cam_distance_factor;
-  let r_y = 0;
+  let cam_look_at = [0.0, 0.0, 0.0];
+  let cam_pos = [1.0, 0.0, 0.5];
 
   function update_cam_transform() {
-    // let r = cam_distance_base * cam_distance_factor;
-    // const look_at = mat4.lookAt(
-    //   mat4.create(),
-    //   [-r, 0, 0], // camera position in world coord
-    //   cam_target, // view target point
-    //   [0, 0, 1] // up vector
-    // );
-    // let rotatedY = mat4.fromYRotation(mat4.create(), cam_angle_y);
-    // let rotatedZ = mat4.fromZRotation(mat4.create(), cam_angle_z);
-
-    // mat4_matmul_many(mat_world_to_cam, look_at, rotatedY, rotatedZ);
-    update_cam_transform_r()
-  }
-  function update_cam_transform_r() {
-    
     const look_at = mat4.lookAt(
       mat4.create(),
-      [-cam_distance_base * cam_distance_factor, r_y, r], // camera position in world coord
-      cam_target, // view target point
+      cam_pos, // camera position in world coord
+      cam_look_at, // view target point
       [0, 0, 1] // up vector
     );
-    let rotatedY = mat4.fromYRotation(mat4.create(), cam_angle_y);
-    let rotatedZ = mat4.fromZRotation(mat4.create(), cam_angle_z);
 
-    mat4_matmul_many(mat_world_to_cam, look_at, rotatedY, rotatedZ);
+    mat4_matmul_many(mat_world_to_cam, look_at);
   }
 
   update_cam_transform();
+
+  /*
+		UI
+	*/
+  register_keyboard_action("z", () => {
+    debug_overlay.classList.toggle("hide");
+  });
+  register_keyboard_action("w", () => {
+    cam_look_at[0] -= 0.2;
+    cam_pos[0] -= 0.2;
+
+    update_cam_transform_r();
+    update_needed = true;
+    console.log("w");
+  });
+  register_keyboard_action("a", () => {
+    cam_look_at[1] -= 0.2;
+    cam_pos[1] -= 0.2;
+    update_cam_transform_r();
+    update_needed = true;
+    console.log("a");
+  });
+  register_keyboard_action("s", () => {
+    cam_look_at[0] += 0.2;
+    cam_pos[0] += 0.2;
+    update_cam_transform_r();
+    update_needed = true;
+    console.log("s");
+  });
+  register_keyboard_action("d", () => {
+    cam_look_at[1] += 0.2;
+    cam_pos[1] += 0.2;
+    update_cam_transform_r();
+    update_needed = true;
+    console.log("d");
+  });
+
+  function activate_preset_view() {
+    cam_angle_z = -1.0;
+    cam_angle_y = -0.42;
+    cam_distance_factor = 1.0;
+    cam_target = [0, 0, 0];
+
+    update_cam_transform();
+    update_needed = true;
+  }
+  activate_preset_view();
+  register_button_with_hotkey("btn-preset-view", "c", activate_preset_view);
 
   // Prevent clicking and dragging from selecting the GUI text.
   canvas_elem.addEventListener("mousedown", (event) => {
@@ -213,53 +244,6 @@ async function main() {
   });
 
   const terrain_actor = init_terrain(regl, resources, texture_fbm.get_buffer());
-
-  /*
-		UI
-	*/
-  register_keyboard_action("z", () => {
-    debug_overlay.classList.toggle("hide");
-  });
-  register_keyboard_action("w", () => {
-    r+=0.5
-    cam_target[0] += 0.5
-    update_cam_transform_r()
-    update_needed = true;
-    console.log('w')
-  });
-  register_keyboard_action("a", () => {
-    r_y+=0.5
-    cam_target[1] += 0.5
-    update_cam_transform_r()
-    update_needed = true;
-    console.log('a')
-  });
-  register_keyboard_action("s", () => {
-    r-=0.5
-    cam_target[0] -= 0.5
-    update_cam_transform_r()
-    update_needed = true;
-    console.log('s')
-  });
-  register_keyboard_action("d", () => {
-    r_y-=0.5
-    cam_target[1] -= 0.5
-    update_cam_transform_r()
-    update_needed = true;
-    console.log('d')
-  });
-
-  function activate_preset_view() {
-    cam_angle_z = -1.0;
-    cam_angle_y = -0.42;
-    cam_distance_factor = 1.0;
-    cam_target = [0, 0, 0];
-
-    update_cam_transform();
-    update_needed = true;
-  }
-  activate_preset_view();
-  register_button_with_hotkey("btn-preset-view", "c", activate_preset_view);
 
   /*---------------------------------------------------------------
 		Frame render
