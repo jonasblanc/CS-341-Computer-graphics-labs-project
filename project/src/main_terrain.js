@@ -219,7 +219,7 @@ async function main() {
 		Actors
 	---------------------------------------------------------------*/
 
-  const terrain_actor = init_terrain(regl, resources);
+  const terrain_actor = init_terrain(regl, resources, [0.0, 0.0, 0.0]);
 
   /*---------------------------------------------------------------
 		Frame render

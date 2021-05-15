@@ -19,7 +19,7 @@ function xyz_to_cube_index(x, y, z) {
   );
 }
 
-function terrain_build_mesh() {
+function terrain_build_mesh(offset) {
   const halfEdgePoints = [];
   const faces = [];
 
@@ -174,7 +174,7 @@ function getIndexHalfEdgePoints(x, y, z) {
       case 3:
         return 3 * xyz_to_cube_index(x, y, z);
       case 4:
-        return 3 * xyz_to_cube_index(x, y, z + 1 + 1);
+        return 3 * xyz_to_cube_index(x, y, z + 1) + 1;
       case 5:
         return 3 * xyz_to_cube_index(x, y + 1, z + 1);
       case 6:
@@ -248,8 +248,8 @@ function isOnSurface(areCornersInObject) {
 }
 
 function noise3D(x, y, z) {
-  return plan3D(x, y, z);
-  //return sphere3D(x, y, z);
+  //return plan3D(x, y, z);
+  return sphere3D(x, y, z);
 }
 
 function plan3D(x, y, z) {
@@ -269,8 +269,10 @@ function sphere3D(x, y, z) {
   return 0;
 }
 
-export function init_terrain(regl, resources) {
-  const terrain_mesh = terrain_build_mesh();
+export function init_terrain(regl, resources, offset) {
+  const meshes = [];
+
+  const terrain_mesh = terrain_build_mesh(offset);
 
   const pipeline_draw_terrain = regl({
     attributes: {
