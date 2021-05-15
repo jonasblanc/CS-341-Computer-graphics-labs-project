@@ -21,7 +21,6 @@ import {
   mat4_matmul_many,
 } from "./icg_math.js";
 
-import { init_noise } from "./noise.js";
 import { init_terrain } from "./terrain_cube.js";
 
 async function main() {

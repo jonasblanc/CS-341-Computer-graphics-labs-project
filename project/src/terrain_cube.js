@@ -7,6 +7,7 @@ import {
   mat4,
 } from "../lib/gl-matrix_3.3.0/esm/index.js";
 import { mat4_matmul_many } from "./icg_math.js";
+import { noise3D } from "./noise.js";
 
 const NUMBER_CUBE_X = 10;
 const NUMBER_CUBE_Y = 10;
@@ -254,35 +255,6 @@ function isOnSurface(areCornersInObject) {
     allCornersInObject &= isInObject;
   }
   return atLeatOneCornerInObject && !allCornersInObject;
-}
-
-/**
- * Coordinates recieved are in real world coordinates (ie between -0.5 and 0.5 for the central chunk)
- * @param {*} x
- * @param {*} y
- * @param {*} z
- * @returns
- */
-function noise3D(x, y, z) {
-  return plan3D(x, y, z);
-  //return sphere3D(x, y, z);
-}
-
-function plan3D(x, y, z) {
-  if (z < 0) {
-    return 1;
-  }
-  return 0;
-}
-
-function sphere3D(x, y, z) {
-  x -= 4;
-  y -= 4;
-  z -= 4;
-  if (x * x + y * y + z * z < 15) {
-    return 1;
-  }
-  return 0;
 }
 
 var last_offset = [0, 0, 0];
