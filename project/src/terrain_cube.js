@@ -304,6 +304,7 @@ export function init_terrain(regl, resources, position) {
     var faces = [];
 
     // TODO be smart and not recompute the 6 chunks in common
+    // Find a way to deal with index_offset
     for (let i = 0; i < chunk_offset.length; ++i) {
       const mesh = terrain_build_mesh(
         [
@@ -313,11 +314,7 @@ export function init_terrain(regl, resources, position) {
         ],
         vertices.length
       );
-      /*
-      vertices = [...vertices, ...mesh.vertex_positions]
-      normals = [...normals, ...mesh.vertex_positions]
-      vertices = [...vertices, ...mesh.vertex_positions]
-*/
+
       vertices = vertices.concat(mesh.vertex_positions);
       normals = normals.concat(mesh.vertex_normals);
       faces = faces.concat(mesh.faces);
