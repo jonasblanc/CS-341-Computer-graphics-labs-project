@@ -112,7 +112,6 @@ async function main() {
   let cam_distance_factor = 1;
 
   let cam_target = [0, 0, 0];
-
   let cam_look_at = [0.0, 0.0, 0.0];
   let cam_pos = [1.0, 0.0, 0.5];
 
@@ -138,29 +137,28 @@ async function main() {
   register_keyboard_action("w", () => {
     cam_look_at[0] -= 0.2;
     cam_pos[0] -= 0.2;
-
-    update_cam_transform_r();
+    update_cam_transform();
     update_needed = true;
     console.log("w");
   });
   register_keyboard_action("a", () => {
     cam_look_at[1] -= 0.2;
     cam_pos[1] -= 0.2;
-    update_cam_transform_r();
+    update_cam_transform();
     update_needed = true;
     console.log("a");
   });
   register_keyboard_action("s", () => {
     cam_look_at[0] += 0.2;
     cam_pos[0] += 0.2;
-    update_cam_transform_r();
+    update_cam_transform();
     update_needed = true;
     console.log("s");
   });
   register_keyboard_action("d", () => {
     cam_look_at[1] += 0.2;
     cam_pos[1] += 0.2;
-    update_cam_transform_r();
+    update_cam_transform();
     update_needed = true;
     console.log("d");
   });
@@ -221,29 +219,7 @@ async function main() {
 		Actors
 	---------------------------------------------------------------*/
 
-  const noise_textures = init_noise(regl, resources);
-
-  const texture_fbm = (() => {
-    for (const t of noise_textures) {
-      //if(t.name === 'FBM') {
-      /*
-			if(t.name === 'FBM_for_terrain') {
-				return t
-			}
-			*/
-      if (t.name === "Marching_cube_noise") {
-        return t;
-      }
-    }
-  })();
-
-  texture_fbm.draw_texture_to_buffer({
-    width: 96,
-    height: 96,
-    mouse_offset: [-12.24, 8.15],
-  });
-
-  const terrain_actor = init_terrain(regl, resources, texture_fbm.get_buffer());
+  const terrain_actor = init_terrain(regl, resources);
 
   /*---------------------------------------------------------------
 		Frame render

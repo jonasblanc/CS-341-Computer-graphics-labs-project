@@ -269,7 +269,7 @@ function sphere3D(x, y, z) {
   return 0;
 }
 
-export function init_terrain(regl, resources, height_map_buffer) {
+export function init_terrain(regl, resources) {
   const terrain_mesh = terrain_build_mesh();
 
   const pipeline_draw_terrain = regl({
