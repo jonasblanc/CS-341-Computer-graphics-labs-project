@@ -36,7 +36,12 @@ function terrain_build_mesh(offset_xyz, vertex_index_offset) {
     for (let gy = 0; gy <= NUMBER_CUBE_Y; gy++) {
       for (let gz = 0; gz <= NUMBER_CUBE_Z; gz++) {
         const idx_corner = xyz_to_cube_index(gx, gy, gz);
-        cornersInObject[idx_corner] = noise3D(gx, gy, gz) >= 0.5;
+        const mapped_X = offset_xyz[0] + gx / (NUMBER_CUBE_X + 1) - 0.5;
+        const mapped_Y = offset_xyz[1] + gy / (NUMBER_CUBE_Y + 1) - 0.5;
+        const mapped_Z = offset_xyz[2] + gz / (NUMBER_CUBE_Z + 1) - 0.5;
+
+        cornersInObject[idx_corner] =
+          noise3D(mapped_X, mapped_Y, mapped_Z) >= 0.5;
       }
     }
   }
@@ -61,7 +66,11 @@ function terrain_build_mesh(offset_xyz, vertex_index_offset) {
           const mapped_Z = offset_xyz[2] + (gz + vect[2]) / NUMBER_CUBE_Z - 0.5;
           halfEdgePoints[idx + i] = [mapped_X, mapped_Y, mapped_Z];
           // TODO FIX normal
-          halfEdgesNormals[idx + i] = [0, 0, 1];
+          if ((offset_xyz[0] + offset_xyz[1]) % 2 == 0) {
+            halfEdgesNormals[idx + i] = [0, 0, 1];
+          } else {
+            halfEdgesNormals[idx + i] = [0, 0, -1];
+          }
         }
       }
     }
@@ -247,13 +256,20 @@ function isOnSurface(areCornersInObject) {
   return atLeatOneCornerInObject && !allCornersInObject;
 }
 
+/**
+ * Coordinates recieved are in real world coordinates (ie between -0.5 and 0.5 for the central chunk)
+ * @param {*} x
+ * @param {*} y
+ * @param {*} z
+ * @returns
+ */
 function noise3D(x, y, z) {
   return plan3D(x, y, z);
   //return sphere3D(x, y, z);
 }
 
 function plan3D(x, y, z) {
-  if (z < 5) {
+  if (z < 0) {
     return 1;
   }
   return 0;
