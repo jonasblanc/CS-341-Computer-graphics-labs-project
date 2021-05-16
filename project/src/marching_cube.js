@@ -18,7 +18,7 @@ import {
 } from "./terrain_constants.js";
 
 // Map a 3D grid index (x, y, z) into a 1D index array.
-function xyz_to_cube_index(x, y, z) {
+function xyz_to_cube_index(x, y, z, border) {
   return (
     x + y * (NUMBER_CUBE_X + 1) + z * (NUMBER_CUBE_X + 1) * (NUMBER_CUBE_Y + 1)
   );

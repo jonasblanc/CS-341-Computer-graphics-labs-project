@@ -2,9 +2,9 @@ const CHUNK_SIZE_X = 1;
 const CHUNK_SIZE_Y = 1;
 const CHUNK_SIZE_Z = 1;
 
-const NUMBER_CUBE_X = 10;
-const NUMBER_CUBE_Y = 10;
-const NUMBER_CUBE_Z = 10;
+const NUMBER_CUBE_X = 15;
+const NUMBER_CUBE_Y = 15;
+const NUMBER_CUBE_Z = 15;
 
 export {
   CHUNK_SIZE_X,

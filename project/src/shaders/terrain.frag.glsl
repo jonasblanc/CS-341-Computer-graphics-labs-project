@@ -37,7 +37,7 @@ void main()
     float nl = dot(v2f_normal, l);
     float rv = dot(r, v);
 
-    vec3 color = ambient;
+    vec3 color = ambient * color_map;
 
     
     if(nl > 0.0){
@@ -50,6 +50,6 @@ void main()
     }
     
     // Brut force terrain color
-    color = light_color * color_map;
+    color = mix(color, vec3(1.0), length(v2f_dir_from_view) / 3.0);
 	gl_FragColor = vec4(color, 1.); // output: RGBA in 0..1 range
 }
