@@ -1,12 +1,3 @@
-import {
-  vec2,
-  vec3,
-  vec4,
-  mat2,
-  mat3,
-  mat4,
-} from "../lib/gl-matrix_3.3.0/esm/index.js";
-import { mat4_matmul_many } from "./icg_math.js";
 import { noise3D } from "./noise.js";
 
 const NUMBER_CUBE_X = 10;
@@ -20,7 +11,7 @@ function xyz_to_cube_index(x, y, z) {
   );
 }
 
-function terrain_build_mesh(offset_xyz, vertex_index_offset) {
+export function terrain_build_mesh(offset_xyz) {
   const halfEdgePoints = [];
   const faces = [];
 
@@ -103,9 +94,9 @@ function terrain_build_mesh(offset_xyz, vertex_index_offset) {
 
           for (let i = 0; i < trianglesIndexInCube.length; ++i) {
             const triangle = trianglesIndexInCube[i];
-            const p1 = halfEdgePointsIndexes[triangle[0]] + vertex_index_offset;
-            const p2 = halfEdgePointsIndexes[triangle[1]] + vertex_index_offset;
-            const p3 = halfEdgePointsIndexes[triangle[2]] + vertex_index_offset;
+            const p1 = halfEdgePointsIndexes[triangle[0]];
+            const p2 = halfEdgePointsIndexes[triangle[1]];
+            const p3 = halfEdgePointsIndexes[triangle[2]];
             faces.push(p1, p2, p3);
           }
         }
@@ -255,109 +246,6 @@ function isOnSurface(areCornersInObject) {
     allCornersInObject &= isInObject;
   }
   return atLeatOneCornerInObject && !allCornersInObject;
-}
-
-var last_offset = [0, 0, 0];
-var last_terrain = null;
-
-export function init_terrain(regl, resources, position) {
-  const offset_x = Math.round(position[0]);
-  const offset_y = Math.round(position[1]);
-  const offset_z = Math.round(position[2]);
-
-  if (
-    last_offset[0] == offset_x &&
-    last_offset[1] == offset_y &&
-    last_offset[2] == offset_z &&
-    last_terrain != null
-  ) {
-    return last_terrain;
-  } else {
-    last_offset = [offset_x, offset_y, offset_z];
-
-    const chunk_offset = [
-      [-1, -1, 0],
-      [-1, 0, 0],
-      [-1, 1, 0],
-      [0, -1, 0],
-      [0, 0, 0],
-      [0, 1, 0],
-      [1, -1, 0],
-      [1, 0, 0],
-      [1, 1, 0],
-    ];
-
-    var vertices = [];
-    var normals = [];
-    var faces = [];
-
-    // TODO be smart and not recompute the 6 chunks in common
-    // Find a way to deal with index_offset
-    for (let i = 0; i < chunk_offset.length; ++i) {
-      const mesh = terrain_build_mesh(
-        [
-          offset_x + chunk_offset[i][0],
-          offset_y + chunk_offset[i][1],
-          offset_z + chunk_offset[i][2],
-        ],
-        vertices.length
-      );
-
-      vertices = vertices.concat(mesh.vertex_positions);
-      normals = normals.concat(mesh.vertex_normals);
-      faces = faces.concat(mesh.faces);
-    }
-
-    const pipeline_draw_terrain = regl({
-      attributes: {
-        position: vertices,
-        normal: normals,
-      },
-      uniforms: {
-        mat_mvp: regl.prop("mat_mvp"),
-        mat_model_view: regl.prop("mat_model_view"),
-        mat_normals: regl.prop("mat_normals"),
-
-        light_position: regl.prop("light_position"),
-      },
-      elements: faces,
-
-      vert: resources["shaders/terrain.vert.glsl"],
-      frag: resources["shaders/terrain.frag.glsl"],
-    });
-
-    class TerrainActor {
-      constructor() {
-        this.mat_mvp = mat4.create();
-        this.mat_model_view = mat4.create();
-        this.mat_normals = mat3.create();
-        this.mat_model_to_world = mat4.create();
-      }
-
-      draw({ mat_projection, mat_view, light_position_cam }) {
-        mat4_matmul_many(
-          this.mat_model_view,
-          mat_view,
-          this.mat_model_to_world
-        );
-        mat4_matmul_many(this.mat_mvp, mat_projection, this.mat_model_view);
-
-        mat3.fromMat4(this.mat_normals, this.mat_model_view);
-        mat3.transpose(this.mat_normals, this.mat_normals);
-        mat3.invert(this.mat_normals, this.mat_normals);
-
-        pipeline_draw_terrain({
-          mat_mvp: this.mat_mvp,
-          mat_model_view: this.mat_model_view,
-          mat_normals: this.mat_normals,
-
-          light_position: light_position_cam,
-        });
-      }
-    }
-    last_terrain = new TerrainActor();
-    return last_terrain;
-  }
 }
 
 // Table staken from: http://paulbourke.net/geometry/polygonise/

@@ -14,6 +14,7 @@ import {
   register_button_with_hotkey,
   register_keyboard_action,
 } from "./icg_web.js";
+
 import {
   deg_to_rad,
   mat4_to_string,
@@ -21,7 +22,7 @@ import {
   mat4_matmul_many,
 } from "./icg_math.js";
 
-import { init_terrain } from "./terrain_cube.js";
+import { generate_terrains } from "./terrain_generation.js";
 
 async function main() {
   /* const in JS means the variable will not be bound to a new value, but the value can be modified (if its an object or array)
@@ -218,7 +219,7 @@ async function main() {
 		Actors
 	---------------------------------------------------------------*/
 
-  var terrain_actor = init_terrain(regl, resources, cam_look_at);
+  var terrain_actors = generate_terrains(regl, resources, cam_look_at);
 
   /*---------------------------------------------------------------
 		Frame render
@@ -235,7 +236,7 @@ async function main() {
     if (update_needed) {
       update_needed = false; // do this *before* running the drawing code so we don't keep updating if drawing throws an error.
 
-      terrain_actor = init_terrain(regl, resources, cam_look_at);
+      terrain_actors = generate_terrains(regl, resources, cam_look_at);
 
       mat4.perspective(
         mat_projection,
@@ -259,7 +260,9 @@ async function main() {
       // Set the whole image to black
       regl.clear({ color: [0.9, 0.9, 1, 1] });
 
-      terrain_actor.draw(scene_info);
+      for (let i = 0; i < terrain_actors.length; ++i) {
+        terrain_actors[i].draw(scene_info);
+      }
     }
 
     // 		debug_text.textContent = `
