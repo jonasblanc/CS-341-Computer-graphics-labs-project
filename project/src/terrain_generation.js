@@ -10,23 +10,36 @@ import { mat4_matmul_many } from "./icg_math.js";
 
 import { terrain_build_mesh } from "./marching_cube.js";
 
+import {
+  CHUNK_SIZE_X,
+  CHUNK_SIZE_Y,
+  CHUNK_SIZE_Z,
+} from "./terrain_constants.js";
+
 var last_offset = [0, 0, 0];
 var last_terrains = [];
 
+/**
+ * Generate the terrain composed of 9 chunks based on the given position
+ * @param {*} regl
+ * @param {*} resources
+ * @param {*} position
+ * @returns a list of TerrainActor
+ */
 export function generate_terrains(regl, resources, position) {
-  const offset_x = Math.round(position[0]);
-  const offset_y = Math.round(position[1]);
-  const offset_z = Math.round(position[2]);
+  const chunk_offset_x = Math.round(position[0] / CHUNK_SIZE_X);
+  const chunk_offset_y = Math.round(position[1] / CHUNK_SIZE_Y);
+  const chunk_offset_z = Math.round(position[2] / CHUNK_SIZE_Z);
 
   if (
-    last_offset[0] == offset_x &&
-    last_offset[1] == offset_y &&
-    last_offset[2] == offset_z &&
+    last_offset[0] == chunk_offset_x &&
+    last_offset[1] == chunk_offset_y &&
+    last_offset[2] == chunk_offset_z &&
     last_terrains.length != 0
   ) {
     return last_terrains;
   } else {
-    const chunk_offset = [
+    const chunk_grid_offset = [
       // Front row
       [-1, -1, 0], // 0
       [-1, 0, 0], // 1
@@ -41,37 +54,50 @@ export function generate_terrains(regl, resources, position) {
       [1, 1, 0], // 8
     ];
     var terrains = [];
-    if (last_terrains.length == 0 || last_offset[2] != offset_z) {
-      terrains = generate_all_chunks(regl, resources, chunk_offset, [
-        offset_x,
-        offset_y,
-        offset_z,
+    if (last_terrains.length == 0 || last_offset[2] != chunk_offset_z) {
+      terrains = generate_all_chunks(regl, resources, chunk_grid_offset, [
+        chunk_offset_x,
+        chunk_offset_y,
+        chunk_offset_z,
       ]);
     } else {
       terrains = update_chunks(
         regl,
         resources,
-        chunk_offset,
-        offset_x,
-        offset_y,
-        offset_z
+        chunk_grid_offset,
+        chunk_offset_x,
+        chunk_offset_y,
+        chunk_offset_z
       );
     }
 
-    last_offset = [offset_x, offset_y, offset_z];
+    last_offset = [chunk_offset_x, chunk_offset_y, chunk_offset_z];
     last_terrains = terrains;
     return terrains;
   }
 }
 
-function generate_all_chunks(regl, resources, chunk_offset, offset_xyz) {
+/**
+ * Generate all 9 chunks
+ * @param {*} regl
+ * @param {*} resources
+ * @param {*} chunk_grid_offset
+ * @param {*} chunk_offset_xyz
+ * @returns a list of TerrainActor
+ */
+function generate_all_chunks(
+  regl,
+  resources,
+  chunk_grid_offset,
+  chunk_offset_xyz
+) {
   const terrains = [];
 
-  for (let i = 0; i < chunk_offset.length; ++i) {
+  for (let i = 0; i < chunk_grid_offset.length; ++i) {
     const mesh = terrain_build_mesh([
-      offset_xyz[0] + chunk_offset[i][0],
-      offset_xyz[1] + chunk_offset[i][1],
-      offset_xyz[2] + chunk_offset[i][2],
+      chunk_offset_xyz[0] + chunk_grid_offset[i][0],
+      chunk_offset_xyz[1] + chunk_grid_offset[i][1],
+      chunk_offset_xyz[2] + chunk_grid_offset[i][2],
     ]);
 
     terrains.push(create_terrain_actor(regl, resources, mesh));
@@ -79,6 +105,13 @@ function generate_all_chunks(regl, resources, chunk_offset, offset_xyz) {
   return terrains;
 }
 
+/**
+ * Create a TerrainActor with the given mesh
+ * @param {*} regl
+ * @param {*} resources
+ * @param {*} mesh
+ * @returns a TerrainActor
+ */
 function create_terrain_actor(regl, resources, mesh) {
   const pipeline_draw_terrain = regl({
     attributes: {
@@ -126,6 +159,16 @@ function create_terrain_actor(regl, resources, mesh) {
   return new TerrainActor();
 }
 
+/**
+ * Update the chunk list by recreating the necessary chunks and keeping the common chunks
+ * @param {*} regl
+ * @param {*} resources
+ * @param {*} chunk_offset
+ * @param {*} offset_x
+ * @param {*} offset_y
+ * @param {*} offset_z
+ * @returns List of TerrainActor
+ */
 function update_chunks(
   regl,
   resources,

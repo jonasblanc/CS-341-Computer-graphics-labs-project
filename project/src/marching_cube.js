@@ -8,12 +8,14 @@ import {
   mat4,
 } from "../lib/gl-matrix_3.3.0/esm/index.js";
 
-const CHUNK_SIZE_XY = 1;
-const CHUNK_SIZE_Z = 1;
-
-const NUMBER_CUBE_X = 10;
-const NUMBER_CUBE_Y = 10;
-const NUMBER_CUBE_Z = 10;
+import {
+  CHUNK_SIZE_X,
+  CHUNK_SIZE_Y,
+  CHUNK_SIZE_Z,
+  NUMBER_CUBE_X,
+  NUMBER_CUBE_Y,
+  NUMBER_CUBE_Z,
+} from "./terrain_constants.js";
 
 // Map a 3D grid index (x, y, z) into a 1D index array.
 function xyz_to_cube_index(x, y, z) {
@@ -22,26 +24,52 @@ function xyz_to_cube_index(x, y, z) {
   );
 }
 
-export function terrain_build_mesh(offset_xyz) {
-  const halfEdgePoints = [];
-  const faces = [];
+function cubeCoordinateToNoiseCoordinate(x, y, z, chunk_offset) {
+  const mapped_X = chunk_offset[0] + x / (NUMBER_CUBE_X + 1) - 0.5;
+  const mapped_Y = chunk_offset[1] + y / (NUMBER_CUBE_Y + 1) - 0.5;
+  const mapped_Z = chunk_offset[2] + z / (NUMBER_CUBE_Z + 1) - 0.5;
+  return [mapped_X, mapped_Y, mapped_Z];
+}
 
+function cubeCoordinatesToDrawingCoordinates(
+  x,
+  y,
+  z,
+  chunk_offset,
+  halfEdgeShift
+) {
+  const mapped_X =
+    (chunk_offset[0] + (x + halfEdgeShift[0]) / NUMBER_CUBE_X) * CHUNK_SIZE_X -
+    0.5;
+  const mapped_Y =
+    (chunk_offset[1] + (y + halfEdgeShift[1]) / NUMBER_CUBE_Y) * CHUNK_SIZE_Y -
+    0.5;
+  const mapped_Z =
+    (chunk_offset[2] + (z + halfEdgeShift[2]) / NUMBER_CUBE_Z) * CHUNK_SIZE_Z -
+    0.5;
+  return [mapped_X, mapped_Y, mapped_Z];
+}
+
+export function terrain_build_mesh(chunk_offset) {
+  const cornersInObject = [];
+
+  const halfEdgePoints = [];
   const halfEdgesNormals = [];
   const halfEdgesNormalsContribution = [];
-
-  const cornersInObject = [];
+  const faces = [];
 
   // Compute for each cube corner if it is in the object
   for (let gx = 0; gx <= NUMBER_CUBE_X; gx++) {
     for (let gy = 0; gy <= NUMBER_CUBE_Y; gy++) {
       for (let gz = 0; gz <= NUMBER_CUBE_Z; gz++) {
         const idx_corner = xyz_to_cube_index(gx, gy, gz);
-        const mapped_X = offset_xyz[0] + gx / (NUMBER_CUBE_X + 1) - 0.5;
-        const mapped_Y = offset_xyz[1] + gy / (NUMBER_CUBE_Y + 1) - 0.5;
-        const mapped_Z = offset_xyz[2] + gz / (NUMBER_CUBE_Z + 1) - 0.5;
-
-        cornersInObject[idx_corner] =
-          noise3D(mapped_X, mapped_Y, mapped_Z) >= 0.5;
+        const noiseCoordinates = cubeCoordinateToNoiseCoordinate(
+          gx,
+          gy,
+          gz,
+          chunk_offset
+        );
+        cornersInObject[idx_corner] = noise3D(noiseCoordinates) >= 0.5;
       }
     }
   }
@@ -60,17 +88,15 @@ export function terrain_build_mesh(offset_xyz) {
           [0.0, 0.0, 0.5],
         ];
         for (let i = 0; i < 3; i++) {
-          const vect = shiftVect[i];
-          const mapped_X =
-            (offset_xyz[0] + (gx + vect[0]) / NUMBER_CUBE_X - 0.5) *
-            CHUNK_SIZE_XY;
-          const mapped_Y =
-            (offset_xyz[1] + (gy + vect[1]) / NUMBER_CUBE_Y - 0.5) *
-            CHUNK_SIZE_XY;
-          const mapped_Z =
-            (offset_xyz[2] + (gz + vect[2]) / NUMBER_CUBE_Z - 0.5) *
-            CHUNK_SIZE_Z;
-          halfEdgePoints[idx + i] = [mapped_X, mapped_Y, mapped_Z];
+          const halfEdgeShift = shiftVect[i];
+          const drawingCoordinates = cubeCoordinatesToDrawingCoordinates(
+            gx,
+            gy,
+            gz,
+            chunk_offset,
+            halfEdgeShift
+          );
+          halfEdgePoints[idx + i] = drawingCoordinates;
           halfEdgesNormals[idx + i] = [0, 0, 0];
           halfEdgesNormalsContribution[idx + i] = [0];
         }

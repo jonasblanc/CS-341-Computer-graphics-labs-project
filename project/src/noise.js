@@ -7,10 +7,10 @@ export { noise3D };
  * @param {*} z
  * @returns
  */
-function noise3D(x, y, z) {
-  //return plan3D(x, y, z);
-  //return sin2D(x, y, z);
-  return sin1D(x, y, z);
+function noise3D(xyz) {
+  //return plan3D(xyz[0],xyz[1], xyz[2);
+  //return sin2D(xyz[0],xyz[1], xyz[2);
+  return sin1D(xyz[0], xyz[1], xyz[2]);
 
   //return sphere3D(x, y, z);
 }
