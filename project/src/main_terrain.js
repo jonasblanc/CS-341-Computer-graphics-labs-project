@@ -111,7 +111,6 @@ async function main() {
   let cam_angle_y = -0.42; // in radians!
   let cam_distance_factor = 1;
 
-  let cam_target = [0, 0, 0];
   let cam_look_at = [0.0, 0.0, 0.0];
   let cam_pos = [1.0, 0.0, 0.5];
 
@@ -139,36 +138,29 @@ async function main() {
     cam_pos[0] -= 0.2;
     update_cam_transform();
     update_needed = true;
-    console.log("w");
   });
   register_keyboard_action("a", () => {
     cam_look_at[1] -= 0.2;
     cam_pos[1] -= 0.2;
     update_cam_transform();
     update_needed = true;
-    console.log("a");
   });
   register_keyboard_action("s", () => {
     cam_look_at[0] += 0.2;
     cam_pos[0] += 0.2;
     update_cam_transform();
     update_needed = true;
-    console.log("s");
   });
   register_keyboard_action("d", () => {
     cam_look_at[1] += 0.2;
     cam_pos[1] += 0.2;
     update_cam_transform();
     update_needed = true;
-    console.log("d");
   });
 
   function activate_preset_view() {
-    cam_angle_z = -1.0;
-    cam_angle_y = -0.42;
-    cam_distance_factor = 1.0;
-    cam_target = [0, 0, 0];
-
+    cam_look_at = [0.0, 0.0, 0.0];
+    cam_pos = [1.0, 0.0, 0.5];
     update_cam_transform();
     update_needed = true;
   }
@@ -192,8 +184,8 @@ async function main() {
           r
         );
         vec2.scale(offset, offset, -0.01);
-        cam_target[0] += offset[0];
-        cam_target[1] += offset[1];
+        cam_look_at[0] += offset[0];
+        cam_look_at[1] += offset[1];
       } else {
         cam_angle_z += event.movementX * 0.005;
         cam_angle_y += -event.movementY * 0.005;
@@ -273,3 +265,18 @@ async function main() {
 }
 
 DOM_loaded_promise.then(main);
+
+const chunk_offset = [
+  // Front row
+  [-1, -1, 0], // 0
+  [-1, 0, 0], // 1
+  [-1, 1, 0], // 2
+  // Center row
+  [0, -1, 0], // 3
+  [0, 0, 0], // 4
+  [0, 1, 0], // 5
+  // Back row
+  [1, -1, 0], // 6
+  [1, 0, 0], // 7
+  [1, 1, 0], // 8
+];
