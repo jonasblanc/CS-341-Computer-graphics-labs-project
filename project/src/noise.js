@@ -19,6 +19,9 @@ function noise3D(x, y, z) {
   
   return terrain2d(x,y,z)
   //return plan3D(x, y, z);
+  //return plan3D(x, y, z);
+  //return sin2D(x, y, z);
+  //return sin1D(x, y, z);
   //return sphere3D(x, y, z);
   //return perlin_noise_2D(x, y);
 }
@@ -44,15 +47,35 @@ function plan3D(x, y, z) {
 }
 
 function sphere3D(x, y, z) {
-  x -= 4;
-  y -= 4;
-  z -= 4;
-  if (x * x + y * y + z * z < 15) {
+  if (x * x + y * y + z * z < 0.1) {
     return 1;
   }
   return 0;
 }
 
+function sin2D(x, y, z) {
+  if (z < -0.3) {
+    return 1;
+  } else {
+    if (z < (Math.sin(2 * x) + Math.sin(2 * y)) / 5 - 0.1) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+}
+
+function sin1D(x, y, z) {
+  if (z < -0.1) {
+    return 1;
+  } else {
+    if (z < Math.sin(2 * x) / 3 - 0.1) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+}
 
 //---------------------------------------------------------------------------2D implementation-------------------------------------------------------------------------
 

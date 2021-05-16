@@ -16,7 +16,8 @@ const vec3  terrain_color_grass    = vec3(0.33, 0.43, 0.18);
 void main()
 {
 	const vec3 ambient = 0.2 * light_color; // Ambient light intensity
-	float height = v2f_height;
+	
+    float height = v2f_height;
 
 	vec3 color_map = vec3(0.0);
 	float shininess = 0.0;
@@ -38,6 +39,7 @@ void main()
 
     vec3 color = ambient;
 
+    
     if(nl > 0.0){
         vec3 diffuse = light_color * color_map * nl;
         color += diffuse;
@@ -46,6 +48,8 @@ void main()
             color += specular;
         }
     }
-    color = normalize(v2f_normal);
+    
+    // Brut force terrain color
+    color = light_color * color_map;
 	gl_FragColor = vec4(color, 1.); // output: RGBA in 0..1 range
 }
