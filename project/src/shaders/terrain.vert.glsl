@@ -17,21 +17,13 @@ void main()
     v2f_height = position.z;
     vec4 position_v4 = vec4(position, 1);
 
-    /** TODO 3.2:
-	Setup all outgoing variables so that you can compute in the fragmend shader
-    the phong lighting. You will need to setup all the uniforms listed above, before you
-    can start coding this shader.
-
-    Hint: Compute the vertex position, normal and light_position in eye space.
-    Hint: Write the final vertex position to gl_Position
-    */
 	// viewing vector (from camera to vertex in view coordinates), camera is at vec3(0, 0, 0) in cam coords
     vec4 dir_from_view_4D = mat_model_view * position_v4;//It is just the position in view system since the camera is at origin
 	v2f_dir_from_view = vec3(dir_from_view_4D);	// direction to light source
 
 	v2f_dir_to_light = vec3(light_position) - v2f_dir_from_view;//Vector from vertex to light
 	// transform normal to camera coordinates
-	v2f_normal = normalize(mat_normals * normal); // TODO apply normal transformation
+	v2f_normal = normalize(mat_normals * normal);
 	
-	gl_Position = mat_mvp * vec4(position, 1);
+	gl_Position = mat_mvp * position_v4;
 }

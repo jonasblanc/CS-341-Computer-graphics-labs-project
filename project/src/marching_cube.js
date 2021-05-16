@@ -1,4 +1,15 @@
 import { noise3D } from "./noise.js";
+import {
+  vec2,
+  vec3,
+  vec4,
+  mat2,
+  mat3,
+  mat4,
+} from "../lib/gl-matrix_3.3.0/esm/index.js";
+
+const CHUNK_SIZE_XY = 1;
+const CHUNK_SIZE_Z = 1;
 
 const NUMBER_CUBE_X = 10;
 const NUMBER_CUBE_Y = 10;
@@ -15,11 +26,8 @@ export function terrain_build_mesh(offset_xyz) {
   const halfEdgePoints = [];
   const faces = [];
 
-  // TODO
   const halfEdgesNormals = [];
-
-  // TODO DELETE
-  //const test_vertices = [];
+  const halfEdgesNormalsContribution = [];
 
   const cornersInObject = [];
 
@@ -53,16 +61,18 @@ export function terrain_build_mesh(offset_xyz) {
         ];
         for (let i = 0; i < 3; i++) {
           const vect = shiftVect[i];
-          const mapped_X = offset_xyz[0] + (gx + vect[0]) / NUMBER_CUBE_X - 0.5;
-          const mapped_Y = offset_xyz[1] + (gy + vect[1]) / NUMBER_CUBE_Y - 0.5;
-          const mapped_Z = offset_xyz[2] + (gz + vect[2]) / NUMBER_CUBE_Z - 0.5;
+          const mapped_X =
+            (offset_xyz[0] + (gx + vect[0]) / NUMBER_CUBE_X - 0.5) *
+            CHUNK_SIZE_XY;
+          const mapped_Y =
+            (offset_xyz[1] + (gy + vect[1]) / NUMBER_CUBE_Y - 0.5) *
+            CHUNK_SIZE_XY;
+          const mapped_Z =
+            (offset_xyz[2] + (gz + vect[2]) / NUMBER_CUBE_Z - 0.5) *
+            CHUNK_SIZE_Z;
           halfEdgePoints[idx + i] = [mapped_X, mapped_Y, mapped_Z];
-          // TODO FIX normal
-          if ((offset_xyz[0] + offset_xyz[1]) % 2 == 0) {
-            halfEdgesNormals[idx + i] = [0, 0, 1];
-          } else {
-            halfEdgesNormals[idx + i] = [0, 0, -1];
-          }
+          halfEdgesNormals[idx + i] = [0, 0, 0];
+          halfEdgesNormalsContribution[idx + i] = [0];
         }
       }
     }
@@ -94,10 +104,38 @@ export function terrain_build_mesh(offset_xyz) {
 
           for (let i = 0; i < trianglesIndexInCube.length; ++i) {
             const triangle = trianglesIndexInCube[i];
-            const p1 = halfEdgePointsIndexes[triangle[0]];
-            const p2 = halfEdgePointsIndexes[triangle[1]];
-            const p3 = halfEdgePointsIndexes[triangle[2]];
-            faces.push(p1, p2, p3);
+            const p1_idx = halfEdgePointsIndexes[triangle[0]];
+            const p2_idx = halfEdgePointsIndexes[triangle[1]];
+            const p3_idx = halfEdgePointsIndexes[triangle[2]];
+            faces.push(p1_idx, p2_idx, p3_idx);
+
+            // Normal computation
+            const p1 = halfEdgePoints[p1_idx];
+            const p2 = halfEdgePoints[p2_idx];
+            const p3 = halfEdgePoints[p3_idx];
+
+            const p1p2 = vec3.sub([0, 0, 0], p2, p1);
+            const p1p3 = vec3.sub([0, 0, 0], p3, p1);
+            const face_normal = vec3.normalize(
+              [0, 0, 0],
+              vec3.cross([0, 0, 0], p1p3, p1p2)
+            );
+
+            // Update normal of the three trangle vertex
+            const points_indexes = [p1_idx, p2_idx, p3_idx];
+            for (let j = 0; j < points_indexes.length; ++j) {
+              const p_idx = points_indexes[j];
+              const wheighted_previous_normal = vec3.scale(
+                [0, 0, 0],
+                halfEdgesNormals[p_idx],
+                halfEdgesNormalsContribution[p_idx]
+              );
+              halfEdgesNormals[p_idx] = vec3.normalize(
+                [0, 0, 0],
+                vec3.add([0, 0, 0], wheighted_previous_normal, face_normal)
+              );
+              halfEdgesNormalsContribution[p_idx] += 1;
+            }
           }
         }
       }

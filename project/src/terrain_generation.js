@@ -41,25 +41,23 @@ export function generate_terrains(regl, resources, position) {
       [1, 1, 0], // 8
     ];
     var terrains = [];
-    if (last_terrains.length != 0 || last_offset[2] != offset_z) {
+    if (last_terrains.length == 0 || last_offset[2] != offset_z) {
       terrains = generate_all_chunks(regl, resources, chunk_offset, [
         offset_x,
         offset_y,
         offset_z,
       ]);
     } else {
-      update_chunks(chunk_offset, offset_x, offset_y, offset_z);
+      terrains = update_chunks(
+        regl,
+        resources,
+        chunk_offset,
+        offset_x,
+        offset_y,
+        offset_z
+      );
     }
 
-    for (let i = 0; i < chunk_offset.length; ++i) {
-      const mesh = terrain_build_mesh([
-        offset_x + chunk_offset[i][0],
-        offset_y + chunk_offset[i][1],
-        offset_z + chunk_offset[i][2],
-      ]);
-
-      terrains.push(create_terrain_actor(regl, resources, mesh));
-    }
     last_offset = [offset_x, offset_y, offset_z];
     last_terrains = terrains;
     return terrains;
@@ -85,7 +83,7 @@ function create_terrain_actor(regl, resources, mesh) {
   const pipeline_draw_terrain = regl({
     attributes: {
       position: mesh.vertex_positions,
-      normal: mesh.vertex_positions,
+      normal: mesh.vertex_normals,
     },
     uniforms: {
       mat_mvp: regl.prop("mat_mvp"),
@@ -128,7 +126,14 @@ function create_terrain_actor(regl, resources, mesh) {
   return new TerrainActor();
 }
 
-function update_chunks(chunk_offset, offset_x, offset_y, offset_z) {
+function update_chunks(
+  regl,
+  resources,
+  chunk_offset,
+  offset_x,
+  offset_y,
+  offset_z
+) {
   const terrains = [];
   // Back and front
   if (last_offset[0] < offset_x) {
@@ -138,37 +143,61 @@ function update_chunks(chunk_offset, offset_x, offset_y, offset_z) {
     terrains[3] = last_terrains[6];
     terrains[4] = last_terrains[7];
     terrains[5] = last_terrains[8];
-    terrains[6] = terrain_build_mesh([
-      offset_x + chunk_offset[6][0],
-      offset_y + chunk_offset[6][1],
-      offset_z + chunk_offset[6][2],
-    ]);
-    terrains[7] = terrain_build_mesh([
-      offset_x + chunk_offset[7][0],
-      offset_y + chunk_offset[7][1],
-      offset_z + chunk_offset[7][2],
-    ]);
-    terrains[8] = terrain_build_mesh([
-      offset_x + chunk_offset[8][0],
-      offset_y + chunk_offset[8][1],
-      offset_z + chunk_offset[8][2],
-    ]);
+    terrains[6] = create_terrain_actor(
+      regl,
+      resources,
+      terrain_build_mesh([
+        offset_x + chunk_offset[6][0],
+        offset_y + chunk_offset[6][1],
+        offset_z + chunk_offset[6][2],
+      ])
+    );
+    terrains[7] = create_terrain_actor(
+      regl,
+      resources,
+      terrain_build_mesh([
+        offset_x + chunk_offset[7][0],
+        offset_y + chunk_offset[7][1],
+        offset_z + chunk_offset[7][2],
+      ])
+    );
+    terrains[8] = create_terrain_actor(
+      regl,
+      resources,
+      terrain_build_mesh([
+        offset_x + chunk_offset[8][0],
+        offset_y + chunk_offset[8][1],
+        offset_z + chunk_offset[8][2],
+      ])
+    );
   } else if (last_offset[0] > offset_x) {
-    terrains[0] = terrain_build_mesh([
-      offset_x + chunk_offset[0][0],
-      offset_y + chunk_offset[0][1],
-      offset_z + chunk_offset[0][2],
-    ]);
-    terrains[1] = terrain_build_mesh([
-      offset_x + chunk_offset[1][0],
-      offset_y + chunk_offset[1][1],
-      offset_z + chunk_offset[1][2],
-    ]);
-    terrains[2] = terrain_build_mesh([
-      offset_x + chunk_offset[2][0],
-      offset_y + chunk_offset[2][1],
-      offset_z + chunk_offset[2][2],
-    ]);
+    terrains[0] = create_terrain_actor(
+      regl,
+      resources,
+      terrain_build_mesh([
+        offset_x + chunk_offset[0][0],
+        offset_y + chunk_offset[0][1],
+        offset_z + chunk_offset[0][2],
+      ])
+    );
+    terrains[1] = create_terrain_actor(
+      regl,
+      resources,
+      terrain_build_mesh([
+        offset_x + chunk_offset[1][0],
+        offset_y + chunk_offset[1][1],
+        offset_z + chunk_offset[1][2],
+      ])
+    );
+    terrains[2] = create_terrain_actor(
+      regl,
+      resources,
+      terrain_build_mesh([
+        offset_x + chunk_offset[2][0],
+        offset_y + chunk_offset[2][1],
+        offset_z + chunk_offset[2][2],
+      ])
+    );
     terrains[3] = last_terrains[0];
     terrains[4] = last_terrains[1];
     terrains[5] = last_terrains[2];
@@ -181,45 +210,69 @@ function update_chunks(chunk_offset, offset_x, offset_y, offset_z) {
   if (last_offset[1] < offset_y) {
     terrains[0] = last_terrains[1];
     terrains[1] = last_terrains[2];
-    terrains[2] = terrain_build_mesh([
-      offset_x + chunk_offset[2][0],
-      offset_y + chunk_offset[2][1],
-      offset_z + chunk_offset[2][2],
-    ]);
+    terrains[2] = create_terrain_actor(
+      regl,
+      resources,
+      terrain_build_mesh([
+        offset_x + chunk_offset[2][0],
+        offset_y + chunk_offset[2][1],
+        offset_z + chunk_offset[2][2],
+      ])
+    );
     terrains[3] = last_terrains[4];
     terrains[4] = last_terrains[5];
-    terrains[5] = terrain_build_mesh([
-      offset_x + chunk_offset[5][0],
-      offset_y + chunk_offset[5][1],
-      offset_z + chunk_offset[5][2],
-    ]);
+    terrains[5] = create_terrain_actor(
+      regl,
+      resources,
+      terrain_build_mesh([
+        offset_x + chunk_offset[5][0],
+        offset_y + chunk_offset[5][1],
+        offset_z + chunk_offset[5][2],
+      ])
+    );
     terrains[6] = last_terrains[7];
     terrains[7] = last_terrains[8];
-    terrains[8] = terrain_build_mesh([
-      offset_x + chunk_offset[8][0],
-      offset_y + chunk_offset[8][1],
-      offset_z + chunk_offset[8][2],
-    ]);
+    terrains[8] = create_terrain_actor(
+      regl,
+      resources,
+      terrain_build_mesh([
+        offset_x + chunk_offset[8][0],
+        offset_y + chunk_offset[8][1],
+        offset_z + chunk_offset[8][2],
+      ])
+    );
   } else if (last_offset[1] > offset_y) {
-    terrains[0] = terrain_build_mesh([
-      offset_x + chunk_offset[0][0],
-      offset_y + chunk_offset[0][1],
-      offset_z + chunk_offset[0][2],
-    ]);
+    terrains[0] = create_terrain_actor(
+      regl,
+      resources,
+      terrain_build_mesh([
+        offset_x + chunk_offset[0][0],
+        offset_y + chunk_offset[0][1],
+        offset_z + chunk_offset[0][2],
+      ])
+    );
     terrains[1] = last_terrains[0];
     terrains[2] = last_terrains[1];
-    terrains[3] = terrain_build_mesh([
-      offset_x + chunk_offset[3][0],
-      offset_y + chunk_offset[3][1],
-      offset_z + chunk_offset[3][2],
-    ]);
+    terrains[3] = create_terrain_actor(
+      regl,
+      resources,
+      terrain_build_mesh([
+        offset_x + chunk_offset[3][0],
+        offset_y + chunk_offset[3][1],
+        offset_z + chunk_offset[3][2],
+      ])
+    );
     terrains[4] = last_terrains[3];
     terrains[5] = last_terrains[4];
-    terrains[6] = terrain_build_mesh([
-      offset_x + chunk_offset[6][0],
-      offset_y + chunk_offset[6][1],
-      offset_z + chunk_offset[6][2],
-    ]);
+    terrains[6] = create_terrain_actor(
+      regl,
+      resources,
+      terrain_build_mesh([
+        offset_x + chunk_offset[6][0],
+        offset_y + chunk_offset[6][1],
+        offset_z + chunk_offset[6][2],
+      ])
+    );
     terrains[7] = last_terrains[6];
     terrains[8] = last_terrains[7];
   }

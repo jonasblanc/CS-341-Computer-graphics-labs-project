@@ -107,21 +107,43 @@ async function main() {
   const mat_world_to_cam = mat4.create();
   const cam_distance_base = 0.75;
 
-  let cam_angle_z = -0.5; // in radians!
-  let cam_angle_y = -0.42; // in radians!
+  let cam_angle_z = 0; // in radians!
+  let cam_angle_y = 0; // in radians!
   let cam_distance_factor = 1;
 
-  let cam_look_at = [0.0, 0.0, 0.0];
-  let cam_pos = [1.0, 0.0, 0.5];
+  const DEFAULT_CAM_LOOK_AT = [0.0, 0.0, 0.0];
+  const DEFAULT_CAM_POS = [1.0, 0.0, 0.5];
+
+  let cam_look_at = DEFAULT_CAM_LOOK_AT;
+  let cam_pos = DEFAULT_CAM_POS;
 
   function update_cam_transform() {
+    /*
+    const look_at = mat4.lookAt(
+      mat4.create(),
+      [1, 0, 1], //cam_pos, // camera position in world coord
+      [0, 0, 0], //cam_look_at, // view target point
+      [0, 0, 1] // up vector
+    );
+    let rotatedZ = mat4.fromZRotation(mat4.create(), cam_angle_z);
+    let rotatedY = mat4.fromZRotation(mat4.create(), cam_angle_y);
+
+    let deplacement = mat4.fromTranslation(mat4.create(), cam_pos);
+
+    mat4_matmul_many(
+      mat_world_to_cam,
+      look_at,
+      rotatedZ,
+      rotatedY,
+      deplacement
+    );*/
+
     const look_at = mat4.lookAt(
       mat4.create(),
       cam_pos, // camera position in world coord
       cam_look_at, // view target point
       [0, 0, 1] // up vector
     );
-
     mat4_matmul_many(mat_world_to_cam, look_at);
   }
 
@@ -159,8 +181,8 @@ async function main() {
   });
 
   function activate_preset_view() {
-    cam_look_at = [0.0, 0.0, 0.0];
-    cam_pos = [1.0, 0.0, 0.5];
+    cam_look_at = DEFAULT_CAM_LOOK_AT;
+    cam_pos = DEFAULT_CAM_POS;
     update_cam_transform();
     update_needed = true;
   }
@@ -176,20 +198,10 @@ async function main() {
   window.addEventListener("mousemove", (event) => {
     // if left or middle button is pressed
     if (event.buttons & 1 || event.buttons & 4) {
-      if (event.shiftKey) {
-        const r = mat2.fromRotation(mat2.create(), -cam_angle_z);
-        const offset = vec2.transformMat2(
-          [0, 0],
-          [event.movementY, event.movementX],
-          r
-        );
-        vec2.scale(offset, offset, -0.01);
-        cam_look_at[0] += offset[0];
-        cam_look_at[1] += offset[1];
-      } else {
-        cam_angle_z += event.movementX * 0.005;
-        cam_angle_y += -event.movementY * 0.005;
-      }
+      cam_angle_z += event.movementX * 0.005;
+      cam_angle_y += -event.movementY * 0.005;
+      console.log(cam_angle_z);
+
       update_cam_transform();
       update_needed = true;
     }
@@ -219,7 +231,7 @@ async function main() {
   const mat_projection = mat4.create();
   const mat_view = mat4.create();
 
-  let light_position_world = [0.2, -0.3, 0.8, 1.0];
+  let light_position_world = [0.0, 0.0, 100.0, 1.0];
   //let light_position_world = [1, -1, 1., 1.0]
 
   const light_position_cam = [0, 0, 0, 0];
@@ -265,18 +277,3 @@ async function main() {
 }
 
 DOM_loaded_promise.then(main);
-
-const chunk_offset = [
-  // Front row
-  [-1, -1, 0], // 0
-  [-1, 0, 0], // 1
-  [-1, 1, 0], // 2
-  // Center row
-  [0, -1, 0], // 3
-  [0, 0, 0], // 4
-  [0, 1, 0], // 5
-  // Back row
-  [1, -1, 0], // 6
-  [1, 0, 0], // 7
-  [1, 1, 0], // 8
-];
