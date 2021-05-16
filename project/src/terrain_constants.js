@@ -1,0 +1,16 @@
+const CHUNK_SIZE_X = 1;
+const CHUNK_SIZE_Y = 1;
+const CHUNK_SIZE_Z = 1;
+
+const NUMBER_CUBE_X = 10;
+const NUMBER_CUBE_Y = 10;
+const NUMBER_CUBE_Z = 10;
+
+export {
+  CHUNK_SIZE_X,
+  CHUNK_SIZE_Y,
+  CHUNK_SIZE_Z,
+  NUMBER_CUBE_X,
+  NUMBER_CUBE_Y,
+  NUMBER_CUBE_Z,
+};
