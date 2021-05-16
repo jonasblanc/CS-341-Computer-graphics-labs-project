@@ -25,9 +25,9 @@ function xyz_to_cube_index(x, y, z) {
 }
 
 function cubeCoordinateToNoiseCoordinate(x, y, z, chunk_offset) {
-  const mapped_X = chunk_offset[0] + x / (NUMBER_CUBE_X + 1) - 0.5;
-  const mapped_Y = chunk_offset[1] + y / (NUMBER_CUBE_Y + 1) - 0.5;
-  const mapped_Z = chunk_offset[2] + z / (NUMBER_CUBE_Z + 1) - 0.5;
+  const mapped_X = chunk_offset[0] + x / NUMBER_CUBE_X - 0.5;
+  const mapped_Y = chunk_offset[1] + y / NUMBER_CUBE_Y - 0.5;
+  const mapped_Z = chunk_offset[2] + z / NUMBER_CUBE_Z - 0.5;
   return [mapped_X, mapped_Y, mapped_Z];
 }
 
