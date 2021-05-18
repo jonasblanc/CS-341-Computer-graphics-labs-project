@@ -5,6 +5,7 @@ varying vec3 v2f_normal; // normal vector in camera coordinates
 varying vec3 v2f_dir_to_light; // direction to light source
 varying vec3 v2f_dir_from_view; // viewing vector (from eye to vertex in view coordinates)
 varying float v2f_height;
+uniform bool night_mode;
 
 const vec3  light_color = vec3(1.0, 0.941, 0.898);
 // Small perturbation to prevent "z-fighting" on the water on some machines...
@@ -49,6 +50,10 @@ void main()
     }
     
     // Brut force terrain color
-    color = mix(color, vec3(1.0), length(v2f_dir_from_view) / 3.0);
-	gl_FragColor = vec4(color, 1.); // output: RGBA in 0..1 range
+    if(!night_mode){
+        color = mix(color, vec3(1.0), length(v2f_dir_from_view) / 3.0); //chnage 1 to 0 and vice versa to enable day/night
+    }else{
+      color = mix(color, vec3(.0, .04, .12), length(v2f_dir_from_view) / 3.0); //chnage 1 to 0 and vice versa to enable day/night
+    }	
+    gl_FragColor = vec4(color, 1.); // output: RGBA in 0..1 range
 }

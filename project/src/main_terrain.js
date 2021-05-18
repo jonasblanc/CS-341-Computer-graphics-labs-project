@@ -120,6 +120,8 @@ async function main() {
   const light_position_world = [0, 0, 0, 1];
   const light_position_cam = [0, 0, 0, 0];
 
+  let night = false;
+
   function update_cam_transform() {
     /*
     const look_at = mat4.lookAt(
@@ -180,6 +182,10 @@ async function main() {
     cam_look_at[1] += 0.2;
     cam_pos[1] += 0.2;
     update_cam_transform();
+    update_needed = true;
+  });
+  register_keyboard_action("n", () => {
+    night = !night;
     update_needed = true;
   });
 
@@ -252,15 +258,26 @@ async function main() {
 
       // Calculate light position in camera frame
       vec4.transformMat4(light_position_cam, light_position_world, mat_view);
+      let t = [0,0,-10,1];
+
+      // Set the whole image to black
+      if (night){
+        regl.clear({ color: [1./255, 9./255, 31./255, 1] });
+        console.log('night mode enabled');
+        // glUniform1i(glGetUniformLocation(shader, "foo"), true);
+
+      }else{
+        regl.clear({ color: [1., 1., 1., 1] });
+        console.log('night mode disabled');
+        // glUniform1i(glGetUniformLocation(shader, "foo"), true);
+      }
 
       const scene_info = {
         mat_view: mat_view,
         mat_projection: mat_projection,
-        light_position_cam: light_position_cam,
+        light_position_cam: t,
+        night_mode:night,
       };
-
-      // Set the whole image to black
-      regl.clear({ color: [0.9, 0.9, 1, 1] });
 
       for (let i = 0; i < terrain_actors.length; ++i) {
         terrain_actors[i].draw(scene_info);

@@ -14,7 +14,26 @@ export { noise3D };
  * @returns
  */
 function noise3D(xyz) {
-  return terrain2d(xyz[0], xyz[1], xyz[2]);
+
+  const x=xyz[0]
+  const y=xyz[1]
+  const z=xyz[2]
+
+
+  const value_choose_region = choose_noise_function(x, y);
+
+  if(value_choose_region<=-0.33){
+    return plain(x,y,z);
+  }
+  else if (value_choose_region<=0.33){
+    return water_with_flying_islands(x,y,z);
+  } 
+  else{
+    return mountain(x,y,z);
+  }
+
+
+  //return terrain2d(xyz[0], xyz[1], xyz[2]);
   //return plan3D(xyz[0],xyz[1], xyz[2]);
   //return plan3D(xyz[0],xyz[1], xyz[2]);
   //return sin2D(xyz[0],xyz[1], xyz[2]);
@@ -25,12 +44,12 @@ function noise3D(xyz) {
 
 const HEIGHT_SCALE_FACTOR = 0.35;
 
-function terrain2d(x, y, z) {
+function terrain2d(x, y, z, num_octaves, freq_multiplier, ampl_multiplier) {
   if (z < -0.05) {
     return 1;
   }
 
-  const height = HEIGHT_SCALE_FACTOR * perlin_fbm(x, y);
+  const height = HEIGHT_SCALE_FACTOR * perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
 
   if (z <= height) {
     return 1;
@@ -177,9 +196,9 @@ function perlin_noise_2D(x, y) {
 }
 
 // Constants for FBM
-const freq_multiplier = 2.17;
-const ampl_multiplier = 0.5;
-const num_octaves = 4;
+//const freq_multiplier = 2.17;
+//const ampl_multiplier = 0.8;
+//const num_octaves = 20;
 
 /**
  * Compute the fractional Brownian motion (FBM) of a 2D point
@@ -187,7 +206,7 @@ const num_octaves = 4;
  * @param {*} y: y coordinate
  * @returns a random looking value representing the height at this point with different frequencies to have more details
  */
-function perlin_fbm(x, y) {
+function perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier) {
   let fbm = 0.0;
   let freqi = 1.0;
   let ampi = 1.0;
@@ -197,4 +216,73 @@ function perlin_fbm(x, y) {
     ampi = ampi * ampl_multiplier;
   }
   return fbm;
+}
+
+
+function choose_noise_function(x, y){
+  const angular_speed = 0.8;
+  const value = Math.sin(angular_speed*x)*Math.sin(angular_speed*y);
+
+  return value;
+}
+
+
+
+
+//---------------------------------------------------------------------------------BIOMES-------------------------------------------------------------------------------
+
+function plain(x,y,z){
+  if (z < -0.05) {
+    return 1;
+  }
+  const freq_multiplier = 2.17;
+  const ampl_multiplier = 0.5;
+  const num_octaves = 1;
+  const height_scale_factor = 0.35;
+
+  const height = height_scale_factor*perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
+
+  if (z <= height) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+
+function mountain(x,y,z){
+  if (z < -0.05) {
+    return 1;
+  }
+  const freq_multiplier = 2.17;
+  const ampl_multiplier = 0.6;
+  const num_octaves = 8;
+  const height_scale_factor = 0.25;
+  const base_height = 0.15;
+
+  const height = base_height+height_scale_factor*perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
+
+  if (z <= height) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+function water_with_flying_islands(x,y,z){
+  if (z < -0.05) {
+    return 1;
+  }
+  const freq_multiplier = 2.17;
+  const ampl_multiplier = 0.5;
+  const num_octaves = 4;
+  const height_scale_factor = 0.5;
+
+  const height = height_scale_factor*perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
+
+  if (z <= height && !(z>-0.5 && z<0.2)) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
