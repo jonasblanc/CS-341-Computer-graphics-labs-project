@@ -14,32 +14,28 @@ export { noise3D };
  * @returns
  */
 function noise3D(xyz) {
-
-  const x=xyz[0]
-  const y=xyz[1]
-  const z=xyz[2]
-
+  const x = xyz[0];
+  const y = xyz[1];
+  const z = xyz[2];
 
   const value_choose_region = choose_noise_function(x, y);
 
-  if(value_choose_region<=-0.33){
-    return plain(x,y,z);
+  if (value_choose_region <= -0.33) {
+    return plain(x, y, z);
+  } else if (value_choose_region <= 0.33) {
+    return water_with_flying_islands(x, y, z);
+  } else {
+    return mountain(x, y, z);
   }
-  else if (value_choose_region<=0.33){
-    return water_with_flying_islands(x,y,z);
-  } 
-  else{
-    return mountain(x,y,z);
-  }
-
 
   //return terrain2d(xyz[0], xyz[1], xyz[2]);
   //return plan3D(xyz[0],xyz[1], xyz[2]);
   //return plan3D(xyz[0],xyz[1], xyz[2]);
   //return sin2D(xyz[0],xyz[1], xyz[2]);
   //return sin1D(xyz[0],xyz[1], xyz[2]);
-  //return sphere3D(xyz[0],xyz[1], xyz[2]);
-  //return perlin_noise_2D(xyz[0],xyz[1]);
+  //return sphere3D(xyz[0], xyz[1], xyz[2]);
+  //return smoothSphere3D(xyz[0], xyz[1], xyz[2]);
+  //return perlin_noise_2D(xyz[0], xyz[1]);
 }
 
 const HEIGHT_SCALE_FACTOR = 0.35;
@@ -49,7 +45,9 @@ function terrain2d(x, y, z, num_octaves, freq_multiplier, ampl_multiplier) {
     return 1;
   }
 
-  const height = HEIGHT_SCALE_FACTOR * perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
+  const height =
+    HEIGHT_SCALE_FACTOR *
+    perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
 
   if (z <= height) {
     return 1;
@@ -66,10 +64,19 @@ function plan3D(x, y, z) {
 }
 
 function sphere3D(x, y, z) {
-  if (x * x + y * y + z * z < 0.1) {
+  const r2 = x * x + y * y + z * z;
+  if (r2 < 0.1) {
     return 1;
+  } else {
+    return 0;
   }
-  return 0;
+}
+
+function smoothSphere3D(x, y, z) {
+  const r2 = x * x + y * y + z * z;
+  //console.log(r2, Math.exp(-0.07 * r2));
+  return Math.exp(-3 * r2);
+  //return Math.round(Math.exp(-0.07 * r2) * 2) / 2;
 }
 
 function sin2D(x, y, z) {
@@ -218,20 +225,16 @@ function perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier) {
   return fbm;
 }
 
-
-function choose_noise_function(x, y){
+function choose_noise_function(x, y) {
   const angular_speed = 0.8;
-  const value = Math.sin(angular_speed*x)*Math.sin(angular_speed*y);
+  const value = Math.sin(angular_speed * x) * Math.sin(angular_speed * y);
 
   return value;
 }
 
-
-
-
 //---------------------------------------------------------------------------------BIOMES-------------------------------------------------------------------------------
 
-function plain(x,y,z){
+function plain(x, y, z) {
   if (z < -0.05) {
     return 1;
   }
@@ -240,7 +243,9 @@ function plain(x,y,z){
   const num_octaves = 1;
   const height_scale_factor = 0.35;
 
-  const height = height_scale_factor*perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
+  const height =
+    height_scale_factor *
+    perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
 
   if (z <= height) {
     return 1;
@@ -249,8 +254,7 @@ function plain(x,y,z){
   }
 }
 
-
-function mountain(x,y,z){
+function mountain(x, y, z) {
   if (z < -0.05) {
     return 1;
   }
@@ -260,7 +264,10 @@ function mountain(x,y,z){
   const height_scale_factor = 0.25;
   const base_height = 0.15;
 
-  const height = base_height+height_scale_factor*perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
+  const height =
+    base_height +
+    height_scale_factor *
+      perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
 
   if (z <= height) {
     return 1;
@@ -269,7 +276,7 @@ function mountain(x,y,z){
   }
 }
 
-function water_with_flying_islands(x,y,z){
+function water_with_flying_islands(x, y, z) {
   if (z < -0.05) {
     return 1;
   }
@@ -278,9 +285,11 @@ function water_with_flying_islands(x,y,z){
   const num_octaves = 4;
   const height_scale_factor = 0.5;
 
-  const height = height_scale_factor*perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
+  const height =
+    height_scale_factor *
+    perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
 
-  if (z <= height && !(z>-0.5 && z<0.2)) {
+  if (z <= height && !(z > -0.5 && z < 0.2)) {
     return 1;
   } else {
     return 0;

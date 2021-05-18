@@ -17,8 +17,10 @@ import {
   NUMBER_CUBE_Z,
 } from "./terrain_constants.js";
 
+const ISO_VALUE = 0.5;
+
 // Map a 3D grid index (x, y, z) into a 1D index array.
-function xyz_to_cube_index(x, y, z, border) {
+function xyz_to_cube_index(x, y, z) {
   return (
     x + y * (NUMBER_CUBE_X + 1) + z * (NUMBER_CUBE_X + 1) * (NUMBER_CUBE_Y + 1)
   );
@@ -31,23 +33,42 @@ function cubeCoordinateToNoiseCoordinate(x, y, z, chunk_offset) {
   return [mapped_X, mapped_Y, mapped_Z];
 }
 
-function cubeCoordinatesToDrawingCoordinates(
-  x,
-  y,
-  z,
-  chunk_offset,
-  halfEdgeShift
-) {
+function cubeCoordinatesToDrawingCoordinates(xyz, chunk_offset, halfEdgeShift) {
   const mapped_X =
-    (chunk_offset[0] + (x + halfEdgeShift[0]) / NUMBER_CUBE_X) * CHUNK_SIZE_X -
+    (chunk_offset[0] + (xyz[0] + halfEdgeShift[0]) / NUMBER_CUBE_X) *
+      CHUNK_SIZE_X -
     0.5;
   const mapped_Y =
-    (chunk_offset[1] + (y + halfEdgeShift[1]) / NUMBER_CUBE_Y) * CHUNK_SIZE_Y -
+    (chunk_offset[1] + (xyz[1] + halfEdgeShift[1]) / NUMBER_CUBE_Y) *
+      CHUNK_SIZE_Y -
     0.5;
   const mapped_Z =
-    (chunk_offset[2] + (z + halfEdgeShift[2]) / NUMBER_CUBE_Z) * CHUNK_SIZE_Z -
+    (chunk_offset[2] + (xyz[2] + halfEdgeShift[2]) / NUMBER_CUBE_Z) *
+      CHUNK_SIZE_Z -
     0.5;
   return [mapped_X, mapped_Y, mapped_Z];
+  /*
+  const NUMBER_CUBE_XYZ = [NUMBER_CUBE_X, NUMBER_CUBE_Y, NUMBER_CUBE_Z];
+  const CHUNK_SIZE_XYZ = [CHUNK_SIZE_X, CHUNK_SIZE_Y, CHUNK_SIZE_Z];
+  const SHIFT_CENTER = [0.5, 0.5, 0.5];
+  return vec3.sub(
+    [0, 0, 0],
+    vec3.multiply(
+      [0, 0, 0],
+      vec3.add(
+        [0, 0, 0],
+        vec3.divide(
+          [0, 0, 0],
+          vec3.add([0, 0, 0], xyz, halfEdgeShift),
+          NUMBER_CUBE_XYZ
+        ),
+        chunk_offset
+      ),
+      CHUNK_SIZE_XYZ
+    ),
+    SHIFT_CENTER
+  );
+  */
 }
 
 export function terrain_build_mesh(chunk_offset) {
@@ -69,7 +90,7 @@ export function terrain_build_mesh(chunk_offset) {
           gz,
           chunk_offset
         );
-        cornersInObject[idx_corner] = noise3D(noiseCoordinates) >= 0.5;
+        cornersInObject[idx_corner] = noise3D(noiseCoordinates);
       }
     }
   }
@@ -90,9 +111,7 @@ export function terrain_build_mesh(chunk_offset) {
         for (let i = 0; i < 3; i++) {
           const halfEdgeShift = shiftVect[i];
           const drawingCoordinates = cubeCoordinatesToDrawingCoordinates(
-            gx,
-            gy,
-            gz,
+            [gx, gy, gz],
             chunk_offset,
             halfEdgeShift
           );
@@ -121,24 +140,74 @@ export function terrain_build_mesh(chunk_offset) {
 
         if (isOnSurface(areCornersInObject)) {
           const halfEdgePointsIndexes = getIndexHalfEdgePoints(gx, gy, gz);
-
           const LUTEntry =
             LOOK_UP_TABLE[get_binary_idx_from_corners(areCornersInObject)];
+
           //const LUTEntry = test_face;
           const trianglesIndexInCube =
             translateLUTEntryToIndexOfHalfEdgePointInTheCube(LUTEntry);
 
-          for (let i = 0; i < trianglesIndexInCube.length; ++i) {
-            const triangle = trianglesIndexInCube[i];
-            const p1_idx = halfEdgePointsIndexes[triangle[0]];
-            const p2_idx = halfEdgePointsIndexes[triangle[1]];
-            const p3_idx = halfEdgePointsIndexes[triangle[2]];
-            faces.push(p1_idx, p2_idx, p3_idx);
+          for (
+            let face_idx = 0;
+            face_idx < trianglesIndexInCube.length;
+            ++face_idx
+          ) {
+            const current_face = [];
+            const triangle = trianglesIndexInCube[face_idx];
+
+            for (
+              let vertex_idx = 0;
+              vertex_idx < triangle.length;
+              ++vertex_idx
+            ) {
+              const hafleEdgeNumeE = triangle[vertex_idx];
+              const p_idx = halfEdgePointsIndexes[hafleEdgeNumeE];
+              current_face.push(p_idx);
+
+              const shift = [
+                [0, 0, 0],
+                [0, 1, 0],
+                [1, 1, 0],
+                [1, 0, 0],
+                [0, 0, 1],
+                [0, 1, 1],
+                [1, 1, 1],
+                [1, 0, 1],
+              ];
+
+              const cornerNums = getAdjacentCornersNum(hafleEdgeNumeE);
+              // Corner pos
+              const P1 = cubeCoordinatesToDrawingCoordinates(
+                vec3.add([0, 0, 0], [gx, gy, gz], shift[cornerNums[0]]),
+                chunk_offset,
+                [0, 0, 0]
+              );
+              const P2 = cubeCoordinatesToDrawingCoordinates(
+                vec3.add([0, 0, 0], [gx, gy, gz], shift[cornerNums[1]]),
+                chunk_offset,
+                [0, 0, 0]
+              );
+              // Corner noise value
+              const NV1 = areCornersInObject[cornerNums[0]];
+              const NV2 = areCornersInObject[cornerNums[1]];
+              const halfedgePos = vec3.add(
+                [0, 0, 0],
+                P1,
+                vec3.scale(
+                  [0, 0, 0],
+                  vec3.sub([0, 0, 0], P2, P1),
+                  (ISO_VALUE - NV1) / (NV2 - NV1)
+                )
+              );
+              console.log(halfEdgePoints[p_idx], halfedgePos);
+              halfEdgePoints[p_idx] = halfedgePos;
+            }
+            faces.push(current_face);
 
             // Normal computation
-            const p1 = halfEdgePoints[p1_idx];
-            const p2 = halfEdgePoints[p2_idx];
-            const p3 = halfEdgePoints[p3_idx];
+            const p1 = halfEdgePoints[current_face[0]];
+            const p2 = halfEdgePoints[current_face[1]];
+            const p3 = halfEdgePoints[current_face[2]];
 
             const p1p2 = vec3.sub([0, 0, 0], p2, p1);
             const p1p3 = vec3.sub([0, 0, 0], p3, p1);
@@ -148,9 +217,8 @@ export function terrain_build_mesh(chunk_offset) {
             );
 
             // Update normal of the three trangle vertex
-            const points_indexes = [p1_idx, p2_idx, p3_idx];
-            for (let j = 0; j < points_indexes.length; ++j) {
-              const p_idx = points_indexes[j];
+            for (let j = 0; j < current_face.length; ++j) {
+              const p_idx = current_face[j];
               const wheighted_previous_normal = vec3.scale(
                 [0, 0, 0],
                 halfEdgesNormals[p_idx],
@@ -219,6 +287,35 @@ function getAreCubeCornersInObject(gx, gy, gz, cornersInObject) {
 //              |/_____________________|/
 //              v0         e0          v1
 
+function getAdjacentCornersNum(numE) {
+  switch (numE) {
+    case 0:
+      return [0, 1];
+    case 1:
+      return [1, 2];
+    case 2:
+      return [2, 3];
+    case 3:
+      return [3, 0];
+    case 4:
+      return [4, 5];
+    case 5:
+      return [5, 6];
+    case 6:
+      return [6, 7];
+    case 7:
+      return [7, 4];
+    case 8:
+      return [0, 4];
+    case 9:
+      return [1, 5];
+    case 10:
+      return [2, 6];
+    case 11:
+      return [3, 7];
+  }
+}
+
 /**
  * Create the list of the index of the e0..e11 in "halfEdgePoints"
  * Order based on the drawing above
@@ -274,7 +371,7 @@ function get_binary_idx_from_corners(areCornersInTheObject) {
   for (let i = areCornersInTheObject.length - 1; i >= 0; --i) {
     //maybe have to reverse traversal order
     idx *= 2;
-    if (areCornersInTheObject[i]) {
+    if (areCornersInTheObject[i] >= ISO_VALUE) {
       idx += 1;
     }
   }
@@ -305,7 +402,7 @@ function isOnSurface(areCornersInObject) {
   let atLeatOneCornerInObject = false;
   let allCornersInObject = true;
   for (let i = 0; i < areCornersInObject.length; ++i) {
-    const isInObject = areCornersInObject[i];
+    const isInObject = areCornersInObject[i] >= ISO_VALUE;
     atLeatOneCornerInObject |= isInObject;
     allCornersInObject &= isInObject;
   }
