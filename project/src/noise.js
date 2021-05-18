@@ -19,8 +19,9 @@ function noise3D(xyz) {
   //return plan3D(xyz[0],xyz[1], xyz[2]);
   //return sin2D(xyz[0],xyz[1], xyz[2]);
   //return sin1D(xyz[0],xyz[1], xyz[2]);
-  //return sphere3D(xyz[0],xyz[1], xyz[2]);
-  //return perlin_noise_2D(xyz[0],xyz[1]);
+  //return sphere3D(xyz[0], xyz[1], xyz[2]);
+  //return smoothSphere3D(xyz[0], xyz[1], xyz[2]);
+  //return perlin_noise_2D(xyz[0], xyz[1]);
 }
 
 const HEIGHT_SCALE_FACTOR = 0.35;
@@ -31,6 +32,7 @@ function terrain2d(x, y, z) {
   }
 
   const height = HEIGHT_SCALE_FACTOR * perlin_fbm(x, y);
+  //   return Math.min(Math.max(0, smooth_factor * (height - z) + 0.6), 1);
 
   if (z <= height) {
     return 1;
@@ -47,10 +49,19 @@ function plan3D(x, y, z) {
 }
 
 function sphere3D(x, y, z) {
-  if (x * x + y * y + z * z < 0.1) {
+  const r2 = x * x + y * y + z * z;
+  if (r2 < 0.1) {
     return 1;
+  } else {
+    return 0;
   }
-  return 0;
+}
+
+function smoothSphere3D(x, y, z) {
+  const r2 = x * x + y * y + z * z;
+  //console.log(r2, Math.exp(-0.07 * r2));
+  return Math.exp(-3 * r2);
+  //return Math.round(Math.exp(-0.07 * r2) * 2) / 2;
 }
 
 function sin2D(x, y, z) {
