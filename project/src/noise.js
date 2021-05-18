@@ -18,7 +18,7 @@ function noise3D(xyz) {
   const y = xyz[1];
   const z = xyz[2];
 
-  const value_choose_region = choose_noise_function(x, y);
+  const value_choose_region = perlin_fbm(x,y,8,0.7,1);
 
   if (value_choose_region <= -0.33) {
     return plain(x, y, z);
