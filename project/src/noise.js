@@ -221,7 +221,7 @@ function perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier) {
 
 function choose_noise_function(x, y){
   const angular_speed = 0.8;
-  const value = (Math.sin(angular_speed*x)+Math.sin(angular_speed*y))/2;
+  const value = Math.sin(angular_speed*x)*Math.sin(angular_speed*y);
 
   return value;
 }
