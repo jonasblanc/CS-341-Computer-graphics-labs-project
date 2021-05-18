@@ -26,6 +26,10 @@ function noise3D(xyz) {
 const HEIGHT_SCALE_FACTOR = 0.35;
 
 function terrain2d(x, y, z) {
+  if (z < -0.05) {
+    return 1;
+  }
+
   const height = HEIGHT_SCALE_FACTOR * perlin_fbm(x, y);
 
   if (z <= height) {

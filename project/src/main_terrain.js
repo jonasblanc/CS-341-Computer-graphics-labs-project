@@ -113,12 +113,12 @@ async function main() {
 
   const DEFAULT_CAM_LOOK_AT = [0.0, 0.0, 0.0];
   const DEFAULT_CAM_POS = [1, 0.0, 0.5];
-  const DEFAULT_LIGHT_POS = [0, 0.0, 3, 1.0];
 
   let cam_look_at = DEFAULT_CAM_LOOK_AT;
   let cam_pos = DEFAULT_CAM_POS;
 
-  let light_position_world = DEFAULT_LIGHT_POS;
+  const light_position_world = [0, 0, 0, 1];
+  const light_position_cam = [0, 0, 0, 0];
 
   function update_cam_transform() {
     /*
@@ -161,7 +161,6 @@ async function main() {
   register_keyboard_action("w", () => {
     cam_look_at[0] -= 0.2;
     cam_pos[0] -= 0.2;
-    light_position_world[0] -= 0.2;
     update_cam_transform();
     update_needed = true;
   });
@@ -234,10 +233,6 @@ async function main() {
 	---------------------------------------------------------------*/
   const mat_projection = mat4.create();
   const mat_view = mat4.create();
-
-  //let light_position_world = [1, -1, 1., 1.0]
-
-  const light_position_cam = [0, 0, 0, 0];
 
   regl.frame((frame) => {
     if (update_needed) {

@@ -2,9 +2,11 @@ const CHUNK_SIZE_X = 1;
 const CHUNK_SIZE_Y = 1;
 const CHUNK_SIZE_Z = 1;
 
-const NUMBER_CUBE_X = 15;
-const NUMBER_CUBE_Y = 15;
-const NUMBER_CUBE_Z = 15;
+const NUMBER_CUBE_X = 20;
+const NUMBER_CUBE_Y = 20;
+const NUMBER_CUBE_Z = 20;
+
+const WATER_HEIGHT = -0.3;
 
 export {
   CHUNK_SIZE_X,
@@ -13,4 +15,5 @@ export {
   NUMBER_CUBE_X,
   NUMBER_CUBE_Y,
   NUMBER_CUBE_Z,
+  WATER_HEIGHT,
 };

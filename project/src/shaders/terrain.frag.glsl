@@ -15,7 +15,6 @@ const vec3  terrain_color_grass    = vec3(0.33, 0.43, 0.18);
 
 void main()
 {
-	const vec3 ambient = 0.2 * light_color; // Ambient light intensity
 	
     float height = v2f_height;
 
@@ -37,7 +36,7 @@ void main()
     float nl = dot(v2f_normal, l);
     float rv = dot(r, v);
 
-    vec3 color = ambient * color_map;
+    vec3 color = color_map * light_color * 0.5;
 
     
     if(nl > 0.0){
