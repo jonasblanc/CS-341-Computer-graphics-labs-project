@@ -15,22 +15,23 @@ export { noise3D };
  */
 function noise3D(xyz) {
 
-  const chunk_offset_x = Math.round(xyz[0]);
-  const chunk_offset_y = Math.round(xyz[1]);
-  const chunk_offset_z = Math.round(xyz[2]);
+  const x=xyz[0]
+  const y=xyz[1]
+  const z=xyz[2]
 
-  if((chunk_offset_x+chunk_offset_y)%2==0){
-    const freq_multiplier = 2.17;
-    const ampl_multiplier = 0.8;
-    const num_octaves = 20;
-    return terrain2d(xyz[0], xyz[1], xyz[2], num_octaves, freq_multiplier, ampl_multiplier);
+
+  const value_choose_region = choose_noise_function(x, y);
+
+  if(value_choose_region<=-0.33){
+    return plain(x,y,z);
   }
+  else if (value_choose_region<=0.33){
+    return water_with_flying_islands(x,y,z);
+  } 
   else{
-    const freq_multiplier = 2.17;
-    const ampl_multiplier = 0.5;
-    const num_octaves = 1;
-    return terrain2d(xyz[0], xyz[1], xyz[2], num_octaves, freq_multiplier, ampl_multiplier);
+    return mountain(x,y,z);
   }
+
 
   //return terrain2d(xyz[0], xyz[1], xyz[2]);
   //return plan3D(xyz[0],xyz[1], xyz[2]);
@@ -215,4 +216,73 @@ function perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier) {
     ampi = ampi * ampl_multiplier;
   }
   return fbm;
+}
+
+
+function choose_noise_function(x, y){
+  const angular_speed = 0.8;
+  const value = (Math.sin(angular_speed*x)+Math.sin(angular_speed*y))/2;
+
+  return value;
+}
+
+
+
+
+//---------------------------------------------------------------------------------BIOMES-------------------------------------------------------------------------------
+
+function plain(x,y,z){
+  if (z < -0.05) {
+    return 1;
+  }
+  const freq_multiplier = 2.17;
+  const ampl_multiplier = 0.5;
+  const num_octaves = 1;
+  const height_scale_factor = 0.35;
+
+  const height = height_scale_factor*perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
+
+  if (z <= height) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+
+function mountain(x,y,z){
+  if (z < -0.05) {
+    return 1;
+  }
+  const freq_multiplier = 2.17;
+  const ampl_multiplier = 0.6;
+  const num_octaves = 8;
+  const height_scale_factor = 0.25;
+  const base_height = 0.15;
+
+  const height = base_height+height_scale_factor*perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
+
+  if (z <= height) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+function water_with_flying_islands(x,y,z){
+  if (z < -0.05) {
+    return 1;
+  }
+  const freq_multiplier = 2.17;
+  const ampl_multiplier = 0.5;
+  const num_octaves = 4;
+  const height_scale_factor = 0.5;
+
+  const height = height_scale_factor*perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
+
+  if (z <= height && !(z>-0.5 && z<0.2)) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
