@@ -17,7 +17,9 @@ The core of our project would be to adapt the code from the exercise on noise fu
 **Extensions**
 
 * Add a mist which gets more and more opaque when the distance from the viewpoint increases.
+
 ![Example of mist](images/fog.png){width="600px"}
+
 * Terrain specialisation: use different noise functions based on where we are on the map to have different terrains such as desert (lower height difference), mountains (sharper peaks) and snow texture.
 * Use turbulence to create water waves so that it looks more realistic.
 
@@ -56,7 +58,7 @@ Then, we generate half edge points which will represent the vertex of the triang
 
 - We ported the noise functions to the JS side as well and created some easy 3D-perlin noise function. For example, we transformed the 2D-perlin noise from the last exercise so that our pipeline can generate the same terrain but infinitely long. This is however not the most interesting terrain since it doesn't have any caves, which is one of the main reason why marching cube algorithm is interesting.
 
-- We had a first try at creating a mist to hide the horizon, which doesn't look very good for the moment, but gave some ideas on how to implement it more properly.
+- We had a first try at creating a mist to hide the horizon, which doesn't look very good for the moment, but gave us some ideas on how to implement it more properly.
 
 ![Terrain with simple mist implementation](images/map.png){width="600px"}
 

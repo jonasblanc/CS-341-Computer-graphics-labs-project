@@ -33,7 +33,12 @@
 <p>The core of our project would be to adapt the code from the exercise on noise functions to make the map infinite and make us able to move inside it.</p>
 <p><strong>Extensions</strong></p>
 <ul>
-<li>Add a mist which gets more and more opaque when the distance from the viewpoint increases. <img src="images/fog.png" width="600" alt="Example of mist" /></li>
+<li>Add a mist which gets more and more opaque when the distance from the viewpoint increases.</li>
+</ul>
+<figure>
+<img src="images/fog.png" width="600" alt="Example of mist" /><figcaption aria-hidden="true">Example of mist</figcaption>
+</figure>
+<ul>
 <li>Terrain specialisation: use different noise functions based on where we are on the map to have different terrains such as desert (lower height difference), mountains (sharper peaks) and snow texture.</li>
 <li>Use turbulence to create water waves so that it looks more realistic.</li>
 </ul>
@@ -66,7 +71,7 @@
 </figure>
 <ul>
 <li><p>We ported the noise functions to the JS side as well and created some easy 3D-perlin noise function. For example, we transformed the 2D-perlin noise from the last exercise so that our pipeline can generate the same terrain but infinitely long. This is however not the most interesting terrain since it doesn’t have any caves, which is one of the main reason why marching cube algorithm is interesting.</p></li>
-<li><p>We had a first try at creating a mist to hide the horizon, which doesn’t look very good for the moment, but gave some ideas on how to implement it more properly.</p></li>
+<li><p>We had a first try at creating a mist to hide the horizon, which doesn’t look very good for the moment, but gave us some ideas on how to implement it more properly.</p></li>
 </ul>
 <figure>
 <img src="images/map.png" width="600" alt="Terrain with simple mist implementation" /><figcaption aria-hidden="true">Terrain with simple mist implementation</figcaption>
