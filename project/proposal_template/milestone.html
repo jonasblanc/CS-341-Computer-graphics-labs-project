@@ -64,14 +64,14 @@
 </figure>
 <ul>
 <li><p>An easy interaction with the scene where we can move the camera in the x and y direction to see the generation of the terrain and see that it is indeed infinite.</p></li>
-<li><p>A first implementation of the marching cube on the JS side. For that, we iterate over all our (x,y,z) coordinates of the chunk (when we have to regenerate them), map them to some other coordinates for our perlin noise, call a 3D-perlin noise function which tell us whether the given point (which represents the corner of a cube in the algorithm) will be displayed or not. Then, we generate half edge points which will represent the vertex of the triangles we will create for our mesh. For each cube, we then check which corners have to be displayed, transform this in binary to have an index in a lookup table taken from internet that tells us which triangles we’ll have to draw. We then push our half edge points in our triangle mesh. To finish, we compute our faces normal using the cross product between 2 of our sides and normalizing it and then for each vertex, we update the vertex normal by adding the contribution of each face. We haven’t implemented any smoothing strategy for the marching cube algorithm yet.</p></li>
+<li><p>A first implementation of the marching cube on the JS side. For that, we iterate over all our (x,y,z) coordinates of the chunk (when we have to regenerate them), map them to some other coordinates for our perlin noise, call a 3D-perlin noise function which tell us whether the given point (which represents the corner of a cube in the algorithm) is in the terrain or not. Then, we generate half edge points which will represent the vertex of the triangles we will create for our mesh. For each cube, we check if the cube is one the surface of the terrain and then which corners are in the terrain, transform this in binary to have an index in a lookup table taken from internet that tells us which triangles we’ll have to draw. We then push our half edge points in our triangle mesh. To finish, we compute our faces normal using the cross product between 2 of our sides and normalizing it and then for each vertex, we update the vertex normal by adding the contribution of each face. We haven’t implemented any smoothing strategy for the marching cube algorithm yet.</p></li>
 </ul>
 <figure>
 <img src="images/cavity.png" width="600" alt="Terrain with cavity" /><figcaption aria-hidden="true">Terrain with cavity</figcaption>
 </figure>
 <ul>
-<li><p>We ported the noise functions to the JS side as well and created some easy 3D-perlin noise functions. For example, we transformed the 2D-perlin noise from the last exercise so that our pipeline can generate the same terrain but infinitely long. This is however not the most interesting terrain since it doesn’t have any caves, which is one of the main reason why marching cube algorithm is interesting.</p></li>
-<li><p>We had a first try at creating a mist to hide the horizon, which doesn’t look very good for the moment, but gave us some ideas on how to implement it more properly.</p></li>
+<li><p>We ported the noise functions to the JS side as well and created some easy 3D-perlin noise functions. For example, we transformed the 2D-perlin noise from the last exercise so that our pipeline can generate the same terrain but infinitely long. This is however not the most interesting terrain since it only defines a height for x,y coordinates which was already the case with a 2D noise function in the last exercise. The power of this new implementation combined with the rendering of marching cube allows to create smooth 3D structure or terrains with cavity, which were not implementable with our code from last lab, so we should exploit it.</p></li>
+<li><p>We had a first try at creating a mist to hide the horizon, which still needs to be improved, but gave us some ideas on how to implement it more properly.</p></li>
 </ul>
 <figure>
 <img src="images/map.png" width="600" alt="Terrain with simple mist implementation" /><figcaption aria-hidden="true">Terrain with simple mist implementation</figcaption>
@@ -82,7 +82,7 @@
 <li>As stated before, we had some struggles knowing how and where to start, but now we have a clearer idea on what to do.</li>
 <li>Due to an error on the index, we had discontinuity at the chunks boundaries. It took us some time to find where the bug was, but now it works fine.</li>
 <li>Our light model/normals are not totally correct for the moment and the scene doesn’t look very natural.</li>
-<li>We have normal discontinuity on the chunks boundaries due to the method we are currently using to update the normals.</li>
+<li>We have normal discontinuity on the chunks boundaries due to the method we are currently using to update the normals. We are quite stuck since we still don’t have any solution for how to compute the normals accros the chunk.</li>
 <li>We are thinking about a way to use different noise functions depending on where we are in our world, but we don’t know yet how to ensure not to have discontinuity on the chunks boundaries with different noise functions (how to smooth the values so that it doesn’t jump from +0.5 to -0.5 in two chunks next to each other).</li>
 </ul>
 <p><strong>Refined schedule</strong></p>

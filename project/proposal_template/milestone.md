@@ -53,7 +53,7 @@ During the first weeks of the project, we had some struggles knowing where to st
 
 ![Terrain with cavity](images/cavity.png){width="600px"}
 
-- We ported the noise functions to the JS side as well and created some easy 3D-perlin noise functions. For example, we transformed the 2D-perlin noise from the last exercise so that our pipeline can generate the same terrain but infinitely long. This is however not the most interesting terrain since it only defines a height for x,y coordinates which was already the case with a 2D noise function in the last exercise. The power of this new implemntation combined with the rendering of marching cube allows to create smooth 3D structure and we should exploit it.
+- We ported the noise functions to the JS side as well and created some easy 3D-perlin noise functions. For example, we transformed the 2D-perlin noise from the last exercise so that our pipeline can generate the same terrain but infinitely long. This is however not the most interesting terrain since it only defines a height for x,y coordinates which was already the case with a 2D noise function in the last exercise. The power of this new implementation combined with the rendering of marching cube allows to create smooth 3D structure or terrains with cavity, which were not implementable with our code from last lab, so we should exploit it.
 
 - We had a first try at creating a mist to hide the horizon, which still needs to be improved, but gave us some ideas on how to implement it more properly.
 
