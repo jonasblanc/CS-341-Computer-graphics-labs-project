@@ -85,7 +85,7 @@
 <li>We have normal discontinuity on the chunks boundaries due to the method we are currently using to update the normals.</li>
 <li>We are thinking about a way to use different noise functions depending on where we are in our world, but we don’t know yet how to ensure not to have discontinuity on the chunks boundaries with different noise functions (how to smooth the values so that it doesn’t jump from +0.5 to -0.5 in two chunks next to each other).</li>
 </ul>
-<p><strong>Refined Schedule</strong></p>
+<p><strong>Refined schedule</strong></p>
 <ul>
 <li>18.05-20.05: We will first try to finish our base implementation. For that, we will work on correcting our normals and lights, try to find a way to avoid the normal discontinuity between chunks and implement a smoothing method for the marching cube. We will also try to find some more interesting 3D-noise functions.</li>
 <li>21.05-27.05: We will try to implement some extensions. First the mist effect since we have some ideas on how to do it. Then, we will probably try to find a way to implement different noise functions depending on the offset of the chunks. For that, we are thinking about using a first noise function which given an offset index, returns an index for the noise function we will use. Then we use this noise function on the whole chunk to generate the map. Our main problem will be to avoid the discontinuity on the boundaries and we will have to think carefully about that. We will then try a 3rd extension depending on the time we have and the result of our previous parts.</li>
