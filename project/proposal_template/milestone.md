@@ -56,7 +56,7 @@ Then, we generate half edge points which will represent the vertex of the triang
 
 ![Terrain with cavity](images/cavity.png){width="600px"}
 
-- We ported the noise functions to the JS side as well and created some easy 3D-perlin noise function. For example, we transformed the 2D-perlin noise from the last exercise so that our pipeline can generate the same terrain but infinitely long. This is however not the most interesting terrain since it doesn't have any caves, which is one of the main reason why marching cube algorithm is interesting.
+- We ported the noise functions to the JS side as well and created some easy 3D-perlin noise functions. For example, we transformed the 2D-perlin noise from the last exercise so that our pipeline can generate the same terrain but infinitely long. This is however not the most interesting terrain since it doesn't have any caves, which is one of the main reason why marching cube algorithm is interesting.
 
 - We had a first try at creating a mist to hide the horizon, which doesn't look very good for the moment, but gave us some ideas on how to implement it more properly.
 
@@ -76,7 +76,7 @@ Some of the problems we faced/are currently facing are the following:
 **Refined Schedule**
 
 * 18.05-20.05: We will first try to finish our base implementation. For that, we will work on correcting our normals and lights, try to find a way to avoid the normal discontinuity between chunks and implement a smoothing method for the marching cube. We will also try to find some more interesting 3D-noise functions.
-* 21.05-27.05: We will try to implement some extensions. First the mist effect since we have some ideas on how to do it. Then, we will probably try to find a way to implement different noise functions depending on the offset of the chunks. For that, we are thinking about using a first noise function which given an offset index, give us an index for the noise function we will use. Then we use this noise function on the whole chunk to generate the map. Our main problem will be to avoid the discontinuity on the boundaries and we will have to think carefully about that. We will then try a 3rd extension depending on the time we have and the result of our previous parts.
+* 21.05-27.05: We will try to implement some extensions. First the mist effect since we have some ideas on how to do it. Then, we will probably try to find a way to implement different noise functions depending on the offset of the chunks. For that, we are thinking about using a first noise function which given an offset index, returns an index for the noise function we will use. Then we use this noise function on the whole chunk to generate the map. Our main problem will be to avoid the discontinuity on the boundaries and we will have to think carefully about that. We will then try a 3rd extension depending on the time we have and the result of our previous parts.
 * 28.05-01.06: Finally, during the last exercise session, we will prepare the video for the final presentation and finalize our code/deliverables.
 
 
