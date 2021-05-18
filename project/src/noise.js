@@ -14,7 +14,25 @@ export { noise3D };
  * @returns
  */
 function noise3D(xyz) {
-  return terrain2d(xyz[0], xyz[1], xyz[2]);
+
+  const chunk_offset_x = Math.round(xyz[0]);
+  const chunk_offset_y = Math.round(xyz[1]);
+  const chunk_offset_z = Math.round(xyz[2]);
+
+  if((chunk_offset_x+chunk_offset_y)%2==0){
+    const freq_multiplier = 2.17;
+    const ampl_multiplier = 0.8;
+    const num_octaves = 20;
+    return terrain2d(xyz[0], xyz[1], xyz[2], num_octaves, freq_multiplier, ampl_multiplier);
+  }
+  else{
+    const freq_multiplier = 2.17;
+    const ampl_multiplier = 0.5;
+    const num_octaves = 1;
+    return terrain2d(xyz[0], xyz[1], xyz[2], num_octaves, freq_multiplier, ampl_multiplier);
+  }
+
+  //return terrain2d(xyz[0], xyz[1], xyz[2]);
   //return plan3D(xyz[0],xyz[1], xyz[2]);
   //return plan3D(xyz[0],xyz[1], xyz[2]);
   //return sin2D(xyz[0],xyz[1], xyz[2]);
@@ -25,12 +43,12 @@ function noise3D(xyz) {
 
 const HEIGHT_SCALE_FACTOR = 0.35;
 
-function terrain2d(x, y, z) {
+function terrain2d(x, y, z, num_octaves, freq_multiplier, ampl_multiplier) {
   if (z < -0.05) {
     return 1;
   }
 
-  const height = HEIGHT_SCALE_FACTOR * perlin_fbm(x, y);
+  const height = HEIGHT_SCALE_FACTOR * perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
 
   if (z <= height) {
     return 1;
@@ -177,9 +195,9 @@ function perlin_noise_2D(x, y) {
 }
 
 // Constants for FBM
-const freq_multiplier = 2.17;
-const ampl_multiplier = 0.5;
-const num_octaves = 4;
+//const freq_multiplier = 2.17;
+//const ampl_multiplier = 0.8;
+//const num_octaves = 20;
 
 /**
  * Compute the fractional Brownian motion (FBM) of a 2D point
@@ -187,7 +205,7 @@ const num_octaves = 4;
  * @param {*} y: y coordinate
  * @returns a random looking value representing the height at this point with different frequencies to have more details
  */
-function perlin_fbm(x, y) {
+function perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier) {
   let fbm = 0.0;
   let freqi = 1.0;
   let ampi = 1.0;
