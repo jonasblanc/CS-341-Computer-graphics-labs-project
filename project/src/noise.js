@@ -6,7 +6,8 @@ import {
   mat3,
   mat4,
 } from "../lib/gl-matrix_3.3.0/esm/index.js";
-export { noise3D };
+import { max } from "../lib/gl-matrix_3.3.0/esm/vec3.js";
+export { noise3D, normalComputation };
 
 /**
  * Coordinates recieved are in real world coordinates (ie between -0.5 and 0.5 for the central chunk)
@@ -19,7 +20,6 @@ function noise3D(xyz) {
   const z = xyz[2];
 
   const value_choose_region = choose_noise_function(x, y);
-
   if (value_choose_region <= -0.33) {
     return plain(x, y, z);
   } else if (value_choose_region <= 0.33) {
@@ -36,6 +36,25 @@ function noise3D(xyz) {
   //return sphere3D(xyz[0], xyz[1], xyz[2]);
   //return smoothSphere3D(xyz[0], xyz[1], xyz[2]);
   //return perlin_noise_2D(xyz[0], xyz[1]);
+}
+
+function normalComputation(xyz, delta) {
+  // normal as finite difference of the height map
+  // dz/dx = (h(x+dx) - h(x-dx)) / (2 dx)
+  const x = xyz[0];
+  const y = xyz[1];
+  const z = xyz[2];
+  return vec3.normalize(
+    [0, 0, 0],
+    [
+      -(noise3D([x + delta[0], y, z]) - noise3D([x - delta[0], y, z])) /
+        (2 * delta[0]),
+      -(noise3D([x, y + delta[1], z]) - noise3D([x, y - delta[1], z])) /
+        (2 * delta[1]),
+      -(noise3D([x, y, z + delta[2]]) - noise3D([x, y, z - delta[2]])) /
+        (2 * delta[2]),
+    ]
+  );
 }
 
 const HEIGHT_SCALE_FACTOR = 0.35;
@@ -74,9 +93,7 @@ function sphere3D(x, y, z) {
 
 function smoothSphere3D(x, y, z) {
   const r2 = x * x + y * y + z * z;
-  //console.log(r2, Math.exp(-0.07 * r2));
   return Math.exp(-3 * r2);
-  //return Math.round(Math.exp(-0.07 * r2) * 2) / 2;
 }
 
 function sin2D(x, y, z) {
@@ -234,10 +251,13 @@ function choose_noise_function(x, y) {
 
 //---------------------------------------------------------------------------------BIOMES-------------------------------------------------------------------------------
 
+const WATER_HEIGHT = -0.032;
+
 function plain(x, y, z) {
-  if (z < -0.05) {
-    return 1;
+  if (z < WATER_HEIGHT) {
+    return z - WATER_HEIGHT;
   }
+
   const freq_multiplier = 2.17;
   const ampl_multiplier = 0.5;
   const num_octaves = 1;
@@ -247,17 +267,14 @@ function plain(x, y, z) {
     height_scale_factor *
     perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
 
-  if (z <= height) {
-    return 1;
-  } else {
-    return 0;
-  }
+  return z - Math.max(height, WATER_HEIGHT);
 }
 
 function mountain(x, y, z) {
-  if (z < -0.05) {
-    return 1;
+  if (z < WATER_HEIGHT) {
+    return z - WATER_HEIGHT;
   }
+
   const freq_multiplier = 2.17;
   const ampl_multiplier = 0.6;
   const num_octaves = 8;
@@ -269,29 +286,45 @@ function mountain(x, y, z) {
     height_scale_factor *
       perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
 
-  if (z <= height) {
-    return 1;
-  } else {
-    return 0;
-  }
+  return z - Math.max(height, WATER_HEIGHT);
 }
 
 function water_with_flying_islands(x, y, z) {
-  if (z < -0.05) {
-    return 1;
-  }
+  //if(z < WATER_HEIGHT){
+  return z - WATER_HEIGHT;
+  //}
+  /*
   const freq_multiplier = 2.17;
   const ampl_multiplier = 0.5;
   const num_octaves = 4;
   const height_scale_factor = 0.5;
 
-  const height =
+  const height_bottom_island =
     height_scale_factor *
     perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
-
-  if (z <= height && !(z > -0.5 && z < 0.2)) {
-    return 1;
-  } else {
-    return 0;
+  
+  const freq_multiplier = 2.17;
+  const ampl_multiplier = 0.5;
+  const num_octaves = 4;
+  const height_scale_factor = 0.5;
+  
+    const height_top_island =
+      height_scale_factor *
+      perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
+  
+  // No island
+  if(height_top_island < height_bottom_island){
+    return z - WATER_HEIGHT;
   }
+  
+  if(z > height_top_island){
+    return z - height_top_island
+  }else if(z < height_bottom_island){
+   if(){
+
+   }
+      
+    
+  }
+  */
 }

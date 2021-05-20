@@ -1,4 +1,4 @@
-import { noise3D } from "./noise.js";
+import { noise3D, normalComputation } from "./noise.js";
 import {
   vec2,
   vec3,
@@ -17,7 +17,7 @@ import {
   NUMBER_CUBE_Z,
 } from "./terrain_constants.js";
 
-const ISO_VALUE = 0.5;
+const ISO_VALUE = 0;
 
 // Map a 3D grid index (x, y, z) into a 1D index array.
 function xyz_to_cube_index(x, y, z) {
@@ -199,11 +199,16 @@ export function terrain_build_mesh(chunk_offset) {
                   (ISO_VALUE - NV1) / (NV2 - NV1)
                 )
               );
-              console.log(halfEdgePoints[p_idx], halfedgePos);
               halfEdgePoints[p_idx] = halfedgePos;
+              halfEdgesNormals[p_idx] = normalComputation(halfedgePos, [
+                1 / CHUNK_SIZE_X,
+                1 / CHUNK_SIZE_Y,
+                1 / CHUNK_SIZE_Z,
+              ]);
             }
             faces.push(current_face);
 
+            /*
             // Normal computation
             const p1 = halfEdgePoints[current_face[0]];
             const p2 = halfEdgePoints[current_face[1]];
@@ -229,7 +234,9 @@ export function terrain_build_mesh(chunk_offset) {
                 vec3.add([0, 0, 0], wheighted_previous_normal, face_normal)
               );
               halfEdgesNormalsContribution[p_idx] += 1;
+            
             }
+            */
           }
         }
       }
@@ -402,7 +409,7 @@ function isOnSurface(areCornersInObject) {
   let atLeatOneCornerInObject = false;
   let allCornersInObject = true;
   for (let i = 0; i < areCornersInObject.length; ++i) {
-    const isInObject = areCornersInObject[i] >= ISO_VALUE;
+    const isInObject = areCornersInObject[i] <= ISO_VALUE;
     atLeatOneCornerInObject |= isInObject;
     allCornersInObject &= isInObject;
   }

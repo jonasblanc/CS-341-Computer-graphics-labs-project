@@ -37,7 +37,7 @@ void main()
     float nl = dot(v2f_normal, l);
     float rv = dot(r, v);
 
-    vec3 color = color_map * light_color * 0.5;
+    vec3 color = light_color * 0.2;
 
     
     if(nl > 0.0){
