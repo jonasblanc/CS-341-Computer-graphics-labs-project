@@ -300,7 +300,20 @@ function water_with_flying_islands(x, y, z) {
   return z - WATER_HEIGHT;
   }
   else{
-    return 0.025*perlin_fbm_3D(x,y,z,12, 0.45, 1)+0.05;
+    const val = 0.025*perlin_fbm_3D(2.35*x,2.35*y,2.35*z,12, 0.45, 1)+0.05;
+
+    if(z>0.4){
+      if(z>val){
+        return z-val;
+      }
+      else{
+        return z-WATER_HEIGHT;
+      }
+
+    }
+    else{
+      return val;
+    }
   }
   /*
   const freq_multiplier = 2.17;
