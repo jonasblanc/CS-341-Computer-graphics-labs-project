@@ -242,7 +242,6 @@ async function main() {
       (Math.cos(sim_time) + 1.0) / 2.0,
       (Math.cos(sim_time) + 1.0) / 2.0
     );
-    console.log(cos_sim_time);
 
     terrain_actors = generate_terrains(regl, resources, cam_look_at);
 
@@ -263,12 +262,8 @@ async function main() {
     // Set the whole image to black
     if (night) {
       regl.clear({ color: [1 / 255, 9 / 255, 31 / 255, 1] });
-      console.log("night mode enabled");
-      // glUniform1i(glGetUniformLocation(shader, "foo"), true);
     } else {
       regl.clear({ color: [1, 1, 1, 1] });
-      console.log("night mode disabled");
-      // glUniform1i(glGetUniformLocation(shader, "foo"), true);
     }
 
     const scene_info = {
