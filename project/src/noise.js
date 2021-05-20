@@ -261,7 +261,7 @@ function plain(x, y, z) {
   const freq_multiplier = 2.17;
   const ampl_multiplier = 0.5;
   const num_octaves = 1;
-  const height_scale_factor = 0.35;
+  const height_scale_factor = 0.45;
 
   const height =
     height_scale_factor *
