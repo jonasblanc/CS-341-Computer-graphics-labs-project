@@ -296,9 +296,12 @@ function mountain(x, y, z) {
 }
 
 function water_with_flying_islands(x, y, z) {
-  //if(z < WATER_HEIGHT){
+  if(z < 0.1){
   return z - WATER_HEIGHT;
-  //}
+  }
+  else{
+    return 0.025*perlin_fbm_3D(x,y,z,12, 0.45, 1)+0.05;
+  }
   /*
   const freq_multiplier = 2.17;
   const ampl_multiplier = 0.5;
