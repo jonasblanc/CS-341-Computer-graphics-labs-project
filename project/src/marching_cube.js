@@ -199,7 +199,7 @@ export function terrain_build_mesh(chunk_offset) {
                   (ISO_VALUE - NV1) / (NV2 - NV1)
                 )
               );
-              console.log(halfEdgePoints[p_idx], halfedgePos);
+              // console.log(halfEdgePoints[p_idx], halfedgePos);
               halfEdgePoints[p_idx] = halfedgePos;
             }
             faces.push(current_face);

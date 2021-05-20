@@ -44,7 +44,6 @@ async function main() {
   // The <canvas> (HTML element for drawing graphics) was created by REGL, lets take a handle to it.
   const canvas_elem = document.getElementsByTagName("canvas")[0];
 
-  let update_needed = true;
 
   {
     // Resize canvas to fit the window, but keep it square.
@@ -52,7 +51,6 @@ async function main() {
       canvas_elem.width = window.innerWidth;
       canvas_elem.height = window.innerHeight;
 
-      update_needed = true;
     }
     resize_canvas();
     window.addEventListener("resize", resize_canvas);
@@ -122,6 +120,10 @@ async function main() {
 
   let night = false;
 
+  let sim_time = 0.0;
+	let prev_regl_time = 0.0;
+  let cos_sim_time = 0.0;
+
   function update_cam_transform() {
     /*
     const look_at = mat4.lookAt(
@@ -164,36 +166,31 @@ async function main() {
     cam_look_at[0] -= 0.2;
     cam_pos[0] -= 0.2;
     update_cam_transform();
-    update_needed = true;
   });
   register_keyboard_action("a", () => {
     cam_look_at[1] -= 0.2;
     cam_pos[1] -= 0.2;
     update_cam_transform();
-    update_needed = true;
   });
   register_keyboard_action("s", () => {
     cam_look_at[0] += 0.2;
     cam_pos[0] += 0.2;
     update_cam_transform();
-    update_needed = true;
   });
   register_keyboard_action("d", () => {
     cam_look_at[1] += 0.2;
     cam_pos[1] += 0.2;
     update_cam_transform();
-    update_needed = true;
   });
   register_keyboard_action("n", () => {
     night = !night;
-    update_needed = true;
   });
 
   function activate_preset_view() {
     cam_look_at = DEFAULT_CAM_LOOK_AT;
     cam_pos = DEFAULT_CAM_POS;
+    sim_time = 24.0
     update_cam_transform();
-    update_needed = true;
   }
   activate_preset_view();
   register_button_with_hotkey("btn-preset-view", "c", activate_preset_view);
@@ -212,7 +209,6 @@ async function main() {
       console.log(cam_angle_z);
 
       update_cam_transform();
-      update_needed = true;
     }
   });
 
@@ -225,7 +221,6 @@ async function main() {
     // console.log('wheel', event.deltaY, event.deltaMode)
     event.preventDefault(); // don't scroll the page too...
     update_cam_transform();
-    update_needed = true;
   });
 
   /*---------------------------------------------------------------
@@ -241,8 +236,11 @@ async function main() {
   const mat_view = mat4.create();
 
   regl.frame((frame) => {
-    if (update_needed) {
-      update_needed = false; // do this *before* running the drawing code so we don't keep updating if drawing throws an error.
+    const dt = frame.time - prev_regl_time;
+    sim_time += dt/2.0;
+    prev_regl_time = frame.time;
+    cos_sim_time = vec3.fromValues((Math.cos(sim_time)+1.0)/2.0, (Math.cos(sim_time)+1.0)/2.0, (Math.cos(sim_time)+1.0)/2.0);
+    console.log(cos_sim_time);
 
       terrain_actors = generate_terrains(regl, resources, cam_look_at);
 
@@ -258,7 +256,7 @@ async function main() {
 
       // Calculate light position in camera frame
       vec4.transformMat4(light_position_cam, light_position_world, mat_view);
-      let t = [0,0,-10,1];
+      let moving_light_position_cam = [0,0,-Math.cos(sim_time)*10,1];
 
       // Set the whole image to black
       if (night){
@@ -275,14 +273,14 @@ async function main() {
       const scene_info = {
         mat_view: mat_view,
         mat_projection: mat_projection,
-        light_position_cam: t,
+        light_position_cam: moving_light_position_cam,
         night_mode:night,
+        sim_time: sim_time,
       };
 
       for (let i = 0; i < terrain_actors.length; ++i) {
         terrain_actors[i].draw(scene_info);
       }
-    }
 
     // 		debug_text.textContent = `
     // Hello! Sim time is ${sim_time.toFixed(2)} s
