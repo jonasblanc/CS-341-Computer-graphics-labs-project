@@ -229,6 +229,9 @@ function perlin_noise_2D(x, y) {
  * Compute the fractional Brownian motion (FBM) of a 2D point
  * @param {*} x: x coordinate
  * @param {*} y: y coordinate
+ * @param {*} num_octaves: the number of octaves used
+ * @param {*} freq_multiplier: The factor to scale the frequence of each octave
+ * @param {*} ampl_multiplier: The factor to scale the amplitude of each octave
  * @returns a random looking value representing the height at this point with different frequencies to have more details
  */
 function perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier) {
@@ -429,6 +432,9 @@ function perlin_noise_3D(x, y, z) {
  * @param {*} x: x coordinate
  * @param {*} y: y coordinate
  * @param {*} z: z coordinate
+ * @param {*} num_octaves: the number of octaves used
+ * @param {*} freq_multiplier: The factor to scale the frequence of each octave
+ * @param {*} ampl_multiplier: The factor to scale the amplitude of each octave
  * @returns a random looking value with different frequencies to have more details
  */
  function perlin_fbm_3D(x, y, z, num_octaves, freq_multiplier, ampl_multiplier) {
