@@ -116,11 +116,9 @@ async function main() {
   const light_position_world = [0, 0, 0, 1];
   const light_position_cam = [0, 0, 0, 0];
 
-  let night = false;
-
   let sim_time = 0.0;
   let prev_regl_time = 0.0;
-  let cos_sim_time = 0.0;
+  let is_sun_rotating = true;
 
   function update_cam_transform() {
     /*
@@ -180,8 +178,8 @@ async function main() {
     cam_pos[1] += 0.2;
     update_cam_transform();
   });
-  register_keyboard_action("n", () => {
-    night = !night;
+  register_keyboard_action("m", () => {
+    is_sun_rotating = !is_sun_rotating;
   });
 
   function activate_preset_view() {
@@ -227,6 +225,14 @@ async function main() {
 
   var terrain_actors = generate_terrains(regl, resources, cam_look_at);
 
+  function mix(color1, color2, mix_value) {
+    let result = [];
+    for (let i = 0; i < 3; ++i) {
+      result.push(color1[i] * mix_value + (1 - mix_value) * color2[i]);
+    }
+    return result;
+  }
+
   /*---------------------------------------------------------------
 		Frame render
 	---------------------------------------------------------------*/
@@ -235,14 +241,10 @@ async function main() {
 
   regl.frame((frame) => {
     const dt = frame.time - prev_regl_time;
-    sim_time += dt / 2.0;
+    if (is_sun_rotating) {
+      sim_time += dt;
+    }
     prev_regl_time = frame.time;
-    cos_sim_time = vec3.fromValues(
-      (Math.cos(sim_time) + 1.0) / 2.0,
-      (Math.cos(sim_time) + 1.0) / 2.0,
-      (Math.cos(sim_time) + 1.0) / 2.0
-    );
-    console.log(cos_sim_time);
 
     terrain_actors = generate_terrains(regl, resources, cam_look_at);
 
@@ -258,25 +260,25 @@ async function main() {
 
     // Calculate light position in camera frame
     vec4.transformMat4(light_position_cam, light_position_world, mat_view);
-    let moving_light_position_cam = [0, 0, -Math.cos(sim_time) * 10, 1];
 
-    // Set the whole image to black
-    if (night) {
-      regl.clear({ color: [1 / 255, 9 / 255, 31 / 255, 1] });
-      console.log("night mode enabled");
-      // glUniform1i(glGetUniformLocation(shader, "foo"), true);
-    } else {
-      regl.clear({ color: [1, 1, 1, 1] });
-      console.log("night mode disabled");
-      // glUniform1i(glGetUniformLocation(shader, "foo"), true);
-    }
+    let sin_sim_time = (Math.sin(sim_time) + 1.0) / 2.0;
+    let base_vect = vec3.rotateX([0, 0, 0], [0, 0, -5], [0, 0, 0], sim_time);
+    let moving_light_position_cam = [
+      base_vect[0],
+      base_vect[1],
+      base_vect[2],
+      1,
+    ];
+
+    let sky_color = mix([0, 0.04, 0.12], [1, 1, 1], sin_sim_time); // mix([0, 0.04, 0.12], [0.74, 0.88, 0.97], sin_sim_time);
+
+    regl.clear({ color: [sky_color[0], sky_color[1], sky_color[2], 1] });
 
     const scene_info = {
       mat_view: mat_view,
       mat_projection: mat_projection,
       light_position_cam: moving_light_position_cam,
-      night_mode: night,
-      sim_time: sim_time,
+      sky_color: sky_color,
     };
 
     for (let i = 0; i < terrain_actors.length; ++i) {
