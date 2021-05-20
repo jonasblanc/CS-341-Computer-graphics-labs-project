@@ -5,19 +5,21 @@ varying vec3 v2f_normal; // normal vector in camera coordinates
 varying vec3 v2f_dir_to_light; // direction to light source
 varying vec3 v2f_dir_from_view; // viewing vector (from eye to vertex in view coordinates)
 varying float v2f_height;
-uniform bool night_mode;
-uniform float sim_time;
+uniform vec3 sky_color;
 
-const vec3  light_color = vec3(1.0, 0.941, 0.898);
+//const vec3  light_color = vec3(1.0, 1.0, 1.0); 
+const float ambiant_factor = 0.2;
+const float mist_factor = 5.0;
+const vec3  light_color = vec3(0.94, 0.92, 0.85);
+
 // Small perturbation to prevent "z-fighting" on the water on some machines...
-const float terrain_water_level    = -0.02 + 1e-6; //-0.03125 + 1e-6;
+const float terrain_water_level    = -0.02 + 1e-6;
 const vec3  terrain_color_water    = vec3(0.29, 0.51, 0.62);
 const vec3  terrain_color_mountain = vec3(0.8, 0.5, 0.4);
 const vec3  terrain_color_grass    = vec3(0.33, 0.43, 0.18);
 
 void main()
 {
-	
     float height = v2f_height;
 
 	vec3 color_map = vec3(0.0);
@@ -38,9 +40,8 @@ void main()
     float nl = dot(v2f_normal, l);
     float rv = dot(r, v);
 
-    vec3 color = light_color * 0.2;
+    vec3 color = color_map * light_color * ambiant_factor;
 
-    
     if(nl > 0.0){
         vec3 diffuse = light_color * color_map * nl;
         color += diffuse;
@@ -49,16 +50,12 @@ void main()
             color += specular;
         }
     }
+    
+    float dist = length(v2f_dir_from_view - vec3(0,1,0));
+    if(dist > 1.5){
+        float factor = (dist - 1.5) /0.3;
+        color = mix(color,sky_color, min(factor, 1.0)); 
+    }
 
-    float a = (cos(sim_time)+1.0)/2.0;
-    vec3 day_night_color = mix(vec3(.0, .04, .12),vec3(1.0),  a);
-    color = mix(color, day_night_color, length(v2f_dir_from_view) / 3.0); //chnage 1 to 0 and vice versa to enable day/night
-
-    // Brut force terrain color
-    // if(!night_mode){
-    //     color = mix(color, day_night_color, length(v2f_dir_from_view) / 3.0); //chnage 1 to 0 and vice versa to enable day/night
-    // }else{
-    //   color = mix(color, vec3(.0, .04, .12), length(v2f_dir_from_view) / 3.0); //chnage 1 to 0 and vice versa to enable day/night
-    // }	
     gl_FragColor = vec4(color, 1.); // output: RGBA in 0..1 range
 }
