@@ -19,16 +19,17 @@ function noise3D(xyz) {
   const y = xyz[1];
   const z = xyz[2];
 
+  //return 0.2*perlin_fbm_3D(x,y,z, 4, 0.5, 1);
+
   const value_choose_region = choose_noise_function(x, y);
   if (value_choose_region <= -0.33) {
-    return plain(x, y, z);
+    return plain_with_holes(x,y,z);
   } else if (value_choose_region <= 0.33) {
     return water_with_flying_islands(x, y, z);
   } else {
     return mountain(x, y, z);
   }
 
-  //return 0.01*perlin_fbm_3D(x,y,z, 1, 1, 1);
   //return terrain2d(xyz[0], xyz[1], xyz[2]);
   //return plan3D(xyz[0],xyz[1], xyz[2]);
   //return plan3D(xyz[0],xyz[1], xyz[2]);
@@ -291,6 +292,7 @@ function mountain(x, y, z) {
       perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
 
   return z - Math.max(height, WATER_HEIGHT);
+  
 }
 
 function water_with_flying_islands(x, y, z) {
@@ -331,6 +333,31 @@ function water_with_flying_islands(x, y, z) {
     
   }
   */
+}
+
+function plain_with_holes(x, y, z){
+
+  if (z < WATER_HEIGHT) {
+    return z - WATER_HEIGHT;
+  }
+
+  const freq_multiplier = 2.17;
+  const ampl_multiplier = 0.5;
+  const num_octaves = 1;
+  const height_scale_factor = 0.45;
+
+  const height =
+    height_scale_factor *
+    perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
+
+  if(z>height){
+    return z - Math.max(height, WATER_HEIGHT);
+  }
+  else{
+    return 0.2*perlin_fbm_3D(3*x,3*y,3*z,8, 0.5, 1)-0.11;
+    //0.5*perlin_fbm_3D(x,y,z,1, 1, 1)
+  }
+
 }
 
 //---------------------------------------------------------------------------3D implementation-------------------------------------------------------------------------
