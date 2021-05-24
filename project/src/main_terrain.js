@@ -19,6 +19,8 @@ import {
 
 import { generate_terrains } from "./terrain_generation.js";
 
+import{ STARTING_LOCATION } from "./terrain_constants.js"
+
 async function main() {
   /* const in JS means the variable will not be bound to a new value, but the value can be modified (if its an object or array)
 		https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const
@@ -100,7 +102,7 @@ async function main() {
   let cam_angle_z = 0; // in radians!
   let cam_angle_y = 0; // in radians!
 
-  const STARTING_LOCATION = [-8.5, 12.5, 0];
+
   const DEFAULT_CAM_LOOK_AT = [0, 0.0, 0.0];
   const DEFAULT_CAM_POS = [1, 0.0, 0.4];
   const MIN_Z = 0.4;
@@ -243,8 +245,6 @@ async function main() {
       sim_time += dt / 3;
     }
     prev_regl_time = frame.time;
-
-    console.log(cam_look_at)
 
     terrain_actors = generate_terrains(regl, resources, cam_look_at);
 
