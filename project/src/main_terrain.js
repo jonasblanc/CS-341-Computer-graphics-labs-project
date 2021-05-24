@@ -1,10 +1,7 @@
 import { createREGL } from "../lib/regljs_2.1.0/regl.module.js";
 import {
-  vec2,
   vec3,
   vec4,
-  mat2,
-  mat3,
   mat4,
 } from "../lib/gl-matrix_3.3.0/esm/index.js";
 
@@ -17,12 +14,12 @@ import {
 
 import {
   deg_to_rad,
-  mat4_to_string,
-  vec_to_string,
   mat4_matmul_many,
 } from "./icg_math.js";
 
 import { generate_terrains } from "./terrain_generation.js";
+
+import{ STARTING_LOCATION } from "./terrain_constants.js"
 
 async function main() {
   /* const in JS means the variable will not be bound to a new value, but the value can be modified (if its an object or array)
@@ -101,19 +98,18 @@ async function main() {
 		Camera
 	---------------------------------------------------------------*/
   const mat_world_to_cam = mat4.create();
-  const cam_distance_base = 0.75;
 
   let cam_angle_z = 0; // in radians!
   let cam_angle_y = 0; // in radians!
-  let cam_distance_factor = 1;
 
-  const DEFAULT_CAM_LOOK_AT = [0.0, 0.0, 0.0];
-  const DEFAULT_CAM_POS = [1, 0.0, 0.5];
+
+  const DEFAULT_CAM_LOOK_AT = [0, 0.0, 0.0];
+  const DEFAULT_CAM_POS = [1, 0.0, 0.4];
   const MIN_Z = 0.4;
-  const MAX_Z = 1.0;
+  const MAX_Z = 0.52;
 
-  let cam_look_at = DEFAULT_CAM_LOOK_AT;
-  let cam_pos = DEFAULT_CAM_POS;
+  let cam_look_at = [0,0,0];
+  let cam_pos = [0,0,0];
 
   const light_position_world = [0, 0, 0, 1];
   const light_position_cam = [0, 0, 0, 0];
@@ -183,10 +179,30 @@ async function main() {
   register_keyboard_action("m", () => {
     is_sun_rotating = !is_sun_rotating;
   });
+  register_keyboard_action("i", () => {
+    cam_pos[0] += 0.05;
+    cam_pos[2] += 0.1;
+    update_cam_transform();
+  });
+  register_keyboard_action("k", () => {
+    cam_pos[0] -= 0.05;
+    cam_pos[2] -= 0.1;
+    update_cam_transform();
+  });
+  register_keyboard_action("j", () => {
+    cam_pos[1] += 0.05;
+    cam_pos[2] += 0.1;
+    update_cam_transform();
+  });
+  register_keyboard_action("l", () => {
+    cam_pos[1] -= 0.05;
+    cam_pos[2] -= 0.1;
+    update_cam_transform();
+  });
 
   function activate_preset_view() {
-    cam_look_at = DEFAULT_CAM_LOOK_AT;
-    cam_pos = DEFAULT_CAM_POS;
+    cam_look_at = vec3.add([0,0,0], DEFAULT_CAM_LOOK_AT, STARTING_LOCATION);
+    cam_pos = vec3.add([0,0,0], DEFAULT_CAM_POS, STARTING_LOCATION);
     sim_time = 24.0;
     update_cam_transform();
   }
@@ -204,7 +220,6 @@ async function main() {
     if (event.buttons & 1 || event.buttons & 4) {
       cam_angle_z += event.movementX * 0.005;
       cam_angle_y += -event.movementY * 0.005;
-      console.log(cam_angle_z);
 
       update_cam_transform();
     }
@@ -247,7 +262,7 @@ async function main() {
   regl.frame((frame) => {
     const dt = frame.time - prev_regl_time;
     if (is_sun_rotating) {
-      sim_time += dt;
+      sim_time += dt / 3;
     }
     prev_regl_time = frame.time;
 

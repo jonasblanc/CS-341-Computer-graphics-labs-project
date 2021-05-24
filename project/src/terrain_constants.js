@@ -8,6 +8,9 @@ const NUMBER_CUBE_Z = 20;
 
 const WATER_HEIGHT = -0.3;
 
+const STARTING_LOCATION = [-8.5, 12.5, 0];
+
+
 export {
   CHUNK_SIZE_X,
   CHUNK_SIZE_Y,
@@ -16,4 +19,5 @@ export {
   NUMBER_CUBE_Y,
   NUMBER_CUBE_Z,
   WATER_HEIGHT,
+  STARTING_LOCATION
 };

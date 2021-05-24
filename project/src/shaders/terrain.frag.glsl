@@ -8,7 +8,7 @@ varying float v2f_height;
 uniform vec3 sky_color;
 
 //const vec3  light_color = vec3(1.0, 1.0, 1.0); 
-const float ambiant_factor = 0.2;
+const float ambiant_factor = 0.3;
 const float mist_factor = 5.0;
 const vec3  light_color = vec3(0.94, 0.92, 0.85);
 
