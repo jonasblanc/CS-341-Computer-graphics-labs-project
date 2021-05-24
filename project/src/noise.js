@@ -7,7 +7,10 @@ import {
   mat4,
 } from "../lib/gl-matrix_3.3.0/esm/index.js";
 import { max } from "../lib/gl-matrix_3.3.0/esm/vec3.js";
-export { noise3D, normalComputation };
+export { noise3D, normalComputation, ISO_VALUE };
+
+// Noise value threshold, above is void, below is in the mesh
+const ISO_VALUE = 0;
 
 /**
  * Coordinates recieved are in real world coordinates (ie between -0.5 and 0.5 for the central chunk)
@@ -23,9 +26,9 @@ function noise3D(xyz) {
 
   const value_choose_region = choose_noise_function(x, y);
   if (value_choose_region <= -0.33) {
-    return plain_with_holes(x,y,z);
-  } else if (value_choose_region <= 0.33) {
     return water_with_flying_islands(x, y, z);
+  } else if (value_choose_region <= 0.33) {
+    return plain_with_holes(x, y, z);
   } else {
     return mountain(x, y, z);
   }
@@ -79,47 +82,15 @@ function terrain2d(x, y, z, num_octaves, freq_multiplier, ampl_multiplier) {
 
 function plan3D(x, y, z) {
   if (z < 0) {
-    return 1;
+    return -1;
   }
-  return 0;
+  return 1;
 }
 
-function sphere3D(x, y, z) {
-  const r2 = x * x + y * y + z * z;
-  if (r2 < 0.1) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
 
 function smoothSphere3D(x, y, z) {
   const r2 = x * x + y * y + z * z;
   return Math.exp(-3 * r2);
-}
-
-function sin2D(x, y, z) {
-  if (z < -0.3) {
-    return 1;
-  } else {
-    if (z < (Math.sin(2 * x) + Math.sin(2 * y)) / 5 - 0.1) {
-      return 1;
-    } else {
-      return 0;
-    }
-  }
-}
-
-function sin1D(x, y, z) {
-  if (z < -0.1) {
-    return 1;
-  } else {
-    if (z < Math.sin(2 * x) / 3 - 0.1) {
-      return 1;
-    } else {
-      return 0;
-    }
-  }
 }
 
 //---------------------------------------------------------------------------2D implementation-------------------------------------------------------------------------
@@ -292,26 +263,22 @@ function mountain(x, y, z) {
       perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
 
   return z - Math.max(height, WATER_HEIGHT);
-  
 }
 
 function water_with_flying_islands(x, y, z) {
-  if(z < 0.1){
-  return z - WATER_HEIGHT;
-  }
-  else{
-    const val = 0.025*perlin_fbm_3D(2.35*x,2.35*y,2.35*z,12, 0.45, 1)+0.05;
+  if (z < 0.1) {
+    return z - WATER_HEIGHT;
+  } else {
+    const val =
+      0.025 * perlin_fbm_3D(2.35 * x, 2.35 * y, 2.35 * z, 12, 0.45, 1) + 0.05;
 
-    if(z>0.4){
-      if(z>val){
-        return z-val;
+    if (z > 0.4) {
+      if (z > val) {
+        return z - val;
+      } else {
+        return z - WATER_HEIGHT;
       }
-      else{
-        return z-WATER_HEIGHT;
-      }
-
-    }
-    else{
+    } else {
       return val;
     }
   }
@@ -351,8 +318,7 @@ function water_with_flying_islands(x, y, z) {
   */
 }
 
-function plain_with_holes(x, y, z){
-
+function plain_with_holes(x, y, z) {
   if (z < WATER_HEIGHT) {
     return z - WATER_HEIGHT;
   }
@@ -366,14 +332,12 @@ function plain_with_holes(x, y, z){
     height_scale_factor *
     perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier);
 
-  if(z>height){
+  if (z > height) {
     return z - Math.max(height, WATER_HEIGHT);
-  }
-  else{
-    return 0.2*perlin_fbm_3D(3*x,3*y,3*z,8, 0.5, 1)-0.11;
+  } else {
+    return 0.2 * perlin_fbm_3D(3 * x, 3 * y, 3 * z, 8, 0.5, 1) - 0.11;
     //0.5*perlin_fbm_3D(x,y,z,1, 1, 1)
   }
-
 }
 
 //---------------------------------------------------------------------------3D implementation-------------------------------------------------------------------------
@@ -382,17 +346,17 @@ const NUM_GRADIENTS_3D = 12.0;
 
 // -- Gradient table --
 function gradients_3D(i) {
-  if (i == 0) return [ 1,  1,  0];
-  if (i == 1) return [-1,  1,  0];
-  if (i == 2) return [ 1, -1,  0];
-  if (i == 3) return [-1, -1,  0];
-  if (i == 4) return [ 1,  0,  1];
-  if (i == 5) return [-1,  0,  1];
-  if (i == 6) return [ 1,  0, -1];
-  if (i == 7) return [-1,  0, -1];
-  if (i == 8) return [ 0,  1,  1];
-  if (i == 9) return [ 0, -1,  1];
-  if (i == 10) return [0,  1, -1];
+  if (i == 0) return [1, 1, 0];
+  if (i == 1) return [-1, 1, 0];
+  if (i == 2) return [1, -1, 0];
+  if (i == 3) return [-1, -1, 0];
+  if (i == 4) return [1, 0, 1];
+  if (i == 5) return [-1, 0, 1];
+  if (i == 6) return [1, 0, -1];
+  if (i == 7) return [-1, 0, -1];
+  if (i == 8) return [0, 1, 1];
+  if (i == 9) return [0, -1, 1];
+  if (i == 10) return [0, 1, -1];
   if (i == 11) return [0, -1, -1];
   return [0, 0, 0];
 }
@@ -402,9 +366,11 @@ function gradients_3D(i) {
  * @param {*} grid_point: 3D point on the grid
  * @returns a hash in range [0, NUM_GRADIENTS_3D-1]
  */
- function hash_func_3D(grid_point) {
+function hash_func_3D(grid_point) {
   return Math.floor(
-    hash_poly(hash_poly(hash_poly(grid_point[0]) + grid_point[1]) + grid_point[2]) % NUM_GRADIENTS_3D
+    hash_poly(
+      hash_poly(hash_poly(grid_point[0]) + grid_point[1]) + grid_point[2]
+    ) % NUM_GRADIENTS_3D
   );
 }
 
@@ -445,7 +411,6 @@ function perlin_noise_3D(x, y, z) {
   const pc110 = vec3.subtract([0, 0, 0], point, c110);
   const pc111 = vec3.subtract([0, 0, 0], point, c111);
 
-
   const dot000 = vec3.dot(gradient000, pc000);
   const dot100 = vec3.dot(gradient100, pc100);
   const dot010 = vec3.dot(gradient010, pc010);
@@ -480,7 +445,7 @@ function perlin_noise_3D(x, y, z) {
  * @param {*} ampl_multiplier: The factor to scale the amplitude of each octave
  * @returns a random looking value with different frequencies to have more details
  */
- function perlin_fbm_3D(x, y, z, num_octaves, freq_multiplier, ampl_multiplier) {
+function perlin_fbm_3D(x, y, z, num_octaves, freq_multiplier, ampl_multiplier) {
   let fbm = 0.0;
   let freqi = 1.0;
   let ampi = 1.0;

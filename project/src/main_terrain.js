@@ -1,10 +1,7 @@
 import { createREGL } from "../lib/regljs_2.1.0/regl.module.js";
 import {
-  vec2,
   vec3,
   vec4,
-  mat2,
-  mat3,
   mat4,
 } from "../lib/gl-matrix_3.3.0/esm/index.js";
 
@@ -17,8 +14,6 @@ import {
 
 import {
   deg_to_rad,
-  mat4_to_string,
-  vec_to_string,
   mat4_matmul_many,
 } from "./icg_math.js";
 
@@ -108,7 +103,7 @@ async function main() {
   let cam_distance_factor = 1;
 
   const DEFAULT_CAM_LOOK_AT = [0.0, 0.0, 0.0];
-  const DEFAULT_CAM_POS = [1, 0.0, 0.5];
+  const DEFAULT_CAM_POS = [1, 0.0, 0.4];
 
   let cam_look_at = DEFAULT_CAM_LOOK_AT;
   let cam_pos = DEFAULT_CAM_POS;
@@ -242,7 +237,7 @@ async function main() {
   regl.frame((frame) => {
     const dt = frame.time - prev_regl_time;
     if (is_sun_rotating) {
-      sim_time += dt;
+      sim_time += dt / 3;
     }
     prev_regl_time = frame.time;
 
