@@ -109,6 +109,8 @@ async function main() {
 
   const DEFAULT_CAM_LOOK_AT = [0.0, 0.0, 0.0];
   const DEFAULT_CAM_POS = [1, 0.0, 0.5];
+  const MIN_Z = 0.4;
+  const MAX_Z = 1.0;
 
   let cam_look_at = DEFAULT_CAM_LOOK_AT;
   let cam_pos = DEFAULT_CAM_POS;
@@ -210,11 +212,14 @@ async function main() {
 
   window.addEventListener("wheel", (event) => {
     // scroll wheel to zoom in or out
-    const factor_mul_base = 1.08;
-    const factor_mul = event.deltaY > 0 ? factor_mul_base : 1 / factor_mul_base;
-    cam_distance_factor *= factor_mul;
-    cam_distance_factor = Math.max(0.1, Math.min(cam_distance_factor, 4));
-    // console.log('wheel', event.deltaY, event.deltaMode)
+    const factor = event.deltaY/200;
+    
+    let tmp = cam_pos[2] + factor;
+    if( tmp >MIN_Z && tmp <MAX_Z ){
+      cam_pos[0] += 2*factor;
+      cam_pos[2] = tmp;
+    }
+    
     event.preventDefault(); // don't scroll the page too...
     update_cam_transform();
   });
