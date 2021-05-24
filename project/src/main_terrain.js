@@ -96,17 +96,18 @@ async function main() {
 		Camera
 	---------------------------------------------------------------*/
   const mat_world_to_cam = mat4.create();
-  const cam_distance_base = 0.75;
 
   let cam_angle_z = 0; // in radians!
   let cam_angle_y = 0; // in radians!
-  let cam_distance_factor = 1;
 
-  const DEFAULT_CAM_LOOK_AT = [0.0, 0.0, 0.0];
+  const STARTING_LOCATION = [-8.5, 12.5, 0];
+  const DEFAULT_CAM_LOOK_AT = [0, 0.0, 0.0];
   const DEFAULT_CAM_POS = [1, 0.0, 0.4];
+  const MIN_Z = 0.4;
+  const MAX_Z = 0.52;
 
-  let cam_look_at = DEFAULT_CAM_LOOK_AT;
-  let cam_pos = DEFAULT_CAM_POS;
+  let cam_look_at = [0,0,0];
+  let cam_pos = [0,0,0];
 
   const light_position_world = [0, 0, 0, 1];
   const light_position_cam = [0, 0, 0, 0];
@@ -178,8 +179,8 @@ async function main() {
   });
 
   function activate_preset_view() {
-    cam_look_at = DEFAULT_CAM_LOOK_AT;
-    cam_pos = DEFAULT_CAM_POS;
+    cam_look_at = vec3.add([0,0,0], DEFAULT_CAM_LOOK_AT, STARTING_LOCATION);
+    cam_pos = vec3.add([0,0,0], DEFAULT_CAM_POS, STARTING_LOCATION);
     sim_time = 24.0;
     update_cam_transform();
   }
@@ -197,7 +198,6 @@ async function main() {
     if (event.buttons & 1 || event.buttons & 4) {
       cam_angle_z += event.movementX * 0.005;
       cam_angle_y += -event.movementY * 0.005;
-      console.log(cam_angle_z);
 
       update_cam_transform();
     }
@@ -205,11 +205,14 @@ async function main() {
 
   window.addEventListener("wheel", (event) => {
     // scroll wheel to zoom in or out
-    const factor_mul_base = 1.08;
-    const factor_mul = event.deltaY > 0 ? factor_mul_base : 1 / factor_mul_base;
-    cam_distance_factor *= factor_mul;
-    cam_distance_factor = Math.max(0.1, Math.min(cam_distance_factor, 4));
-    // console.log('wheel', event.deltaY, event.deltaMode)
+    const factor = event.deltaY/200;
+    
+    let tmp = cam_pos[2] + factor;
+    if( tmp >MIN_Z && tmp <MAX_Z ){
+      cam_pos[0] += 2*factor;
+      cam_pos[2] = tmp;
+    }
+    
     event.preventDefault(); // don't scroll the page too...
     update_cam_transform();
   });
@@ -240,6 +243,8 @@ async function main() {
       sim_time += dt / 3;
     }
     prev_regl_time = frame.time;
+
+    console.log(cam_look_at)
 
     terrain_actors = generate_terrains(regl, resources, cam_look_at);
 
