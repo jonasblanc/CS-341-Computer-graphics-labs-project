@@ -8,7 +8,7 @@ const NUMBER_CUBE_Z = 20;
 
 const WATER_HEIGHT = -0.3;
 
-const STARTING_LOCATION = [-8.5, 12.5, 0];
+const STARTING_LOCATION = [-8.5, 12, 0];
 
 
 export {

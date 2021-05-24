@@ -198,9 +198,7 @@ function perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier) {
  * @param {*} y 
  * @returns 
  */
-function choose_noise_function(x, y) {
-  //const value = Math.sin(angular_speed * x) * Math.sin(angular_speed * y);
-  
+function choose_noise_function(x, y) { 
   const scaling_factor = 0.5;
   const amplitude_factor = 1.5;
 
