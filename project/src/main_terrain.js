@@ -179,6 +179,26 @@ async function main() {
   register_keyboard_action("m", () => {
     is_sun_rotating = !is_sun_rotating;
   });
+  register_keyboard_action("i", () => {
+    cam_pos[0] += 0.05;
+    cam_pos[2] += 0.1;
+    update_cam_transform();
+  });
+  register_keyboard_action("k", () => {
+    cam_pos[0] -= 0.05;
+    cam_pos[2] -= 0.1;
+    update_cam_transform();
+  });
+  register_keyboard_action("j", () => {
+    cam_pos[1] += 0.05;
+    cam_pos[2] += 0.1;
+    update_cam_transform();
+  });
+  register_keyboard_action("l", () => {
+    cam_pos[1] -= 0.05;
+    cam_pos[2] -= 0.1;
+    update_cam_transform();
+  });
 
   function activate_preset_view() {
     cam_look_at = vec3.add([0,0,0], DEFAULT_CAM_LOOK_AT, STARTING_LOCATION);
