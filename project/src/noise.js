@@ -199,10 +199,12 @@ function perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier) {
  * @returns 
  */
 function choose_noise_function(x, y) {
-  const angular_speed = 0.8;
-  const value = Math.sin(angular_speed * x) * Math.sin(angular_speed * y);
+  //const value = Math.sin(angular_speed * x) * Math.sin(angular_speed * y);
+  
+  const scaling_factor = 0.5;
+  const amplitude_factor = 1.5;
 
-  return value;
+  return amplitude_factor * perlin_noise_2D(x * scaling_factor , y * scaling_factor);
 }
 
 //---------------------------------------------------------------------------------BIOMES-------------------------------------------------------------------------------
