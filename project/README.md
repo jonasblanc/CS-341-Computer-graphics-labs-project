@@ -18,6 +18,7 @@ The goal of this project is to generate an infinte map. The implementation relie
 We implemented a JS version of the marching cube algorithm. We followed [Ben Anderson's paper](https://www.cs.carleton.edu/cs_comps/0405/shape/marching_cubes.html) for the main steps. First we created a version where the vertices are placed on the middle of the edges, then we modified it to interpolate their exact position based one the noise value at the cube corners. We had to adapat our code to integrate the lookup table (used as an efficient way to retrieve cube faces based on the corner noise value) published in [Paul Bourke's paper](http://paulbourke.net/geometry/polygonise/). We used our own design to iterate over cubes and to translate the coordinates for the noise function or to draw the mesh, resulting in quite a fiew index translation.
 
 The pipeline of our implementation is the following:
+
 * Compute the noise value for every cube corners.
 * Iterate over every cube which is at the surface of our terrain.
 * Read the corresponding faces in the lookup table.

@@ -36,7 +36,13 @@
 <h2 id="technical-approach">Technical Approach</h2>
 <h3 id="marching-cube-algorithm">Marching cube algorithm</h3>
 <p>We implemented a JS version of the marching cube algorithm. We followed <a href="https://www.cs.carleton.edu/cs_comps/0405/shape/marching_cubes.html">Ben Anderson’s paper</a> for the main steps. First we created a version where the vertices are placed on the middle of the edges, then we modified it to interpolate their exact position based one the noise value at the cube corners. We had to adapat our code to integrate the lookup table (used as an efficient way to retrieve cube faces based on the corner noise value) published in <a href="http://paulbourke.net/geometry/polygonise/">Paul Bourke’s paper</a>. We used our own design to iterate over cubes and to translate the coordinates for the noise function or to draw the mesh, resulting in quite a fiew index translation.</p>
-<p>The pipeline of our implementation is the following: * Compute the noise value for every cube corners. * Iterate over every cube which is at the surface of our terrain. * Read the corresponding faces in the lookup table. * For every vertex of every face update its position and normal.</p>
+<p>The pipeline of our implementation is the following:</p>
+<ul>
+<li>Compute the noise value for every cube corners.</li>
+<li>Iterate over every cube which is at the surface of our terrain.</li>
+<li>Read the corresponding faces in the lookup table.</li>
+<li>For every vertex of every face update its position and normal.</li>
+</ul>
 <p>For the normal computation, at first we used a weighted average of the faces normal, but it lead to difficulties at chunk boundaries. We finally computed the normal as the gradient of the noise function which resolved the boundary bug and ended up to be much smoother.</p>
 <h3 id="partial-chunk-generation">Partial chunk generation</h3>
 <p>In order to give the impression of infinite terrain, we rely on partial chunk generation. This straightforward yet effective method makes the computational load bearable. Indeed, we partition the rendered area of the map in 9 chunks of given dimensions (10x10x10 for example) to generate our map. Whenever the camera is moving, we delete in memory the 3 chunks that are in the opposite direction of the camera movement and compute the 3 new chunks. Like that, we always have 9 chunks, we don’t have too many computation to do and we can move to infinity in each directions.</p>
