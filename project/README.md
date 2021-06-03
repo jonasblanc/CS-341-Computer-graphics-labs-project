@@ -46,8 +46,19 @@ The partial chunk generation has it's shortcomings. The main one being the fact 
 ### Day-Night Cycle
 We also implemented a day-night cycle. We keep track of the time and use it to compute the color of the background/sky. This color is always a mixture between a pre-defined day color and a pre-defined night color. We move the light source accordingly to give a realistic effect.
 
+### Difficulties and challenges
 
-##Contribution
+Here are some difficulties and challenges we faced:
+
+- We had some struggles knowing how to start the project as we had to familiarise ourselves with the whole pipeline. As soon as we understood what should be executed on the GPU or on the JS side, it went way better.
+- An error occurred in one of our many index changes which created discontinuity between chunks. It took us a while to find the source of the problem.
+- The implementation of the algorithm marching cube required a lot of reflection on the representation of the data and on how to iterate on our different entities. It took us a few coding sessions to get comfortable with the different coordinates and index systems
+- As explained above our first normal computation version was not compatible with our chunks implementation so we spent quite some time on that issue before modifying the way normals are computed.
+
+## Results
+
+
+## Contribution
 
 Every member participated in almost every tasks and understand the project as a whole. However, we still splitted the work and some members spent more time on some features. These are the features each member worked on a bit more in depth than the others:
 
@@ -56,7 +67,7 @@ Zad: Mist effect and day/night cycle
 Loïc: Noise functions and terrain specializations
 
 
-##Resources/Inspirations:
+## Resources/Inspirations:
 
 https://www.cs.carleton.edu/cs_comps/0405/shape/marching_cubes.html
 http://paulbourke.net/geometry/polygonise/
