@@ -68,9 +68,9 @@ Here are some difficulties and challenges we faced:
 
 Every member participated in almost every tasks and understand the project as a whole. However, we still splitted the work and some members spent more time on some features. These are the features each member worked on a bit more in depth than the others:
 
-Jonas: Marching cube algorithm and infinite map generation
-Zad: Mist effect and day/night cycle
-Loïc: Noise functions and terrain specializations
+Jonas: Marching cube algorithm and infinite map generation  
+Zad: Mist effect and day/night cycle  
+Loïc: Noise functions and terrain specializations  
 
 
 ## Resources/Inspirations:
