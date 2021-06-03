@@ -20,16 +20,18 @@ In order to give the impression of infinite terrain, we rely on partial chunk ge
 - An easy interaction with the scene where we can move the camera in the x and y direction, allows us to see the generation of the terrain and see that it is indeed infinite.
 
 ### Terrain specialisation
-One of our extension was to add different terrains with different features. We chose to have 3 differents terrains: mountains, archipelagos and floating islands. To generate coherent terrains and not just random looking shapes, we decided to do a mix between a 2D perlin-noise function to compute a height and a 3D perlin-noise to modify it and create hollow surfaces. Only using the 3D perlin-noise would have allowed to create complicated terrains, but this approach seemed to give more realistic ones.
+One of our extension was to add different terrains with different features. We chose to have 3 differents terrains: mountains, archipelagos and floating islands. To generate coherent terrains and not just random looking shapes, we decided to do a mix between a 2D perlin-noise function to compute a height and a 3D perlin-noise to modify it and create hollow surfaces. Only using the 3D perlin-noise would have allowed to create complicated terrains, but this approach seemed to give more realistic ones. We took our inspiration from this [forum](https://www.gamedev.net/forums/topic/612655-3d-perlin-noise-map-ridges/) but implemented everything by ourselves.
 
 Our implementation works as follows: we first call a 2D noise function and use the value returned to choose between our 3 terrains using predefined thresholds. This way, there would be some continuity in the kind of terrains generated, but it will still be random and allow different terrains type to be mixed together. Then, we call our terrain method which returns the value for the 3D coordinate used in the marching cube.
 
 Our 3 terrains work as following:
 
 #### Mountains
+
 Mountains are charachterised by higher average altitude and sharper peaks. We decided not to let mountains having holes, therefore, this terrain doesn't use our 3D perlin-noise and could be implemented without the marching-cube algorithm. In order to have a higher altitude, we added a base height to our 2D noise function for the height. In order to add sharper peaks, we used many octaves and a quite high amplitude multiplier factor in our 2D perlin FBM. Finally, in order to have smooth surfaces with the marching cube algorithm, and to be able to compute the normals as the gradient of a signed distance function, we return the difference between the z axis and this height.
 
 #### Archipelagos
+
 Archipelagos are charachterised by more continuous height differences without any peaks and can have holes to create sort of bridges. To avoid having peaks, we used only 1 octave in our 2D perlin FBM for the height. Then to create holes and use the full power of the marching-cube algorithm, if z is smaller than the height (i.e. we would be "inside the terrain"), we use our 3D perlin FBM function with tweeked paramters. This will potentially create holes by returnng values interpreted as "outside the terrain" even if we are under the height computed with the 2D FBM.
 
 #### Floating Islands
@@ -37,6 +39,26 @@ Floating islands are flying on top of water. Basically, we used a max and min th
 
 
 ### Mist
+
 The partial chunk generation has it's shortcomings. The main one being the fact that you can clearly see the linear disparity between the end of the generated area and the background. We implemented a mist feature to work around that problem. For all generated points that are further than a certain threshold, we mix their color with the color of the sky. The quantity of the sky color in that mixture is linearly dependent on the distance to the aforementionned threshold.
 
 
+### Day-Night Cycle
+We also implemented a day-night cycle. We keep track of the time and use it to compute the color of the background/sky. This color is always a mixture between a pre-defined day color and a pre-defined night color. We move the light source accordingly to give a realistic effect.
+
+
+##Contribution
+
+Every member participated in almost every tasks and understand the project as a whole. However, we still splitted the work and some members spent more time on some features. These are the features each member worked on a bit more in depth than the others:
+
+Jonas: Marching cube algorithm and infinite map generation
+Zad: Mist effect and day/night cycle
+Loïc: Noise functions and terrain specializations
+
+
+##Resources/Inspirations:
+
+https://www.cs.carleton.edu/cs_comps/0405/shape/marching_cubes.html
+http://paulbourke.net/geometry/polygonise/
+https://www.redblobgames.com/maps/terrain-from-noise/
+https://www.gamedev.net/forums/topic/612655-3d-perlin-noise-map-ridges/
