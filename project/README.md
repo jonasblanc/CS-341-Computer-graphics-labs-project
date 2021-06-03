@@ -20,5 +20,5 @@ In order to give the impression of infinite terrain, we rely on partial chunk ge
 - An easy interaction with the scene where we can move the camera in the x and y direction, allows us to see the generation of the terrain and see that it is indeed infinite.
 
 ### Mist
-The partial chunk generation has it's shortcomings. The main one being the fact that you can clearly see the linear disparity between the end of the generated area and the backgroung. We implemented a mist feature to work around that problem. For all generated points that are further than a certain threshold, we mix their color with the color of the sky. The quantity of the sky color in that mixture is linearly dependent on the distance to the aforementionned threshold.
+The partial chunk generation has it's shortcomings. The main one being the fact that you can clearly see the linear disparity between the end of the generated area and the background. We implemented a mist feature to work around that problem. For all generated points that are further than a certain threshold, we mix their color with the color of the sky. The quantity of the sky color in that mixture is linearly dependent on the distance to the aforementionned threshold.
 
