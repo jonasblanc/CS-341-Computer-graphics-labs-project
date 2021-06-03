@@ -28,22 +28,22 @@ In order to give the impression of infinite terrain, we rely on partial chunk ge
 - An intuitive interaction with the scene where we can move the camera in the x and y direction, allows us to see the generation of the terrain and see that it is indeed infinite.
 
 ### Terrain specialisation
-One of our extension was to add different terrains with different features. We chose to have 3 differents terrains: mountains, archipelagos and floating islands. To generate coherent terrains and not just random looking shapes, we decided to do a mix between a 2D perlin-noise function to compute a height and a 3D perlin-noise to modify it and create hollow surfaces. Only using the 3D perlin-noise would have allowed to create complicated terrains, but this approach seemed to give more realistic ones. We took our inspiration from this [forum](https://www.gamedev.net/forums/topic/612655-3d-perlin-noise-map-ridges/) but implemented everything by ourselves.
+One of our extension was to add different biomes with different features. We chose to have 3 differents terrains: mountains, archipelagos and floating islands. To generate coherent terrains and not just random looking shapes, we decided to do a mix between a 2D perlin-noise function to compute a height and a 3D perlin-noise to modify it and create hollow surfaces. We took our inspiration from this [forum](https://www.gamedev.net/forums/topic/612655-3d-perlin-noise-map-ridges/) but implemented everything by ourselves.
 
-Our implementation works as follows: we first call a 2D noise function and use the value returned to choose between our 3 terrains using predefined thresholds. This way, there would be some continuity in the kind of terrains generated, but it will still be random and allow different terrains type to be mixed together. Then, we call our terrain method which returns the value for the 3D coordinate used in the marching cube.
+Our implementation works as follows: we first call a 2D noise function and use the value returned to choose between our 3 terrains using predefined thresholds. This way, there would be some continuity in the kind of terrains generated, but it will still be random and allow different terrain types to be mixed together. Then, we call the corresponding biome noise function which returns the value for the 3D coordinate used in the marching cube. The terrain noise functions are implemented using 2D perlin noise FBM with thuned parameters mixed with a 3D perlin noise. In order to have smooth surfaces with the marching cube algorithm, and to be able to compute the normals as the gradient of a signed distance function, they return the difference between the z axis and the height given by the 2D perlin FBM.
 
 Our 3 terrains work as following:
 
 #### Mountains
 
-Mountains are charachterised by higher average altitude and sharper peaks. We decided not to let mountains having holes, therefore, this terrain doesn't use our 3D perlin-noise and could be implemented without the marching-cube algorithm. In order to have a higher altitude, we added a base height to our 2D noise function for the height. In order to add sharper peaks, we used many octaves and a quite high amplitude multiplier factor in our 2D perlin FBM. Finally, in order to have smooth surfaces with the marching cube algorithm, and to be able to compute the normals as the gradient of a signed distance function, we return the difference between the z axis and this height.
+Mountains are charachterised by higher average altitude and sharper peaks. We decided not to let mountains having holes, therefore, this terrain doesn't use our 3D perlin-noise (thus could be rendered with a height map based algorithm instead of the marching cube). In order to have a higher altitude, we added a base height to our 2D noise function for the height. In order to add sharper peaks, we used many octaves and a quite high amplitude multiplier factor in our 2D perlin FBM.
 
 #### Archipelagos
 
 Archipelagos are charachterised by more continuous height differences without any peaks and can have holes to create sort of bridges. To avoid having peaks, we used only 1 octave in our 2D perlin FBM for the height. Then to create holes and use the full power of the marching-cube algorithm, if z is smaller than the height (i.e. we would be "inside the terrain"), we use our 3D perlin FBM function with tweeked paramters. This will potentially create holes by returnng values interpreted as "outside the terrain" even if we are under the height computed with the 2D FBM.
 
 #### Floating Islands
-Floating islands are flying on top of water. Basically, we used a max and min threshold where we are for sure outside the surface. Otherwise, we use our 3D perlin FBM with parameters that most of the time return a value interpreted as outside the surface and just sometimes as inside the surface, which will create blocks of earth on top of the water.
+Floating islands are flying on top of water. Basically, we used a max and min threshold where we are for sure outside the surface. Then, we use our 3D perlin FBM with parameters that most of the time return a value interpreted as outside the surface and just sometimes as inside the surface, which will create blocks of earth on top of the water.
 
 
 ### Mist
