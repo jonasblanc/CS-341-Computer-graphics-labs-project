@@ -2,10 +2,11 @@
 title: Infinite map generation
 ---
 
-Group 9:  
-Zad Abi Fadel  
-Loïc Houmard  
-Jonas Blanc  
+**Group 9:**
+
+* Zad Abi Fadel  
+* Loïc Houmard  
+* Jonas Blanc  
 
 ## Abstract
 The goal of this project is to generate an infinte map. The implementation relies on the marching cubes algorithm and makes use of multiple three dimensional Perlin Noise functions to make it aesthetically pleasing and look randomly generated. All design choices are made to keep the project computationnally efficient in order to run smoothly on most modern day machines. In addition to that, the GPU, through the shaders, was used to compute the color of each pixel. 
