@@ -47,9 +47,7 @@ Floating islands are flying on top of water. Basically, we used a max and min th
 
 
 ### Mist
-
-The partial chunk generation has it's shortcomings. The main one being the fact that you can clearly see the linear disparity between the end of the generated area and the background. We implemented a mist feature to work around that problem. For all generated points that are further than a certain threshold, we mix their color with the color of the sky. The quantity of the sky color in that mixture is linearly dependent on the distance to the aforementionned threshold.
-
+The partial chunk generation has it's shortcomings. The main one being the fact that you can clearly see the linear disparity between the end of the generated area and the background. In order to fix that problem, we could have generated more chunks, increased chunk dimensions or even zoomed in. Instead, we implemented a mist feature to work around that problem. For all generated points that are further than a certain threshold, we mix their color with the color of the sky. The quantity of the sky color in that mixture is linearly dependent on the distance to the aforementionned threshold. We judged it to be the best solution computation-cost wise and aesthetically-wise
 
 ### Day-Night Cycle
 We also implemented a day-night cycle. We keep track of the time and use it to compute the color of the background/sky. This color is always a mixture between a pre-defined day color and a pre-defined night color. We move the light source accordingly to give a realistic effect.
@@ -60,7 +58,7 @@ Here are some difficulties and challenges we faced:
 
 - We had some struggles knowing how to start the project as we had to familiarise ourselves with the whole pipeline. As soon as we understood what should be executed on the GPU or on the JS side, it went way better.
 - An error occurred in one of our many index changes which created discontinuity between chunks. It took us a while to find the source of the problem.
-- The implementation of the algorithm marching cube required a lot of reflection on the representation of the data and on how to iterate on our different entities. It took us a few coding sessions to get comfortable with the different coordinates and index systems
+- The implementation of the marching cube algorithm required a lot of reflection on the representation of the data and on how to iterate on our different entities. It took us a few coding sessions to get comfortable with the different coordinates and index systems.
 - As explained above our first normal computation version was not compatible with our chunks implementation so we spent quite some time on that issue before modifying the way normals are computed.
 
 ## Results
@@ -77,7 +75,7 @@ Loïc: Noise functions and terrain specializations
 
 ## Resources/Inspirations:
 
-https://www.cs.carleton.edu/cs_comps/0405/shape/marching_cubes.html
-http://paulbourke.net/geometry/polygonise/
-https://www.redblobgames.com/maps/terrain-from-noise/
-https://www.gamedev.net/forums/topic/612655-3d-perlin-noise-map-ridges/
+* https://www.cs.carleton.edu/cs_comps/0405/shape/marching_cubes.html  
+* http://paulbourke.net/geometry/polygonise/  
+* https://www.redblobgames.com/maps/terrain-from-noise/  
+* https://www.gamedev.net/forums/topic/612655-3d-perlin-noise-map-ridges/  
