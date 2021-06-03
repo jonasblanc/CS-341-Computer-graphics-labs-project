@@ -56,6 +56,5 @@ void main()
         float factor = (dist - 1.5) /0.3;
         color = mix(color,sky_color, min(factor, 1.0)); 
     }
-
     gl_FragColor = vec4(color, 1.); // output: RGBA in 0..1 range
 }

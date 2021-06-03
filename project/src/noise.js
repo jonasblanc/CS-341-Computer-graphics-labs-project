@@ -1,9 +1,6 @@
-import {
-  vec2,
-  vec3,
-} from "../lib/gl-matrix_3.3.0/esm/index.js";
+import { vec2, vec3 } from "../lib/gl-matrix_3.3.0/esm/index.js";
 
-import{ STARTING_LOCATION } from "./terrain_constants.js"
+import { STARTING_LOCATION } from "./terrain_constants.js";
 
 export { noise3D, normalComputation, ISO_VALUE };
 
@@ -13,7 +10,7 @@ const ISO_VALUE = 0;
 /**
  * Compute noise value for a location xyz
  * @param {*} xyz - 3D vector of the location
- * @returns noise value 
+ * @returns noise value
  */
 function noise3D(xyz) {
   const x = xyz[0];
@@ -24,7 +21,7 @@ function noise3D(xyz) {
   if (value_choose_region <= -0.33) {
     return water_with_flying_islands(x, y, z);
   } else if (value_choose_region <= 0.33) {
-    return plain_with_holes(x, y, z);
+    return archipelagos(x, y, z);
   } else {
     return mountain(x, y, z);
   }
@@ -32,7 +29,7 @@ function noise3D(xyz) {
 
 /**
  * Compute the normal of the noise function at the location xyz
- * @param {*} xyz 
+ * @param {*} xyz
  * @param {*} delta - size of the differential interval
  * @returns 3D vector with the normal direction
  */
@@ -58,12 +55,12 @@ function normalComputation(xyz, delta) {
 }
 
 /**
- * Noise function for a sphere 
- * @param {*} xyz 
+ * Noise function for a sphere
+ * @param {*} xyz
  * @returns noise value at location xyz
  */
 function smoothSphere3D(xyz) {
-  xyz = vec3.sub([0,0,0], xyz, STARTING_LOCATION)
+  xyz = vec3.sub([0, 0, 0], xyz, STARTING_LOCATION);
   const x = xyz[0];
   const y = xyz[1];
   const z = xyz[2];
@@ -194,15 +191,17 @@ function perlin_fbm(x, y, num_octaves, freq_multiplier, ampl_multiplier) {
 
 /**
  * Noise function used to choose the biom at the location (x, y)
- * @param {*} x 
- * @param {*} y 
- * @returns 
+ * @param {*} x
+ * @param {*} y
+ * @returns
  */
-function choose_noise_function(x, y) { 
+function choose_noise_function(x, y) {
   const scaling_factor = 0.5;
   const amplitude_factor = 1.5;
 
-  return amplitude_factor * perlin_noise_2D(x * scaling_factor , y * scaling_factor);
+  return (
+    amplitude_factor * perlin_noise_2D(x * scaling_factor, y * scaling_factor)
+  );
 }
 
 //---------------------------------------------------------------------------------BIOMES-------------------------------------------------------------------------------
@@ -211,9 +210,9 @@ const WATER_HEIGHT = -0.032;
 
 /**
  * Noise function for biom of style: plain
- * @param {*} x 
- * @param {*} y 
- * @param {*} z 
+ * @param {*} x
+ * @param {*} y
+ * @param {*} z
  * @returns noise value for location (x, y, z)
  */
 function plain(x, y, z) {
@@ -234,13 +233,13 @@ function plain(x, y, z) {
 }
 
 /**
- * Noise function for biom of style: plain with cavity
- * @param {*} x 
- * @param {*} y 
- * @param {*} z 
+ * Noise function for biom of style: archipelagos
+ * @param {*} x
+ * @param {*} y
+ * @param {*} z
  * @returns noise value for location (x, y, z)
  */
-function plain_with_holes(x, y, z) {
+function archipelagos(x, y, z) {
   if (z < WATER_HEIGHT) {
     return z - WATER_HEIGHT;
   }
@@ -263,9 +262,9 @@ function plain_with_holes(x, y, z) {
 
 /**
  * Noise function for biom of style: mountain
- * @param {*} x 
- * @param {*} y 
- * @param {*} z 
+ * @param {*} x
+ * @param {*} y
+ * @param {*} z
  * @returns noise value for location (x, y, z)
  */
 function mountain(x, y, z) {
@@ -289,9 +288,9 @@ function mountain(x, y, z) {
 
 /**
  * Noise function for biom of style: water with flying island
- * @param {*} x 
- * @param {*} y 
- * @param {*} z 
+ * @param {*} x
+ * @param {*} y
+ * @param {*} z
  * @returns noise value for location (x, y, z)
  */
 function water_with_flying_islands(x, y, z) {

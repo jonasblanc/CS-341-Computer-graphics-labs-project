@@ -1,9 +1,5 @@
 import { createREGL } from "../lib/regljs_2.1.0/regl.module.js";
-import {
-  vec3,
-  vec4,
-  mat4,
-} from "../lib/gl-matrix_3.3.0/esm/index.js";
+import { vec3, vec4, mat4 } from "../lib/gl-matrix_3.3.0/esm/index.js";
 
 import {
   DOM_loaded_promise,
@@ -12,20 +8,16 @@ import {
   register_keyboard_action,
 } from "./icg_web.js";
 
-import {
-  deg_to_rad,
-  mat4_matmul_many,
-} from "./icg_math.js";
+import { deg_to_rad, mat4_matmul_many } from "./icg_math.js";
 
 import { generate_terrains } from "./terrain_generation.js";
 
-import{ STARTING_LOCATION } from "./terrain_constants.js"
+import { STARTING_LOCATION } from "./terrain_constants.js";
 
 async function main() {
   /* const in JS means the variable will not be bound to a new value, but the value can be modified (if its an object or array)
 		https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const
 	*/
-
   const debug_overlay = document.getElementById("debug-overlay");
 
   // We are using the REGL library to work with webGL
@@ -93,52 +85,29 @@ async function main() {
   for (const key of Object.keys(resources)) {
     resources[key] = await resources[key];
   }
-
   /*---------------------------------------------------------------
-		Camera
+		Simulation variables
 	---------------------------------------------------------------*/
-  const mat_world_to_cam = mat4.create();
 
-  let cam_angle_z = 0; // in radians!
-  let cam_angle_y = 0; // in radians!
-
-
-  const DEFAULT_CAM_LOOK_AT = [0, 0.0, 0.0];
-  const DEFAULT_CAM_POS = [1, 0.0, 0.4];
-  const MIN_Z = 0.4;
-  const MAX_Z = 0.52;
-
-  let cam_look_at = [0,0,0];
-  let cam_pos = [0,0,0];
-
-  const light_position_world = [0, 0, 0, 1];
-  const light_position_cam = [0, 0, 0, 0];
-
+  // Init in activate_preset_view
+  let cam_look_at = [0, 0, 0];
+  let cam_pos = [0, 0, 0];
   let sim_time = 0.0;
   let prev_regl_time = 0.0;
   let is_sun_rotating = true;
 
+  /*---------------------------------------------------------------
+		Camera
+	---------------------------------------------------------------*/
+
+  const DEFAULT_CAM_LOOK_AT = [0, 0.0, 0.0];
+  const DEFAULT_CAM_POS = [1, 0.0, 0.4];
+  const MIN_ZOOM = 0.4;
+  const MAX_ZOOM = 0.52;
+
+  const mat_world_to_cam = mat4.create();
+
   function update_cam_transform() {
-    /*
-    const look_at = mat4.lookAt(
-      mat4.create(),
-      [1, 0, 1], //cam_pos, // camera position in world coord
-      [0, 0, 0], //cam_look_at, // view target point
-      [0, 0, 1] // up vector
-    );
-    let rotatedZ = mat4.fromZRotation(mat4.create(), cam_angle_z);
-    let rotatedY = mat4.fromZRotation(mat4.create(), cam_angle_y);
-
-    let deplacement = mat4.fromTranslation(mat4.create(), cam_pos);
-
-    mat4_matmul_many(
-      mat_world_to_cam,
-      look_at,
-      rotatedZ,
-      rotatedY,
-      deplacement
-    );*/
-
     const look_at = mat4.lookAt(
       mat4.create(),
       cam_pos, // camera position in world coord
@@ -150,9 +119,10 @@ async function main() {
 
   update_cam_transform();
 
-  /*
-		UI
-	*/
+  /*---------------------------------------------------------------
+		Mouvements
+	---------------------------------------------------------------*/
+
   register_keyboard_action("z", () => {
     debug_overlay.classList.toggle("hide");
   });
@@ -176,36 +146,55 @@ async function main() {
     cam_pos[1] += 0.2;
     update_cam_transform();
   });
-  register_keyboard_action("m", () => {
+  register_keyboard_action("p", () => {
     is_sun_rotating = !is_sun_rotating;
   });
+
+  /*
+  Complex, non-intuitive moves
   register_keyboard_action("i", () => {
-    cam_pos[0] += 0.05;
-    cam_pos[2] += 0.1;
+    cam_pos[0] += 0.005;
+    cam_pos[2] += 0.01;
     update_cam_transform();
   });
   register_keyboard_action("k", () => {
-    cam_pos[0] -= 0.05;
-    cam_pos[2] -= 0.1;
+    cam_pos[0] -= 0.005;
+    cam_pos[2] -= 0.01;
     update_cam_transform();
   });
   register_keyboard_action("j", () => {
-    cam_pos[1] += 0.05;
-    cam_pos[2] += 0.1;
+    cam_pos[1] += 0.005;
+    cam_pos[2] += 0.01;
     update_cam_transform();
   });
   register_keyboard_action("l", () => {
-    cam_pos[1] -= 0.05;
-    cam_pos[2] -= 0.1;
+    cam_pos[1] -= 0.005;
+    cam_pos[2] -= 0.01;
+    update_cam_transform();
+  });
+*/
+
+  window.addEventListener("wheel", (event) => {
+    // scroll wheel to zoom in or out
+    const factor = event.deltaY / 200;
+
+    let tmp = cam_pos[2] + factor;
+    if (tmp > MIN_ZOOM && tmp < MAX_ZOOM) {
+      cam_pos[0] += 2 * factor;
+      cam_pos[2] = tmp;
+    }
+
+    event.preventDefault(); // don't scroll the page too...
     update_cam_transform();
   });
 
   function activate_preset_view() {
-    cam_look_at = vec3.add([0,0,0], DEFAULT_CAM_LOOK_AT, STARTING_LOCATION);
-    cam_pos = vec3.add([0,0,0], DEFAULT_CAM_POS, STARTING_LOCATION);
+    cam_look_at = vec3.add([0, 0, 0], DEFAULT_CAM_LOOK_AT, STARTING_LOCATION);
+    cam_pos = vec3.add([0, 0, 0], DEFAULT_CAM_POS, STARTING_LOCATION);
     sim_time = 24.0;
     update_cam_transform();
   }
+
   activate_preset_view();
   register_button_with_hotkey("btn-preset-view", "c", activate_preset_view);
 
@@ -214,37 +203,15 @@ async function main() {
     event.preventDefault();
   });
 
-  // Rotate camera position by dragging with the mouse
-  window.addEventListener("mousemove", (event) => {
-    // if left or middle button is pressed
-    if (event.buttons & 1 || event.buttons & 4) {
-      cam_angle_z += event.movementX * 0.005;
-      cam_angle_y += -event.movementY * 0.005;
-
-      update_cam_transform();
-    }
-  });
-
-  window.addEventListener("wheel", (event) => {
-    // scroll wheel to zoom in or out
-    const factor = event.deltaY/200;
-    
-    let tmp = cam_pos[2] + factor;
-    if( tmp >MIN_Z && tmp <MAX_Z ){
-      cam_pos[0] += 2*factor;
-      cam_pos[2] = tmp;
-    }
-    
-    event.preventDefault(); // don't scroll the page too...
-    update_cam_transform();
-  });
-
   /*---------------------------------------------------------------
 		Actors
 	---------------------------------------------------------------*/
 
   var terrain_actors = generate_terrains(regl, resources, cam_look_at);
 
+  /*---------------------------------------------------------------
+		Frame render
+	---------------------------------------------------------------*/
   function mix(color1, color2, mix_value) {
     let result = [];
     for (let i = 0; i < 3; ++i) {
@@ -253,9 +220,6 @@ async function main() {
     return result;
   }
 
-  /*---------------------------------------------------------------
-		Frame render
-	---------------------------------------------------------------*/
   const mat_projection = mat4.create();
   const mat_view = mat4.create();
 
@@ -266,6 +230,7 @@ async function main() {
     }
     prev_regl_time = frame.time;
 
+    // Return the same mesh without recomputing it or a new if the location has changed
     terrain_actors = generate_terrains(regl, resources, cam_look_at);
 
     mat4.perspective(
@@ -278,10 +243,7 @@ async function main() {
 
     mat4.copy(mat_view, mat_world_to_cam);
 
-    // Calculate light position in camera frame
-    vec4.transformMat4(light_position_cam, light_position_world, mat_view);
-
-    let sin_sim_time = (Math.sin(sim_time) + 1.0) / 2.0;
+    // We directly compute the light position in the camera coordinates
     let base_vect = vec3.rotateX([0, 0, 0], [0, 0, -5], [0, 0, 0], sim_time);
     let moving_light_position_cam = [
       base_vect[0],
@@ -290,8 +252,10 @@ async function main() {
       1,
     ];
 
-    let sky_color = mix([0, 0.04, 0.12], [1, 1, 1], sin_sim_time); // mix([0, 0.04, 0.12], [0.74, 0.88, 0.97], sin_sim_time);
+    let sin_sim_time = (Math.sin(sim_time) + 1.0) / 2.0;
+    let sky_color = mix([0, 0.04, 0.22], [1, 1, 1], sin_sim_time);
 
+    // Set the sky color
     regl.clear({ color: [sky_color[0], sky_color[1], sky_color[2], 1] });
 
     const scene_info = {
@@ -304,11 +268,6 @@ async function main() {
     for (let i = 0; i < terrain_actors.length; ++i) {
       terrain_actors[i].draw(scene_info);
     }
-
-    // 		debug_text.textContent = `
-    // Hello! Sim time is ${sim_time.toFixed(2)} s
-    // Camera: angle_z ${(cam_angle_z / deg_to_rad).toFixed(1)}, angle_y ${(cam_angle_y / deg_to_rad).toFixed(1)}, distance ${(cam_distance_factor*cam_distance_base).toFixed(1)}
-    // `
   });
 }
 

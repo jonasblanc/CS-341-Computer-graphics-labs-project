@@ -364,6 +364,7 @@ Camera: angle_z ${(cam_angle_z / deg_to_rad).toFixed(1)}, angle_y ${(cam_angle_y
 cam pos ${vec_to_string(camera_position)}
 `;
 	})
+	
 }
 
 DOM_loaded_promise.then(main);

@@ -54,7 +54,8 @@ export function generate_terrains(regl, resources, position) {
       [1, 1, 0], // 8
     ];
     var terrains = [];
-    if (last_terrains.length == 0 || last_offset[2] != chunk_offset_z) {
+    if (last_terrains.length == 0 || last_offset[2] != chunk_offset_z || 
+      Math.abs(last_offset[0] - chunk_offset_x) > 1 || Math.abs(last_offset[1] - chunk_offset_y)) {
       terrains = generate_all_chunks(regl, resources, chunk_grid_offset, [
         chunk_offset_x,
         chunk_offset_y,
