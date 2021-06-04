@@ -451,7 +451,7 @@ vec3 lighting(
 		vec3 r = normalize(reflect(-l, object_normal));
 
 		if(dot(r, direction_to_camera) >0.){
-			specular = mat.color * mat.specular * pow(dot(r, direction_to_camera), mat.shininess);
+			specular =  light.color * mat.color * mat.specular * pow(dot(r, direction_to_camera), mat.shininess);
 		}
 	}
 	

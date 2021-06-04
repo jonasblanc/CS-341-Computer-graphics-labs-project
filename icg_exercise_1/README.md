@@ -1,4 +1,4 @@
-# ICG Exercise 1 - Ray intersection with plan and cylinder
+# ICG Exercise 1 - Planes and Cylinders
 
 [Handout](https://htmlpreview.github.io/?https://github.com/jonasblanc/ComputerGraphicProject/blob/master/icg_exercise_1/exercise1.html)
 

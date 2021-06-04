@@ -12,5 +12,7 @@ It should be executed in the folder containing the lab / project. Then you shoul
 
 ## Labs
 
-* [Lab 0](./icg_exercise_0) we set up the working environment. If the above instructions are not clear enough, you should find all the required explanation in this lab.
-* [Lab 1](./icg_exercise_1) we compute ray intersection with various 3D shapes (plan, cylinder).
+* [Lab 0 - “Hello World”](./icg_exercise_0) we set up the working environment. If the above instructions are not clear enough, you should find all the required explanation in this lab.
+* [Lab 1 - Planes and Cylinders](./icg_exercise_1) we compute ray intersection with various 3D shapes (plan, cylinder).
+* [Lab 2 - Lighting](./icg_exercise_2) we implement the lighting in the scene in three steps: phong lightiing, shadows and reflections.
+
