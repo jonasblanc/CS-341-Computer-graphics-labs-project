@@ -8,11 +8,11 @@ In this exercise we bring light into the scenes by first implementing the phong 
 
 Below are some examples of the scene.
 
-With phong lighting and shadows:
+With phong lighting and shadows:  
 ![result](./report/desk.png)
 ![result](./report/shading1.png)
 
-Then we add reflexions:
+Then we add reflexions:  
 ![result](./report/mirror1.png)
 ![result](./report/mirror2.png)
 
