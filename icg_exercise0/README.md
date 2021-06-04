@@ -6,4 +6,4 @@ The goal of the first exercise is to set up the environment we will work with fo
 
 Once everything is set up correctly, here is the final result:
 
-[result](./img/basic-sphere.png)
+![result](./img/basic-sphere.png)
