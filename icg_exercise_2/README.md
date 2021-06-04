@@ -1,5 +1,5 @@
 # ICG Exercise 2 - Lighting
-[Handout](https://htmlpreview.github.io/?https://github.com/jonasblanc/ComputerGraphicProject/blob/master/icg_exercise_1/exercise1.html)
+[Handout](https://htmlpreview.github.io/?https://github.com/jonasblanc/ComputerGraphicProject/blob/master/icg_exercise_2/exercise2.html)
 
 In this exercise we bring light into the scenes by first implementing the phong lighting model, then computing the shadows and finally adding differnts level of reflexion.
 
