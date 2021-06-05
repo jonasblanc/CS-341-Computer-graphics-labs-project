@@ -32,7 +32,7 @@ If everything holds, we have an intersection, otherwise not.
 To implement flat and Phong shading, we just had to first check which mode was used (#if defined). 
 Then we computed the normal either by taking the cross product between two side of the triangle (which will give the vector perpendicular to both sides, i.e. the normal) and normalizing it in case of flat shading, or by adding the 3 vertex normals using alpha, beta and gamma as weights in case of Phong shading.
 
-## Task 3.3: Implement Bounding Box intersection""
+## Task 3.3: Implement Bounding Box intersection
 
 Basically we want to check the equation p_m <= x <= p_M component wise, where p_m and p_M are the respective min and max corner of the AABB, and x is a point in space.
 In our case x = o + td, where o is the ray_origin  and d the ray_direction.
