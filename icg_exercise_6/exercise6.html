@@ -1,0 +1,845 @@
+<!DOCTYPE html><html lang="en"><head>
+	<meta charset="utf-8">
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title> ICG Exercise 6 - Shadows and Cube Mapping </title>
+<style>
+* {
+	box-sizing: border-box;
+}
+
+body {
+	width: 100%;
+	padding: 0;
+	padding-bottom: 10rem;
+	margin: 0;
+	border: 0;
+
+	max-width: 55rem;
+	margin-left: auto;
+	margin-right: auto;
+
+	font-family: sans-serif;
+	font-size: 1.2rem;
+	line-height: 160%;
+
+	text-align: justify;
+}
+
+h1, h2, h3, h4, h5, h6, a
+{
+	margin-top: 4rem;
+	/* color: rgb(50, 90, 200); */
+	color: hsl(138, 70%, 25%);
+
+}
+h3, h4, h5, h6 {
+	font-weight: normal;
+}
+
+p, ul {
+	margin-left: 1.5em;
+	margin-right: 1.5em;
+}
+
+h3, h4, h5, h6 { 
+	margin-left: 1em;
+}
+
+h3 {}
+
+ul {
+	padding-left: 1.5em;
+}
+
+h2 {
+	margin-top: 5em;
+	padding: 1em;
+
+	width: 100%;
+
+	/* background: linear-gradient(90deg, white, rgb(50, 50, 200)); */
+	border: solid 2px hsl(138, 70%, 25%);
+	/* background: rgb(200, 200, 255) */
+	border-radius: 1.5rem;
+}
+
+h1 { font-size: 2em; }
+h2 { font-size: 1.75em; }
+h3 { font-size: 1.4em; }
+h4 { font-size: 1.05em; }
+
+body > img {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+code {
+	color: rgb(0, 44, 122);
+}
+
+figure {
+	/* margin: 0.5rem; */
+	margin-bottom: 2rem;
+	margin-left: auto;
+	margin-right: auto;
+	
+	width: 100%;
+	max-width: 100%;
+
+	display: flex;
+	flex-flow: column;
+	justify-content: space-around;
+	align-items: center;
+}
+
+figure.row {
+	flex-flow: row;
+}
+
+figcaption {
+	margin: 0.5rem;
+	width: 100%;
+	max-width: 100%;
+
+	max-height: 30rem;
+
+	text-align: center;
+}
+
+figure img {
+	object-fit: contain;
+	max-width: inherit;
+	max-height: inherit;
+}
+
+figure.col2 {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-column-gap: 1rem;
+}
+
+figure.col3 {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	grid-column-gap: 1rem;
+}
+
+
+.box {
+	margin-left: 1rem;
+	border: 0.1rem solid;
+	border-top: 0.3rem solid;
+	border-radius: 0.5rem;
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+	margin-bottom: 0.5rem;
+}
+.box.practice {
+	border-color: hsl(182, 100%, 60%);
+	background: hsla(182, 100%, 60%, 0.05)
+}
+.box.task {
+	border-color: hsl(41, 100%, 40%);
+	background: hsla(41, 100%, 40%, 0.05)
+}
+.box.grade {
+	border-color: hsl(12, 100%, 40%);
+	background: hsla(12, 100%, 40%, 0.05)
+}
+
+.box h2,
+.box h3,
+.box h4,
+.box h5 {
+	color: black;
+	margin-top: 1rem;
+}
+
+/* img {
+	max-width: 100%;
+} */
+
+div.sourceCode {
+	background: hsla(0, 0%, 0%, 0.05);
+	border-radius: 0.5rem;
+	/* border: hsla(0, 0%, 0%, 0.15) 1px dashed; */
+}
+pre.sourceCode {
+	font-size: 0.9rem;
+	margin-left: 2rem;
+}
+
+code.sourceCode, .sourceCode a {
+	color: black;
+}
+
+pre.sourceCode
+
+/* code span.al { color: #ef2929; } /* Alert */
+code span.an { color: black; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: hsl(215, 77%, 12%); } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: hsl(215, 77%, 12%); font-weight: bold; } /* ControlFlow */
+code span.ch { color: #204a87;; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: hsl(118, 100%, 12%); font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #204a87; } /* SpecialString */
+code span.st { color: #204a87; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #204a87; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+
+<!-- pseudocode -->
+<style>
+.ps-root{font-family:KaTeX_Main,'Times New Roman',Times,serif;font-size:1em;font-weight:100;-webkit-font-smoothing:antialiased!important}
+.ps-root .ps-algorithm{margin:.8em 0;border-top:3px solid #000;border-bottom:2px solid #000}.ps-root .ps-algorithm.with-caption>.ps-line:first-child{border-bottom:2px solid #000}
+.ps-root .katex{text-indent:0;font-size:1em}
+.ps-root .MathJax,.ps-root .MathJax_CHTML{text-indent:0;font-size:1em!important}
+.ps-root .ps-line{margin:0;padding:0;line-height:1.2}
+.ps-root .ps-funcname{font-family:KaTeX_Main,'Times New Roman',Times,serif;font-weight:400;font-variant:small-caps;font-style:normal;text-transform:none}
+.ps-root .ps-keyword{font-family:KaTeX_Main,'Times New Roman',Times,serif;font-weight:700;font-variant:normal;font-style:normal;text-transform:none}
+.ps-root .ps-comment{font-family:KaTeX_Main,'Times New Roman',Times,serif;font-weight:400;font-variant:normal;font-style:normal;text-transform:none}
+.ps-root .ps-linenum{font-size:.8em;line-height:1em;width:1.6em;text-align:right;display:inline-block;position:relative;padding-right:.3em}
+.ps-root .ps-algorithmic.with-linenum .ps-line.ps-code{text-indent:-1.6em}.ps-root .ps-algorithmic.with-linenum .ps-line.ps-code>span{text-indent:0}
+.ps-root .base {
+	display: none;
+}
+</style>
+<style type="text/css">
+                            .mjpage .MJX-monospace {
+                            font-family: monospace
+                            }
+
+                            .mjpage .MJX-sans-serif {
+                            font-family: sans-serif
+                            }
+
+                            .mjpage {
+                            display: inline;
+                            font-style: normal;
+                            font-weight: normal;
+                            line-height: normal;
+                            font-size: 100%;
+                            font-size-adjust: none;
+                            text-indent: 0;
+                            text-align: left;
+                            text-transform: none;
+                            letter-spacing: normal;
+                            word-spacing: normal;
+                            word-wrap: normal;
+                            white-space: nowrap;
+                            float: none;
+                            direction: ltr;
+                            max-width: none;
+                            max-height: none;
+                            min-width: 0;
+                            min-height: 0;
+                            border: 0;
+                            padding: 0;
+                            margin: 0
+                            }
+
+                            .mjpage * {
+                            transition: none;
+                            -webkit-transition: none;
+                            -moz-transition: none;
+                            -ms-transition: none;
+                            -o-transition: none
+                            }
+
+                            .mjx-svg-href {
+                            fill: blue;
+                            stroke: blue
+                            }
+
+                            .MathJax_SVG_LineBox {
+                            display: table!important
+                            }
+
+                            .MathJax_SVG_LineBox span {
+                            display: table-cell!important;
+                            width: 10000em!important;
+                            min-width: 0;
+                            max-width: none;
+                            padding: 0;
+                            border: 0;
+                            margin: 0
+                            }
+
+                            .mjpage__block {
+                            text-align: center;
+                            margin: 1em 0em;
+                            position: relative;
+                            display: block!important;
+                            text-indent: 0;
+                            max-width: none;
+                            max-height: none;
+                            min-width: 0;
+                            min-height: 0;
+                            width: 100%
+                            }</style></head>
+
+<body>
+
+<h1>ICG Exercise 6 - Shadows and Cube Mapping</h1>
+
+<ul>
+<li><a href="#review-on-phong-lighting-and-shadows">Review on Phong Lighting and Shadows</a></li>
+<li><a href="#real-time-shadows-with-shadow-mapping">Real-time Shadows with Shadow Mapping</a></li>
+<li><a href="#cube-mapping">Cube Mapping</a></li>
+<li><a href="#task-6.1-building-view-and-projection-matrices-for-a-cube-face">TASK 6.1: Building View and Projection Matrices for a Cube Face</a>
+<ul>
+<li><a href="#task-6.1.0-copy-from-your-last-homework">TASK 6.1.0 Copy from Your Last Homework</a></li>
+<li><a href="#task-6.1.1-and-6.1.2-construct-transformation-matrix-for-shadow-mapping">TASK 6.1.1 and 6.1.2 Construct Transformation Matrix for Shadow Mapping</a></li>
+</ul></li>
+<li><a href="#task-6.2-shaders-and-blend-options">TASK 6.2: Shaders and Blend Options</a>
+<ul>
+<li><a href="#task-6.2.1-light-depth-fragment-shader">TASK 6.2.1: Light Depth Fragment Shader</a></li>
+<li><a href="#task-6.2.2-phong-lighting-shader-with-shadows">TASK 6.2.2: Phong Lighting Shader with Shadows</a></li>
+<li><a href="#task-6.2.3-blend-options">TASK 6.2.3 Blend Options</a></li>
+</ul></li>
+<li><a href="#what-to-submit">What to submit</a>
+<ul>
+<li><a href="#grading">Grading</a></li>
+</ul></li>
+</ul>
+
+<p>In this assignment, you will implement a real-time shadowing technique for multiple omni-directional point lights. We will be using a new framework code, but it should seem very familiar to you; it’s using the same libraries as the solar system codebase.</p>
+<h2 id="review-on-phong-lighting-and-shadows">Review on Phong Lighting and Shadows</h2>
+<p>Recall the Phong illumination model you’ve used in the previous assignments:</p>
+<figure>
+<img src="doc/phong_lighting_diagram.png" id="fig:singleShadowma" style="width:60.0%" alt=""><figcaption><span class="math display"><span class="mjpage mjpage__block"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="41.995ex" height="5.509ex" style="vertical-align: -3.005ex;" viewBox="0 -1078.4 18081.1 2372" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-1-Title">
+<title id="MathJax-SVG-1-Title">I = I_{a}m_{a} + \sum_l I_{l}m_{d}(\mathbf{n}\cdot \mathbf{l}) + I_{l}m_{s}(\mathbf{r} \cdot \mathbf{v})^{s},</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMATHI-49" x="0" y="0"></use>
+ <use xlink:href="#MJMAIN-3D" x="782" y="0"></use>
+<g transform="translate(1838,0)">
+ <use xlink:href="#MJMATHI-49" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#MJMATHI-61" x="622" y="-213"></use>
+</g>
+<g transform="translate(2753,0)">
+ <use xlink:href="#MJMATHI-6D" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#MJMATHI-61" x="1242" y="-213"></use>
+</g>
+ <use xlink:href="#MJMAIN-2B" x="4328" y="0"></use>
+<g transform="translate(5329,0)">
+ <use xlink:href="#MJSZ2-2211" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#MJMATHI-6C" x="872" y="-1570"></use>
+</g>
+<g transform="translate(6940,0)">
+ <use xlink:href="#MJMATHI-49" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#MJMATHI-6C" x="622" y="-213"></use>
+</g>
+<g transform="translate(7692,0)">
+ <use xlink:href="#MJMATHI-6D" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#MJMATHI-64" x="1242" y="-213"></use>
+</g>
+ <use xlink:href="#MJMAIN-28" x="9040" y="0"></use>
+ <use xlink:href="#MJMAINB-6E" x="9430" y="0"></use>
+ <use xlink:href="#MJMAIN-22C5" x="10291" y="0"></use>
+ <use xlink:href="#MJMAINB-6C" x="10792" y="0"></use>
+ <use xlink:href="#MJMAIN-29" x="11112" y="0"></use>
+ <use xlink:href="#MJMAIN-2B" x="11723" y="0"></use>
+<g transform="translate(12724,0)">
+ <use xlink:href="#MJMATHI-49" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#MJMATHI-6C" x="622" y="-213"></use>
+</g>
+<g transform="translate(13476,0)">
+ <use xlink:href="#MJMATHI-6D" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#MJMATHI-73" x="1242" y="-213"></use>
+</g>
+ <use xlink:href="#MJMAIN-28" x="14786" y="0"></use>
+ <use xlink:href="#MJMAINB-72" x="15176" y="0"></use>
+ <use xlink:href="#MJMAIN-22C5" x="15872" y="0"></use>
+ <use xlink:href="#MJMAINB-76" x="16373" y="0"></use>
+<g transform="translate(16981,0)">
+ <use xlink:href="#MJMAIN-29" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#MJMATHI-73" x="550" y="583"></use>
+</g>
+ <use xlink:href="#MJMAIN-2C" x="17802" y="0"></use>
+</g>
+</svg></span></span></figcaption>
+</figure>
+<p>where the final fragment’s intensity, <span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.172ex" height="2.176ex" style="vertical-align: -0.338ex;" viewBox="0 -791.3 504.5 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-2-Title">
+<title id="MathJax-SVG-2-Title">I</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMATHI-49" x="0" y="0"></use>
+</g>
+</svg></span></span>, is computed adding specular and diffuse contributions from each light, <span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="0.693ex" height="2.176ex" style="vertical-align: -0.338ex;" viewBox="0 -791.3 298.5 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-3-Title">
+<title id="MathJax-SVG-3-Title">l</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMATHI-6C" x="0" y="0"></use>
+</g>
+</svg></span></span>, atop the ambient contribution. Here <span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="2.125ex" height="2.509ex" style="vertical-align: -0.671ex;" viewBox="0 -791.3 914.9 1080.4" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-4-Title">
+<title id="MathJax-SVG-4-Title">I_{a}</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMATHI-49" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#MJMATHI-61" x="622" y="-213"></use>
+</g>
+</svg></span></span> is the ambient light intensity, <span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.746ex" height="2.509ex" style="vertical-align: -0.671ex;" viewBox="0 -791.3 751.6 1080.4" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-5-Title">
+<title id="MathJax-SVG-5-Title">I_{l}</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMATHI-49" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#MJMATHI-6C" x="622" y="-213"></use>
+</g>
+</svg></span></span> is diffuse/specular intensity of light source <span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="0.693ex" height="2.176ex" style="vertical-align: -0.338ex;" viewBox="0 -791.3 298.5 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-6-Title">
+<title id="MathJax-SVG-6-Title">l</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMATHI-6C" x="0" y="0"></use>
+</g>
+</svg></span></span>, <span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="6.603ex" height="2.509ex" style="vertical-align: -1.171ex;" viewBox="0 -576.1 2842.8 1080.4" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-7-Title">
+<title id="MathJax-SVG-7-Title">m_{[a|d|s]}</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMATHI-6D" x="0" y="0"></use>
+<g transform="translate(878,-187)">
+ <use transform="scale(0.707)" xlink:href="#MJMAIN-5B" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#MJMATHI-61" x="278" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#MJMAIN-7C" x="808" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#MJMATHI-64" x="1086" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#MJMAIN-7C" x="1610" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#MJMATHI-73" x="1888" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#MJMAIN-5D" x="2358" y="0"></use>
+</g>
+</g>
+</svg></span></span> is the ambient/diffuse/specular component of the material, <span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.09ex" height="1.676ex" style="vertical-align: -0.338ex;" viewBox="0 -576.1 469.5 721.6" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-8-Title">
+<title id="MathJax-SVG-8-Title">s</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMATHI-73" x="0" y="0"></use>
+</g>
+</svg></span></span> is the shininess, and <span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="7.842ex" height="2.509ex" style="vertical-align: -0.671ex;" viewBox="0 -791.3 3376.5 1080.4" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-9-Title">
+<title id="MathJax-SVG-9-Title">\mathbf{n}, \mathbf{l}, \mathbf{r}, \mathbf{v}</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMAINB-6E" x="0" y="0"></use>
+ <use xlink:href="#MJMAIN-2C" x="639" y="0"></use>
+ <use xlink:href="#MJMAINB-6C" x="1084" y="0"></use>
+ <use xlink:href="#MJMAIN-2C" x="1404" y="0"></use>
+ <use xlink:href="#MJMAINB-72" x="1849" y="0"></use>
+ <use xlink:href="#MJMAIN-2C" x="2323" y="0"></use>
+ <use xlink:href="#MJMAINB-76" x="2769" y="0"></use>
+</g>
+</svg></span></span> are the normal, light, reflected light, and view vectors respectively.</p>
+<p>Remember that, in the second raytracing assignment, you computed shadows by neglecting the contributions from lights that are obscured by other scene geometry. To do this, you cast a <strong>shadow ray</strong> from the point being lit, ''<span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.485ex" height="2.009ex" style="vertical-align: -0.671ex;" viewBox="0 -576.1 639.5 865.1" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-10-Title">
+<title id="MathJax-SVG-10-Title">\mathbf{p}</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMAINB-70" x="0" y="0"></use>
+</g>
+</svg></span></span>'', to the light to check if there was an intersection between the two.</p>
+<p>An equivalent formulation of this test, which we will see is more compatible with the WebGL/regl rasterization pipeline, is to instead cast a ray from the light toward the point and check if there is any intersection <strong>closer</strong> to the light than <span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.485ex" height="2.009ex" style="vertical-align: -0.671ex;" viewBox="0 -576.1 639.5 865.1" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-11-Title">
+<title id="MathJax-SVG-11-Title">{\mathbf{p}}</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMAINB-70" x="0" y="0"></use>
+</g>
+</svg></span></span> is. If so, then <span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.485ex" height="2.009ex" style="vertical-align: -0.671ex;" viewBox="0 -576.1 639.5 865.1" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-12-Title">
+<title id="MathJax-SVG-12-Title">{\mathbf{p}}</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMAINB-70" x="0" y="0"></use>
+</g>
+</svg></span></span> is in a shadow, and no diffuse or specular components from this light should be added.</p>
+<figure class="row">
+<img src="doc/shadow_unoccluded.svg" style="width:35.0%"> <img src="doc/shadow_occluded.svg" style="width:35.0%">
+</figure>
+<h2 id="real-time-shadows-with-shadow-mapping">Real-time Shadows with Shadow Mapping</h2>
+<p>The nice thing about this new shadow test formulation is that determining the first intersection of a whole frustum of rays with a scene is exactly the problem GPU rasterization pipeline solves: we can simply render the scene from the perspective of the light to determine the distance of the closest intersection along every light ray. The resulting grayscale image of distance values is called a shadow map:</p>
+<figure class="row center">
+<img src="doc/shadow_map_figure_left.png" style="width:35.0%"> <img src="doc/shadow_map_figure_right.png" style="width:35.0%">
+</figure>
+<figcaption>
+From Akenine-Moller, “Real-Time Rendering.”
+</figcaption>
+<p>Then, when computing the lighting for point <span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.485ex" height="2.009ex" style="vertical-align: -0.671ex;" viewBox="0 -576.1 639.5 865.1" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-13-Title">
+<title id="MathJax-SVG-13-Title">\mathbf{p}</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMAINB-70" x="0" y="0"></use>
+</g>
+</svg></span></span>, we can compare its distance from the light against the corresponding ray’s intersection distance value stored in this shadow map. This test involves only an efficient, constant-time texture look-up operation.</p>
+<p>Shadow mapping implementations traditionally store the depth buffer (or <code>z-buffer</code>) value in the shadow map. However, for omnidirectional lighting, it will be simpler to instead work with <strong>the Euclidean distance from the light to the intersection point</strong>.</p>
+<p>With this approach, we need the following multi-pass rendering process:</p>
+<!-- <div style='width: 70%; margin: 0 auto;'>
+<pre id="shadowmapPseudocode" style="display:hidden;">
+\begin{algorithm}
+\caption{Phong Lighting with Shadow Maps}
+\begin{algorithmic}
+    \ForAll{rasterized fragments ``$\mathbf{p}$''}
+        \State $I(\mathbf{p}) \gets \texttt{ambient\_contribution}$
+    \EndFor
+    \For{lights $l$ in the scene}
+        \State Draw shadow map for $l$ by computing distances to each fragment seen by $l$
+        \ForAll{rasterized fragments ``$\mathbf{p}$''}
+            \If{$\texttt{length}(\mathbf{p} - l.\texttt{pos}) < \texttt{shadowmap\_depth}$}
+                \State $I(\mathbf{p}) \gets I(\mathbf{p}) + \texttt{diffuse\_specular\_contribution}$
+            \EndIf
+        \EndFor
+    \EndFor
+\end{algorithmic}
+\end{algorithm}
+</pre>
+</div>
+<script>
+pseudocode.renderElement(document.getElementById("shadowmapPseudocode"));
+</script> -->
+<div style="margin: 0 auto;">
+<div class="ps-root">
+<div class="ps-algorithm with-caption">
+<p class="ps-line" style="text-indent:-1.2em;padding-left:1.2em;">
+<span class="ps-keyword">Algorithm 1 </span>Phong Lighting with Shadow Maps
+</p>
+<div class="ps-algorithmic">
+<div class="ps-block" style="margin-left:1.2em;">
+<p class="ps-line ps-code">
+<span class="ps-keyword">for all </span>rasterized fragments ‘‘<span class="katex"><span class="katex-mathml"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.485ex" height="2.009ex" style="vertical-align: -0.671ex;" viewBox="0 -576.1 639.5 865.1" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-14-Title">
+<title id="MathJax-SVG-14-Title">Equation</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMAINB-70" x="0" y="0"></use>
+</g>
+</svg></span></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.63888em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathbf">p</span></span></span></span></span>’’<span class="ps-keyword"> do</span>
+</p>
+<div class="ps-block" style="margin-left:1.2em;">
+<p class="ps-line ps-code">
+<span class="katex"><span class="katex-mathml"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="32.491ex" height="2.843ex" style="vertical-align: -0.838ex;" viewBox="0 -863.1 13989.1 1223.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-15-Title">
+<title id="MathJax-SVG-15-Title">Equation</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMATHI-49" x="0" y="0"></use>
+ <use xlink:href="#MJMAIN-28" x="504" y="0"></use>
+ <use xlink:href="#MJMAINB-70" x="894" y="0"></use>
+ <use xlink:href="#MJMAIN-29" x="1533" y="0"></use>
+ <use xlink:href="#MJMAIN-2190" x="2200" y="0"></use>
+<g transform="translate(3479,0)">
+ <use xlink:href="#MJTT-61"></use>
+ <use xlink:href="#MJTT-6D" x="525" y="0"></use>
+ <use xlink:href="#MJTT-62" x="1051" y="0"></use>
+ <use xlink:href="#MJTT-69" x="1576" y="0"></use>
+ <use xlink:href="#MJTT-65" x="2102" y="0"></use>
+ <use xlink:href="#MJTT-6E" x="2627" y="0"></use>
+ <use xlink:href="#MJTT-74" x="3153" y="0"></use>
+ <use xlink:href="#MJTT-5F" x="3678" y="0"></use>
+ <use xlink:href="#MJTT-63" x="4204" y="0"></use>
+ <use xlink:href="#MJTT-6F" x="4729" y="0"></use>
+ <use xlink:href="#MJTT-6E" x="5255" y="0"></use>
+ <use xlink:href="#MJTT-74" x="5780" y="0"></use>
+ <use xlink:href="#MJTT-72" x="6306" y="0"></use>
+ <use xlink:href="#MJTT-69" x="6831" y="0"></use>
+ <use xlink:href="#MJTT-62" x="7357" y="0"></use>
+ <use xlink:href="#MJTT-75" x="7882" y="0"></use>
+ <use xlink:href="#MJTT-74" x="8408" y="0"></use>
+ <use xlink:href="#MJTT-69" x="8933" y="0"></use>
+ <use xlink:href="#MJTT-6F" x="9459" y="0"></use>
+ <use xlink:href="#MJTT-6E" x="9984" y="0"></use>
+</g>
+</g>
+</svg></span></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.07847em;">I</span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">p</span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.27em;"></span><span class="mrel">←</span><span class="mspace" style="margin-right:0.27em;"></span></span><span class="base"><span class="strut" style="height:0.70625em;vertical-align:-0.09514em;"></span><span class="mord text"><span class="mord texttt">ambient_contribution</span></span></span></span></span>
+</p>
+</div>
+<p class="ps-line ps-code">
+<span class="ps-keyword">end for</span>
+</p>
+<p class="ps-line ps-code">
+<span class="ps-keyword">for </span>lights <span class="katex"><span class="katex-mathml"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="0.693ex" height="2.176ex" style="vertical-align: -0.338ex;" viewBox="0 -791.3 298.5 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-16-Title">
+<title id="MathJax-SVG-16-Title">Equation</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMATHI-6C" x="0" y="0"></use>
+</g>
+</svg></span></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span></span></span></span> in the scene<span class="ps-keyword"> do</span>
+</p>
+<div class="ps-block" style="margin-left:1.2em;">
+<p class="ps-line ps-code">
+Draw shadow map for <span class="katex"><span class="katex-mathml"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="0.693ex" height="2.176ex" style="vertical-align: -0.338ex;" viewBox="0 -791.3 298.5 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-17-Title">
+<title id="MathJax-SVG-17-Title">Equation</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMATHI-6C" x="0" y="0"></use>
+</g>
+</svg></span></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span></span></span></span> by computing distances to each fragment seen by <span class="katex"><span class="katex-mathml"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="0.693ex" height="2.176ex" style="vertical-align: -0.338ex;" viewBox="0 -791.3 298.5 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-18-Title">
+<title id="MathJax-SVG-18-Title">Equation</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMATHI-6C" x="0" y="0"></use>
+</g>
+</svg></span></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span></span></span></span>
+</p>
+<p class="ps-line ps-code">
+<span class="ps-keyword">for all </span>rasterized fragments ‘‘<span class="katex"><span class="katex-mathml"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.485ex" height="2.009ex" style="vertical-align: -0.671ex;" viewBox="0 -576.1 639.5 865.1" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-19-Title">
+<title id="MathJax-SVG-19-Title">Equation</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMAINB-70" x="0" y="0"></use>
+</g>
+</svg></span></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.63888em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathbf">p</span></span></span></span></span>’’<span class="ps-keyword"> do</span>
+</p>
+<div class="ps-block" style="margin-left:1.2em;">
+<p class="ps-line ps-code">
+<span class="ps-keyword">if </span><span class="katex"><span class="katex-mathml"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="39.866ex" height="2.843ex" style="vertical-align: -0.838ex;" viewBox="0 -863.1 17164.5 1223.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-20-Title">
+<title id="MathJax-SVG-20-Title">Equation</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJTT-6C"></use>
+ <use xlink:href="#MJTT-65" x="525" y="0"></use>
+ <use xlink:href="#MJTT-6E" x="1051" y="0"></use>
+ <use xlink:href="#MJTT-67" x="1576" y="0"></use>
+ <use xlink:href="#MJTT-74" x="2102" y="0"></use>
+ <use xlink:href="#MJTT-68" x="2627" y="0"></use>
+ <use xlink:href="#MJMAIN-28" x="3153" y="0"></use>
+ <use xlink:href="#MJMAINB-70" x="3542" y="0"></use>
+ <use xlink:href="#MJMAIN-2212" x="4404" y="0"></use>
+ <use xlink:href="#MJMATHI-6C" x="5404" y="0"></use>
+ <use xlink:href="#MJMAIN-2E" x="5703" y="0"></use>
+<g transform="translate(5981,0)">
+ <use xlink:href="#MJTT-70"></use>
+ <use xlink:href="#MJTT-6F" x="525" y="0"></use>
+ <use xlink:href="#MJTT-73" x="1051" y="0"></use>
+</g>
+ <use xlink:href="#MJMAIN-29" x="7558" y="0"></use>
+ <use xlink:href="#MJMAIN-3C" x="8225" y="0"></use>
+<g transform="translate(9282,0)">
+ <use xlink:href="#MJTT-73"></use>
+ <use xlink:href="#MJTT-68" x="525" y="0"></use>
+ <use xlink:href="#MJTT-61" x="1051" y="0"></use>
+ <use xlink:href="#MJTT-64" x="1576" y="0"></use>
+ <use xlink:href="#MJTT-6F" x="2102" y="0"></use>
+ <use xlink:href="#MJTT-77" x="2627" y="0"></use>
+ <use xlink:href="#MJTT-6D" x="3153" y="0"></use>
+ <use xlink:href="#MJTT-61" x="3678" y="0"></use>
+ <use xlink:href="#MJTT-70" x="4204" y="0"></use>
+ <use xlink:href="#MJTT-5F" x="4729" y="0"></use>
+ <use xlink:href="#MJTT-64" x="5255" y="0"></use>
+ <use xlink:href="#MJTT-65" x="5780" y="0"></use>
+ <use xlink:href="#MJTT-70" x="6306" y="0"></use>
+ <use xlink:href="#MJTT-74" x="6831" y="0"></use>
+ <use xlink:href="#MJTT-68" x="7357" y="0"></use>
+</g>
+</g>
+</svg></span></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord texttt">length</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">p</span></span><span class="mspace" style="margin-right:0.22em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.22em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord">.</span><span class="mord text"><span class="mord texttt">pos</span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.27em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.27em;"></span></span><span class="base"><span class="strut" style="height:0.833em;vertical-align:-0.22em;"></span><span class="mord text"><span class="mord texttt">shadowmap_depth</span></span></span></span></span><span class="ps-keyword"> then</span>
+</p>
+<div class="ps-block" style="margin-left:1.2em;">
+<p class="ps-line ps-code">
+<span class="katex"><span class="katex-mathml"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="50.782ex" height="2.843ex" style="vertical-align: -0.838ex;" viewBox="0 -863.1 21864.5 1223.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-21-Title">
+<title id="MathJax-SVG-21-Title">Equation</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMATHI-49" x="0" y="0"></use>
+ <use xlink:href="#MJMAIN-28" x="504" y="0"></use>
+ <use xlink:href="#MJMAINB-70" x="894" y="0"></use>
+ <use xlink:href="#MJMAIN-29" x="1533" y="0"></use>
+ <use xlink:href="#MJMAIN-2190" x="2200" y="0"></use>
+ <use xlink:href="#MJMATHI-49" x="3479" y="0"></use>
+ <use xlink:href="#MJMAIN-28" x="3983" y="0"></use>
+ <use xlink:href="#MJMAINB-70" x="4373" y="0"></use>
+ <use xlink:href="#MJMAIN-29" x="5012" y="0"></use>
+ <use xlink:href="#MJMAIN-2B" x="5624" y="0"></use>
+<g transform="translate(6625,0)">
+ <use xlink:href="#MJTT-64"></use>
+ <use xlink:href="#MJTT-69" x="525" y="0"></use>
+ <use xlink:href="#MJTT-66" x="1051" y="0"></use>
+ <use xlink:href="#MJTT-66" x="1576" y="0"></use>
+ <use xlink:href="#MJTT-75" x="2102" y="0"></use>
+ <use xlink:href="#MJTT-73" x="2627" y="0"></use>
+ <use xlink:href="#MJTT-65" x="3153" y="0"></use>
+ <use xlink:href="#MJTT-5F" x="3678" y="0"></use>
+ <use xlink:href="#MJTT-73" x="4204" y="0"></use>
+ <use xlink:href="#MJTT-70" x="4729" y="0"></use>
+ <use xlink:href="#MJTT-65" x="5255" y="0"></use>
+ <use xlink:href="#MJTT-63" x="5780" y="0"></use>
+ <use xlink:href="#MJTT-75" x="6306" y="0"></use>
+ <use xlink:href="#MJTT-6C" x="6831" y="0"></use>
+ <use xlink:href="#MJTT-61" x="7357" y="0"></use>
+ <use xlink:href="#MJTT-72" x="7882" y="0"></use>
+ <use xlink:href="#MJTT-5F" x="8408" y="0"></use>
+ <use xlink:href="#MJTT-63" x="8933" y="0"></use>
+ <use xlink:href="#MJTT-6F" x="9459" y="0"></use>
+ <use xlink:href="#MJTT-6E" x="9984" y="0"></use>
+ <use xlink:href="#MJTT-74" x="10510" y="0"></use>
+ <use xlink:href="#MJTT-72" x="11035" y="0"></use>
+ <use xlink:href="#MJTT-69" x="11561" y="0"></use>
+ <use xlink:href="#MJTT-62" x="12086" y="0"></use>
+ <use xlink:href="#MJTT-75" x="12612" y="0"></use>
+ <use xlink:href="#MJTT-74" x="13137" y="0"></use>
+ <use xlink:href="#MJTT-69" x="13663" y="0"></use>
+ <use xlink:href="#MJTT-6F" x="14188" y="0"></use>
+ <use xlink:href="#MJTT-6E" x="14714" y="0"></use>
+</g>
+</g>
+</svg></span></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.07847em;">I</span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">p</span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.27em;"></span><span class="mrel">←</span><span class="mspace" style="margin-right:0.27em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.07847em;">I</span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">p</span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.22em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.22em;"></span></span><span class="base"><span class="strut" style="height:0.833em;vertical-align:-0.22em;"></span><span class="mord text"><span class="mord texttt">diffuse_specular_contribution</span></span></span></span></span>
+</p>
+</div>
+<p class="ps-line ps-code">
+<span class="ps-keyword">end if</span>
+</p>
+</div>
+<p class="ps-line ps-code">
+<span class="ps-keyword">end for</span>
+</p>
+</div>
+<p class="ps-line ps-code">
+<span class="ps-keyword">end for</span>
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>In our implementation, the loops over rasterized fragments will be executed by the fragment shaders <code>src/shaders/ambient_color.frag.glsl</code> and <code>src/shaders/phong_shadow.frag.glsl</code>. The shadow map distance values are written by <code>..src/shaders/shadowmap_gen.frag.glsl</code>.</p>
+<h2 id="cube-mapping">Cube Mapping</h2>
+<p>Because we are working with <strong>omnidirectional</strong> point lights, our situation is a bit more complicated. It’s not possible to set up a single view frustum to render the light rays emanating in all directions. Instead, we will set up <span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.162ex" height="2.176ex" style="vertical-align: -0.338ex;" viewBox="0 -791.3 500.5 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-22-Title">
+<title id="MathJax-SVG-22-Title">6</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMAIN-36" x="0" y="0"></use>
+</g>
+</svg></span></span> different view frustums—one for each face of an imaginary cube surrounding our light—and take advantage of the GPU’s cube-mapping functionality.</p>
+<p>One such frustum together with its corresponding shadow map is depicted in Figure below. Please note that, when the eye is placed inside the light cube to render the shadow map, we will refer to it as the <strong>light camera</strong> to distinguish it from the viewpoint used to render the image on screen.</p>
+<figure>
+<img src="doc/src/shadow_cube.svg" width="70%">
+<figcaption class="justified">
+Figure 1. (a) The shadow cube map for the omnidirectional point light source <span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.608ex" height="2.176ex" style="vertical-align: -0.338ex;" viewBox="0 -791.3 692.5 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-23-Title">
+<title id="MathJax-SVG-23-Title">\mathbf{L}</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMAINB-4C" x="0" y="0"></use>
+</g>
+</svg></span></span>. It is necessary to render a separate shadow map texture for each of the six cube faces. Here, the setup for rendering <code>face 3</code>’s map is visualized. The coordinate axes indicate the orientation of the light camera used to render the shadow map; as usual for OpenGL, the camera looks along the -<code>z axis</code>. (b) The resulting shadow map texture (darker is closer).
+</figcaption>
+</figure>
+<p>A cube map texture is really a collection of <span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.162ex" height="2.176ex" style="vertical-align: -0.338ex;" viewBox="0 -791.3 500.5 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-24-Title">
+<title id="MathJax-SVG-24-Title">6</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMAIN-36" x="0" y="0"></use>
+</g>
+</svg></span></span> textures that are conceptually attached to the faces of a cube. Instead of sampling this cube map with 2D texture coordinates <span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="4.773ex" height="2.843ex" style="vertical-align: -0.838ex;" viewBox="0 -863.1 2055.2 1223.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-25-Title">
+<title id="MathJax-SVG-25-Title">(s, t)</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMAIN-28" x="0" y="0"></use>
+ <use xlink:href="#MJMATHI-73" x="389" y="0"></use>
+ <use xlink:href="#MJMAIN-2C" x="859" y="0"></use>
+ <use xlink:href="#MJMATHI-74" x="1304" y="0"></use>
+ <use xlink:href="#MJMAIN-29" x="1665" y="0"></use>
+</g>
+</svg></span></span>, you sample it with a 3D vector <span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="6.856ex" height="2.843ex" style="vertical-align: -0.838ex;" viewBox="0 -863.1 2951.8 1223.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-26-Title">
+<title id="MathJax-SVG-26-Title">(s, t, r)</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMAIN-28" x="0" y="0"></use>
+ <use xlink:href="#MJMATHI-73" x="389" y="0"></use>
+ <use xlink:href="#MJMAIN-2C" x="859" y="0"></use>
+ <use xlink:href="#MJMATHI-74" x="1304" y="0"></use>
+ <use xlink:href="#MJMAIN-2C" x="1665" y="0"></use>
+ <use xlink:href="#MJMATHI-72" x="2110" y="0"></use>
+ <use xlink:href="#MJMAIN-29" x="2562" y="0"></use>
+</g>
+</svg></span></span>; the GPU then returns the color of the point on the cube where this 3D vector pierces through:</p>
+<figure>
+<img src="doc/cubemap_sample.png" width="40%">
+</figure>
+<p>This sampling mechanism is a perfect fit for our shadow mapping problem: if we sample the cube map with the shadow ray vector pointing from the light to <span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.485ex" height="2.009ex" style="vertical-align: -0.671ex;" viewBox="0 -576.1 639.5 865.1" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-27-Title">
+<title id="MathJax-SVG-27-Title">\mathbf{p}</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMAINB-70" x="0" y="0"></use>
+</g>
+</svg></span></span>, it will pull out the intersection distance value for this ray (as long as we correctly rendered each face’s shadow map).</p>
+<p>The <span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1.162ex" height="2.176ex" style="vertical-align: -0.338ex;" viewBox="0 -791.3 500.5 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-28-Title">
+<title id="MathJax-SVG-28-Title">6</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMAIN-36" x="0" y="0"></use>
+</g>
+</svg></span></span> texture images making up the cube map are oriented as follows:</p>
+<figure>
+<img src="doc/cube_map_unfolded_wiki.png" style="width:60.0%" alt=""><figcaption>Figure 2. Cube mapping texture coordinate systems (from <a href="https://en.wikipedia.org/wiki/Cube_mapping">Wikipedia</a>).</figcaption>
+</figure>
+<p>They are wrapped around the cube as shown in Figure 2. An example of how these shadow maps will be drawn is shown in Figure 1.</p>
+<figure>
+<img src="doc/shadow_cube_faces_and_light_camera_coord_systems.svg">
+<figcaption class="justified">
+Figure 3. (a) Names of the shadow map cube faces used in this assignment. (b-d) Example of the light camera coordinate axes oriented to render faces 0, 2, and 4, respectively.
+</figcaption>
+</figure>
+<h2 id="task-6.1-building-view-and-projection-matrices-for-a-cube-face">TASK 6.1: Building View and Projection Matrices for a Cube Face</h2>
+<h3 id="task-6.1.0-copy-from-your-last-homework">TASK 6.1.0 Copy from Your Last Homework</h3>
+<ol type="1">
+<li><p><code>src/main.js</code>: Copy your construction of the camera’s view matrix (<code>world_to_cam</code> transformation matrix) from your solution to Task 2.2 of assignment 5. To implement our new translation gesture, please translate the view center by <code>cam_target</code> (this gesture may be helpful for inspecting the scene while debugging).</p></li>
+<li><p><code>src/shaders/phong_shadow.{vert,frag}.glsl</code> : Copy your phong shading code code in preparation for adding the shadow test. The <code>uniform</code> and <code>varying</code> inputs for this shader have changed, so you will need to adapt your solution. We compute the normal for you, but you need to compute the light and view vectors yourself. The diffuse and specular colors of the material are passed as <code>v2f_diffuse_color</code> and <code>v2f_specular_color</code>.</p></li>
+</ol>
+<hr>
+<h3 id="task-6.1.1-and-6.1.2-construct-transformation-matrix-for-shadow-mapping">TASK 6.1.1 and 6.1.2 Construct Transformation Matrix for Shadow Mapping</h3>
+<p>In <code>src/light.js</code>, finish the <code>todo</code> items marked <code>6.1.1</code> and <code>6.1.2</code>. This is the most challenging part of this assignment: constructing the proper view and projection matrices for rendering the shadow maps on each face of the cube.</p>
+<p>Start by constructing the <code>cube_camera_projection</code> matrix in <code>src/light.js</code>. Note that the shadow map cube model assumes the light is positioned at the center of the cube. Given such a geometry, think of what aspect ratio and field of view properly define the light camera’s view frustum as visualized in Figure 1. The near/far parameters control the minimum and maximum distances at which you can compute shadow ray intersections. For this scene, you can use <span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="2.972ex" height="2.176ex" style="vertical-align: -0.338ex;" viewBox="0 -791.3 1279.5 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-29-Title">
+<title id="MathJax-SVG-29-Title">0.1</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMAIN-30"></use>
+ <use xlink:href="#MJMAIN-2E" x="500" y="0"></use>
+ <use xlink:href="#MJMAIN-31" x="779" y="0"></use>
+</g>
+</svg></span></span> and <span class="math inline"><span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="3.487ex" height="2.176ex" style="vertical-align: -0.338ex;" viewBox="0 -791.3 1501.5 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-30-Title">
+<title id="MathJax-SVG-30-Title">100</title>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#MJMAIN-31"></use>
+ <use xlink:href="#MJMAIN-30" x="500" y="0"></use>
+ <use xlink:href="#MJMAIN-30" x="1001" y="0"></use>
+</g>
+</svg></span></span> respectively.</p>
+<p>Next, implement the <code>cube_camera_view</code> function to construct the view matrix for the light camera looking through side <code>side_idx</code> (in 0..5) of the shadow map cube. This the matrix representing the transformation from the world coordinate system to the coordinate system for the light camera.</p>
+<p>Note that the orientation of the shadow map cube itself (i.e., the shadow map cube coordinate system) must always be aligned with current eye coordinate system (see Figure 3 (a))! This will allow you sample the cube map texture directly with the light vectors calculated in your Phong shader (since your lighting calculation is done in eye space).</p>
+<p>Therefore, when setting up the <code>cube_camera_view</code> matrix, you will need to use the current eye’s view matrix (i.e.&nbsp;the transformation from the world coordinates system to the eye coordinate system) which is provided for you via the <code>scene_view</code> argument. You will also find the function <code>mat4.lookAt</code> helpful to point the camera through the specified cube face. See Figure 3 (b-d) for example light camera orientations. You should be able to figure out the correct <code>up</code> vector to specify for each cube face by studying Figure 2. You may find it easiest to construct this transformation as a composition of <code>scene_view</code> followed by a matrix that you construct with <code>mat4.lookAt</code>.</p>
+<p>Notice that we provide you with a visualization of the shadow map cube surrounding each light. After you’ve set up the view and projection matrices and before you move on to the fragment shaders, we recommend that you test your matrices by applying the preset scene (using the <code>c</code> key) and viewing the scene from the various cube faces. The view from the 0th cube face should match the following image:</p>
+<figure>
+<img src="doc/ground_truth_false_shadowmap.jpg" style="width:50.0%" alt=""><figcaption>Expected output after finishing this step.</figcaption>
+</figure>
+<p>Note that this is <em>not</em> yet visualizing a proper shadow map, but rather a dummy value that we provide for you to debug this stage before implementing Task <code>6.2.1</code>.</p>
+<h2 id="task-6.2-shaders-and-blend-options">TASK 6.2: Shaders and Blend Options</h2>
+<h3 id="task-6.2.1-light-depth-fragment-shader">TASK 6.2.1: Light Depth Fragment Shader</h3>
+<p>In <code>src/shaders/shadowmap_gen.frag.glsl</code>, finish the todo item <code>6.2.1</code>, calculating the fragment distance.</p>
+<p>Note that the <code>shadowmap_gen</code> fragment shader should write the <strong>Euclidean distance</strong> to the fragment instead of its z (depth) coordinate.</p>
+<p>After completing this task, you can verify your implementation by pressing the <code>c</code> key and comparing with the ground-truth shadow maps:</p>
+<figure>
+<img src="doc/ground_truth_post_shadowmap_gen.png" style="width:50.0%" alt=""><figcaption>Expected output after finishing this step.</figcaption>
+</figure>
+<hr>
+<h3 id="task-6.2.2-phong-lighting-shader-with-shadows">TASK 6.2.2: Phong Lighting Shader with Shadows</h3>
+<p>In <code>src/shaders/phong_shadow.frag.glsl</code>, finish the todo item <code>6.2.2</code>.</p>
+<p>Adapt your solution from the last assignment to implement Phong lighting and then use the <code>shadow_cubemap</code> shadow map to test whether the fragment is under shadow; your shader should only output a nonzero color if the light is visible from the fragment. You can use the GLSL function <code>textureCube</code> to sample the cube map texture using a vector.</p>
+<p>To simulate the attenuation of light emitted from a point source over distance, you should scale the light color by the inverse squared distance from the light to the fragment.</p>
+<hr>
+<h3 id="task-6.2.3-blend-options">TASK 6.2.3 Blend Options</h3>
+<p>In <code>src/light.js</code>, finish the todo item <code>6.2.3</code>.</p>
+<p>We need each iteration of our loop over the lights to <strong>add</strong> to the current image, not overwrite it. This can be accomplished by enabling blending and appropriately configuring the blend function. You will want to change the <code>blend</code> field to look like:</p>
+<pre><code>        blend: {
+            enable: true,
+            func: {
+                src: sfactor,
+                dst: dfactor,
+            },
+        },</code></pre>
+<p>which corresponds to a call to the OpenGL function <code>glBlendFunc(sfactor, defactor)</code>. To determine the correct arguments to pass as <code>sfactor</code> and <code>dfactor</code>, please study the <a href="https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glBlendFunc.xhtml">OpenGL reference page</a> and think about how to make the blend operation <em>add</em> the source and destination values. You may also find it useful to read the <code>regl</code> documentation on blending <a href="http://regl.party/api#blending">here</a>.</p>
+<p>Now, with this last task finished, you should see the following result:</p>
+<figure>
+<img src="doc/ground_truth_final.jpg" style="width:75.0%" alt=""><figcaption>Preset view on a correctly completed implementation.</figcaption>
+</figure>
+<h2 id="what-to-submit">What to submit</h2>
+<p>A .zip compressed file named <code>ExerciseN-GroupG.zip</code>, where <em>N</em> is the number of the current exercise sheet, and <em>G</em> is the number of your group. It should contain:</p>
+<ul>
+<li>The files you changed.</li>
+<li>A couple of screenshots clearly showing that you can render the proper shadows from multiple viewpoints.</li>
+<li>A <code>readme.txt</code> file containing a description of how you solved each part of the exercise (use the same numbers and titles) and whatever problems you encountered. <em>Indicate what fraction of the total workload each project member contributed.</em></li>
+</ul>
+<p>Submit solutions to Moodle before the deadline. Late submissions receive 0 points!</p>
+<div class="box grade">
+
+<h3 id="grading">Grading</h3>
+<ul>
+<li>20%: Building the projection matrix for rendering the shadow maps</li>
+<li>30%: Building the view matrix for each face of the shadow cube map</li>
+<li>10%: Setting the blending mode so that each diffuse/specular lighting pass <strong>adds</strong> to the output color.</li>
+<li>10%: Completing <code>../shadow/shadowmap_gen.frag.glsl</code> to draw the distance map for a light</li>
+<li>30%: Completing <code>../shadow/phong_shadow.frag.glsl</code> to render the attenuated diffuse and specular contributions to unshaded fragments only.</li>
+</ul>
+
+ 
+</div><svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs id="MathJax_SVG_glyphs"><path stroke-width="1" id="MJMATHI-49" d="M43 1Q26 1 26 10Q26 12 29 24Q34 43 39 45Q42 46 54 46H60Q120 46 136 53Q137 53 138 54Q143 56 149 77T198 273Q210 318 216 344Q286 624 286 626Q284 630 284 631Q274 637 213 637H193Q184 643 189 662Q193 677 195 680T209 683H213Q285 681 359 681Q481 681 487 683H497Q504 676 504 672T501 655T494 639Q491 637 471 637Q440 637 407 634Q393 631 388 623Q381 609 337 432Q326 385 315 341Q245 65 245 59Q245 52 255 50T307 46H339Q345 38 345 37T342 19Q338 6 332 0H316Q279 2 179 2Q143 2 113 2T65 2T43 1Z"></path><path stroke-width="1" id="MJMAIN-3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path><path stroke-width="1" id="MJMATHI-61" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path><path stroke-width="1" id="MJMATHI-6D" d="M21 287Q22 293 24 303T36 341T56 388T88 425T132 442T175 435T205 417T221 395T229 376L231 369Q231 367 232 367L243 378Q303 442 384 442Q401 442 415 440T441 433T460 423T475 411T485 398T493 385T497 373T500 364T502 357L510 367Q573 442 659 442Q713 442 746 415T780 336Q780 285 742 178T704 50Q705 36 709 31T724 26Q752 26 776 56T815 138Q818 149 821 151T837 153Q857 153 857 145Q857 144 853 130Q845 101 831 73T785 17T716 -10Q669 -10 648 17T627 73Q627 92 663 193T700 345Q700 404 656 404H651Q565 404 506 303L499 291L466 157Q433 26 428 16Q415 -11 385 -11Q372 -11 364 -4T353 8T350 18Q350 29 384 161L420 307Q423 322 423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 181Q151 335 151 342Q154 357 154 369Q154 405 129 405Q107 405 92 377T69 316T57 280Q55 278 41 278H27Q21 284 21 287Z"></path><path stroke-width="1" id="MJMAIN-2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path><path stroke-width="1" id="MJSZ2-2211" d="M60 948Q63 950 665 950H1267L1325 815Q1384 677 1388 669H1348L1341 683Q1320 724 1285 761Q1235 809 1174 838T1033 881T882 898T699 902H574H543H251L259 891Q722 258 724 252Q725 250 724 246Q721 243 460 -56L196 -356Q196 -357 407 -357Q459 -357 548 -357T676 -358Q812 -358 896 -353T1063 -332T1204 -283T1307 -196Q1328 -170 1348 -124H1388Q1388 -125 1381 -145T1356 -210T1325 -294L1267 -449L666 -450Q64 -450 61 -448Q55 -446 55 -439Q55 -437 57 -433L590 177Q590 178 557 222T452 366T322 544L56 909L55 924Q55 945 60 948Z"></path><path stroke-width="1" id="MJMATHI-6C" d="M117 59Q117 26 142 26Q179 26 205 131Q211 151 215 152Q217 153 225 153H229Q238 153 241 153T246 151T248 144Q247 138 245 128T234 90T214 43T183 6T137 -11Q101 -11 70 11T38 85Q38 97 39 102L104 360Q167 615 167 623Q167 626 166 628T162 632T157 634T149 635T141 636T132 637T122 637Q112 637 109 637T101 638T95 641T94 647Q94 649 96 661Q101 680 107 682T179 688Q194 689 213 690T243 693T254 694Q266 694 266 686Q266 675 193 386T118 83Q118 81 118 75T117 65V59Z"></path><path stroke-width="1" id="MJMATHI-64" d="M366 683Q367 683 438 688T511 694Q523 694 523 686Q523 679 450 384T375 83T374 68Q374 26 402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487H491Q506 153 506 145Q506 140 503 129Q490 79 473 48T445 8T417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157Q33 205 53 255T101 341Q148 398 195 420T280 442Q336 442 364 400Q369 394 369 396Q370 400 396 505T424 616Q424 629 417 632T378 637H357Q351 643 351 645T353 664Q358 683 366 683ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path><path stroke-width="1" id="MJMAIN-28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path><path stroke-width="1" id="MJMAINB-6E" d="M40 442Q217 450 218 450H224V407L225 365Q233 378 245 391T289 422T362 448Q374 450 398 450Q428 450 448 447T491 434T529 402T551 346Q553 335 554 198V62H623V0H614Q596 3 489 3Q374 3 365 0H356V62H425V194V275Q425 348 416 373T371 399Q326 399 288 370T238 290Q236 281 235 171V62H304V0H295Q277 3 171 3Q64 3 46 0H37V62H106V210V303Q106 353 104 363T91 376Q77 380 50 380H37V442H40Z"></path><path stroke-width="1" id="MJMAIN-22C5" d="M78 250Q78 274 95 292T138 310Q162 310 180 294T199 251Q199 226 182 208T139 190T96 207T78 250Z"></path><path stroke-width="1" id="MJMAINB-6C" d="M43 686L134 690Q225 694 226 694H232V62H301V0H292Q274 3 170 3Q67 3 49 0H40V62H109V332Q109 387 109 453T110 534Q110 593 108 605T94 620Q80 624 53 624H40V686H43Z"></path><path stroke-width="1" id="MJMAIN-29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path><path stroke-width="1" id="MJMATHI-73" d="M131 289Q131 321 147 354T203 415T300 442Q362 442 390 415T419 355Q419 323 402 308T364 292Q351 292 340 300T328 326Q328 342 337 354T354 372T367 378Q368 378 368 379Q368 382 361 388T336 399T297 405Q249 405 227 379T204 326Q204 301 223 291T278 274T330 259Q396 230 396 163Q396 135 385 107T352 51T289 7T195 -10Q118 -10 86 19T53 87Q53 126 74 143T118 160Q133 160 146 151T160 120Q160 94 142 76T111 58Q109 57 108 57T107 55Q108 52 115 47T146 34T201 27Q237 27 263 38T301 66T318 97T323 122Q323 150 302 164T254 181T195 196T148 231Q131 256 131 289Z"></path><path stroke-width="1" id="MJMAINB-72" d="M405 293T374 293T324 312T305 361Q305 378 312 394Q315 397 315 399Q305 399 294 394T266 375T238 329T222 249Q221 241 221 149V62H308V0H298Q280 3 161 3Q47 3 38 0H29V62H98V210V303Q98 353 96 363T83 376Q69 380 42 380H29V442H32L118 446Q204 450 205 450H210V414L211 378Q247 449 315 449H321Q384 449 413 422T442 360Q442 332 424 313Z"></path><path stroke-width="1" id="MJMAINB-76" d="M401 444Q413 441 495 441Q568 441 574 444H580V382H510L409 156Q348 18 339 6Q331 -4 320 -4Q318 -4 313 -4T303 -3H288Q273 -3 264 12T221 102Q206 135 197 156L96 382H26V444H34Q49 441 145 441Q252 441 270 444H279V382H231L284 264Q335 149 338 149Q338 150 389 264T442 381Q442 382 418 382H394V444H401Z"></path><path stroke-width="1" id="MJMAIN-2C" d="M78 35T78 60T94 103T137 121Q165 121 187 96T210 8Q210 -27 201 -60T180 -117T154 -158T130 -185T117 -194Q113 -194 104 -185T95 -172Q95 -168 106 -156T131 -126T157 -76T173 -3V9L172 8Q170 7 167 6T161 3T152 1T140 0Q113 0 96 17Z"></path><path stroke-width="1" id="MJMAIN-5B" d="M118 -250V750H255V710H158V-210H255V-250H118Z"></path><path stroke-width="1" id="MJMAIN-7C" d="M139 -249H137Q125 -249 119 -235V251L120 737Q130 750 139 750Q152 750 159 735V-235Q151 -249 141 -249H139Z"></path><path stroke-width="1" id="MJMAIN-5D" d="M22 710V750H159V-250H22V-210H119V710H22Z"></path><path stroke-width="1" id="MJMAINB-70" d="M32 442L123 446Q214 450 215 450H221V409Q222 409 229 413T251 423T284 436T328 446T382 450Q480 450 540 388T600 223Q600 128 539 61T361 -6H354Q292 -6 236 28L227 34V-132H296V-194H287Q269 -191 163 -191Q56 -191 38 -194H29V-132H98V113V284Q98 330 97 348T93 370T83 376Q69 380 42 380H29V442H32ZM457 224Q457 303 427 349T350 395Q282 395 235 352L227 345V104L233 97Q274 45 337 45Q383 45 420 86T457 224Z"></path><path stroke-width="1" id="MJMAIN-2190" d="M944 261T944 250T929 230H165Q167 228 182 216T211 189T244 152T277 96T303 25Q308 7 308 0Q308 -11 288 -11Q281 -11 278 -11T272 -7T267 2T263 21Q245 94 195 151T73 236Q58 242 55 247Q55 254 59 257T73 264Q121 283 158 314T215 375T247 434T264 480L267 497Q269 503 270 505T275 509T288 511Q308 511 308 500Q308 493 303 475Q293 438 278 406T246 352T215 315T185 287T165 270H929Q944 261 944 250Z"></path><path stroke-width="1" id="MJTT-61" d="M126 306Q105 306 90 321T74 359Q74 439 211 439Q268 439 276 438Q343 426 383 390T430 306Q431 301 431 190V81Q446 79 465 78T492 76T509 72T521 60T524 38Q524 11 506 3Q502 1 466 1Q426 1 406 5T379 14T355 36L345 30Q284 -6 205 -6Q135 -6 92 39T48 141Q48 182 79 212T158 256T252 278T342 285H347V290Q347 315 325 335T267 362Q258 363 224 363Q189 363 185 362H179L178 358Q178 353 178 352T176 345T174 337T170 330T165 322T158 316T150 311T139 308T126 306ZM132 140Q132 115 157 93T224 70Q269 70 302 87T344 133Q346 139 347 175V211H339Q256 209 194 190T132 140Z"></path><path stroke-width="1" id="MJTT-6D" d="M133 76Q156 74 164 67T172 38Q172 9 151 1H11Q-12 8 -12 38Q-12 61 5 73Q10 75 28 76H45V355H28Q10 356 5 358Q-12 370 -12 393Q-12 419 11 431H52H70Q91 431 100 427T116 405Q163 436 200 436Q255 436 281 390L285 394Q289 398 292 400T301 407T314 415T329 423T346 429T366 434T389 436H392Q425 436 448 411Q469 390 474 360T480 268V232V203V76H497Q520 74 528 67T536 38Q536 9 515 1H396Q374 9 374 32V38Q374 73 402 76H409V191V242Q409 317 404 339T375 361Q343 361 323 332T299 264Q298 258 298 165V76H315Q338 74 346 67T354 38Q354 9 333 1H214Q192 9 192 32V38Q192 73 220 76H227V191V242Q227 317 222 339T193 361Q161 361 141 332T117 264Q116 258 116 165V76H133Z"></path><path stroke-width="1" id="MJTT-62" d="M4 573Q4 596 15 603T52 611H90H124Q146 611 155 608T171 591Q173 586 173 491V396L182 402Q217 424 256 431Q280 437 309 437Q376 437 434 379T492 217Q492 162 473 118T422 47T358 8T293 -6Q229 -6 174 38Q171 13 163 7T135 1H131H122Q99 1 90 23L89 279V535H58L27 536Q4 543 4 573ZM409 215Q409 269 377 315T283 361Q255 361 224 344T177 297L173 290V167Q189 124 213 97T278 70Q330 70 369 111T409 215Z"></path><path stroke-width="1" id="MJTT-69" d="M202 538T202 559T218 596T260 612Q283 612 300 597T317 560Q317 538 300 523T260 507Q235 507 219 522ZM411 76Q441 76 451 69T462 38Q462 29 462 26T460 18T453 9T440 1H94Q72 8 72 33V38Q72 46 72 49T74 58T81 68T94 76H233V355H167L102 356Q80 363 80 393Q80 418 91 425T138 432Q145 432 165 432T200 431H295Q297 429 303 425T310 420T314 415T317 404T317 389T318 363Q318 354 318 314T317 241V76H378H411Z"></path><path stroke-width="1" id="MJTT-65" d="M48 217Q48 295 100 361T248 439L258 440Q268 440 274 440Q329 438 369 416T428 359T456 292T464 228Q464 215 461 208T454 198T442 190L288 189H135L138 179Q153 132 199 102T303 71Q336 71 353 86T380 120T398 143Q404 146 422 146Q453 146 462 126Q464 120 464 116Q464 84 416 39T285 -6Q187 -6 118 59T48 217ZM377 264Q371 291 365 306T341 338T294 362Q288 363 264 363Q225 363 190 336T139 264H377Z"></path><path stroke-width="1" id="MJTT-6E" d="M89 431Q94 431 105 431T122 432Q173 432 173 399Q173 394 175 394Q176 394 190 404T233 425T298 436Q343 436 371 423Q411 402 423 365T436 265Q436 257 436 239T435 211V198V76H498Q512 67 516 60T520 38Q520 9 498 1H308Q286 9 286 32V38V45Q286 65 303 73Q309 76 329 76H351V188Q351 204 351 230T352 266Q352 321 341 341T288 361Q253 361 222 341T176 274L174 264L173 170V76H236Q250 67 254 60T258 38Q258 9 236 1H27Q4 8 4 38Q4 53 8 60T27 76H89V355H58L27 356Q4 363 4 393Q4 408 8 415T27 431H89Z"></path><path stroke-width="1" id="MJTT-74" d="M25 395Q26 405 26 408T29 416T35 423T48 431H145V481L146 532Q154 547 161 550T184 554H189Q218 554 227 534Q229 529 229 480V431H405Q406 430 411 427T418 422T422 416T426 407T427 393Q427 387 427 382T424 374T421 368T417 363T413 360T408 358L405 356L317 355H229V249Q229 237 229 214T228 179Q228 126 241 98T295 70Q354 70 365 149Q366 167 375 174Q383 182 407 182H415Q438 182 446 166Q448 161 448 148Q448 84 398 39T282 -6Q226 -6 189 29T146 128Q145 134 145 247V355H96H72Q45 355 35 362T25 395Z"></path><path stroke-width="1" id="MJTT-5F" d="M57 -60Q57 -33 86 -25H438Q468 -34 468 -60T438 -95H86Q57 -86 57 -60Z"></path><path stroke-width="1" id="MJTT-63" d="M291 -6Q196 -6 131 60T66 216Q66 296 119 361Q154 403 200 421T273 439Q275 440 293 440H313Q400 440 433 409Q454 388 454 359Q454 335 439 321T402 306Q380 306 365 321T350 357V362L340 363Q339 363 326 363T303 364Q280 364 266 362Q217 352 184 313T151 215Q151 153 199 112T313 70Q341 70 357 85T381 118T394 140Q402 146 424 146Q443 146 447 144Q466 137 466 117Q466 106 457 88T429 47T374 10T291 -6Z"></path><path stroke-width="1" id="MJTT-6F" d="M52 216Q52 318 118 379T261 440Q343 440 407 378T472 216Q472 121 410 58T262 -6Q176 -6 114 58T52 216ZM388 225Q388 281 351 322T261 364Q213 364 175 325T136 225Q136 158 174 114T262 70T350 114T388 225Z"></path><path stroke-width="1" id="MJTT-72" d="M327 76Q359 76 369 70T380 38Q380 10 359 1H47Q24 8 24 38Q24 54 28 61T47 76H145V355H96L47 356Q24 363 24 393Q24 409 28 416T47 431H207Q223 419 226 414T229 393V387V369Q297 437 394 437Q436 437 461 417T487 368Q487 347 473 332T438 317Q428 317 420 320T407 327T398 337T393 347T390 356L388 361Q348 356 324 345Q228 299 228 170Q228 161 228 151T229 138V76H293H327Z"></path><path stroke-width="1" id="MJTT-75" d="M4 393Q4 416 15 423T52 431H90Q141 431 151 429T168 417Q171 412 173 409V254L174 100Q182 70 244 70Q320 70 344 119Q349 130 350 144T351 248V355H320L289 356Q266 363 266 393Q266 408 270 415T289 431H351H386Q409 431 418 428T433 411Q435 406 435 241V76H498Q512 67 516 60T520 38Q520 9 498 1H436H394Q372 1 364 5T351 26L342 21Q293 -5 227 -5Q118 -5 96 67Q91 82 90 101T89 227V355H58L27 356Q4 363 4 393Z"></path><path stroke-width="1" id="MJTT-6C" d="M51 573Q51 602 73 610H76Q79 610 84 610T97 610T113 610T133 611T155 611T179 611H282Q301 598 304 586V76H452Q466 67 470 60T474 38Q474 10 452 1H73Q51 9 51 32V38Q51 54 54 60T73 76H220V535H146L73 536Q51 545 51 567V573Z"></path><path stroke-width="1" id="MJTT-67" d="M60 274Q60 337 107 386T233 436Q278 436 316 417L329 410L338 416Q384 442 427 442T489 423T509 381T494 345T460 332Q449 332 440 338Q432 341 427 348T419 360T415 365Q414 364 410 364L383 355Q406 320 406 274Q406 211 358 162T233 112Q189 112 155 128L146 133Q142 125 142 115Q142 99 150 85T175 71Q182 72 187 70Q188 70 195 70T218 70T254 69Q259 69 275 69T297 69T318 68T340 66T361 62T384 57T405 49T428 38Q495 -1 495 -76Q495 -143 427 -186T262 -229Q161 -229 94 -185T29 -73Q30 -60 33 -48T39 -26T47 -8T57 8T67 20T77 30T86 38L91 43Q91 44 86 53T75 80T70 117Q70 142 89 183L83 194Q60 232 60 274ZM321 274Q321 312 296 337T230 362Q197 362 171 338T145 274Q145 235 170 211T233 187Q273 187 297 212T321 274ZM422 -78Q422 -54 408 -38T366 -15T315 -6T255 -4H200Q198 -4 193 -4T183 -3Q148 -3 125 -26T102 -78Q102 -110 151 -132T261 -154Q321 -154 371 -132T422 -78Z"></path><path stroke-width="1" id="MJTT-68" d="M4 573Q4 596 15 603T52 611H90H124Q146 611 155 608T171 591Q173 586 173 489Q173 394 175 394L186 402Q197 410 219 420T269 434Q278 436 306 436Q343 436 371 423Q411 402 423 365T436 265Q436 257 436 239T435 211V198V76H498Q512 67 516 60T520 38Q520 9 498 1H308Q286 10 286 32V38V46Q286 65 303 73Q309 76 329 76H351V188Q351 204 351 230T352 266Q352 321 341 341T288 361Q253 361 222 341T176 274L174 264L173 170V76H236Q250 67 254 60T258 38Q258 9 236 1H27Q4 8 4 38Q4 53 8 60T27 76H89V535H58L27 536Q4 543 4 573Z"></path><path stroke-width="1" id="MJMAIN-2212" d="M84 237T84 250T98 270H679Q694 262 694 250T679 230H98Q84 237 84 250Z"></path><path stroke-width="1" id="MJMAIN-2E" d="M78 60Q78 84 95 102T138 120Q162 120 180 104T199 61Q199 36 182 18T139 0T96 17T78 60Z"></path><path stroke-width="1" id="MJTT-70" d="M89 431Q93 431 104 431T121 432Q173 432 173 401V396L182 402Q237 437 305 437Q376 437 434 378T492 217Q492 146 459 93T382 17T291 -6Q261 -6 232 5T188 26L174 37Q173 37 173 -54V-146H236Q250 -155 254 -162T258 -184Q258 -213 236 -221H27Q4 -214 4 -184Q4 -169 8 -162T27 -146H89V355H58L27 356Q4 363 4 393Q4 408 8 415T27 431H89ZM409 215Q409 269 377 315T283 361Q255 361 224 344T177 297L173 290V167Q189 124 213 97T278 70Q330 70 369 111T409 215Z"></path><path stroke-width="1" id="MJTT-73" d="M72 317Q72 361 108 396T229 439Q231 439 245 439T268 440Q303 439 324 435T353 427T363 423L372 432Q380 440 397 440Q430 440 430 395Q430 390 430 380T429 366V335Q429 311 422 302T387 293Q364 293 355 300T346 316T343 336T325 353Q306 364 257 364Q209 364 178 351T147 317Q147 284 231 272Q327 256 357 247Q458 210 458 129V121Q458 74 413 34T271 -6Q246 -6 224 -3T189 5T165 14T150 22T144 26Q142 23 139 18T135 11T132 6T128 1T124 -2T119 -4T113 -5T104 -6Q84 -6 78 6T71 43Q71 48 71 60T72 79Q72 132 73 141T81 157Q90 166 115 166Q135 166 142 162T157 140Q168 108 191 90T260 70Q297 70 323 76T361 91T379 110T384 129Q384 157 346 171T247 195T165 212Q119 228 96 256T72 317Z"></path><path stroke-width="1" id="MJMAIN-3C" d="M694 -11T694 -19T688 -33T678 -40Q671 -40 524 29T234 166L90 235Q83 240 83 250Q83 261 91 266Q664 540 678 540Q681 540 687 534T694 519T687 505Q686 504 417 376L151 250L417 124Q686 -4 687 -5Q694 -11 694 -19Z"></path><path stroke-width="1" id="MJTT-64" d="M266 573Q266 596 277 603T314 611H352H385Q411 611 419 607T435 586V76H498Q512 67 516 60T520 38Q520 9 498 1H436Q429 1 417 1T398 0Q375 0 363 7T351 34V43L342 36Q288 -6 223 -6Q143 -6 87 58T31 216Q31 307 88 372T230 437Q292 437 342 405L351 399V535H320L289 536Q266 543 266 573ZM351 290Q347 302 337 316T302 346T244 361Q193 361 154 319T115 215Q115 152 152 111T235 70Q314 70 351 170V290Z"></path><path stroke-width="1" id="MJTT-77" d="M54 355Q16 355 16 388V393Q16 423 37 430Q41 431 125 431H162Q206 431 218 425T230 393Q230 366 212 358Q206 355 174 355Q141 355 141 354L150 296Q181 110 181 89V84Q182 85 183 96Q185 118 199 173T218 237Q223 247 245 259H264H268Q294 259 309 240Q315 229 329 174T343 92Q343 84 344 84V86Q344 88 344 91T345 97Q347 125 356 187T374 301T383 354Q383 355 350 355H333Q314 355 304 362T294 393Q294 420 312 428Q318 431 401 431H440Q485 431 496 425T508 393Q508 382 508 377T498 363T470 355L455 354Q455 353 441 271T413 104T396 16Q384 -4 355 -4H351Q315 -4 305 9T280 79Q278 90 276 96Q265 149 265 169Q265 176 264 169Q263 166 263 162Q261 130 248 79T230 18Q220 -4 183 -4H175L151 -3Q134 5 127 17L112 102Q97 188 83 270T69 354Q62 355 54 355Z"></path><path stroke-width="1" id="MJTT-66" d="M43 395Q44 405 44 408T47 416T53 423T66 431H176V461Q176 500 182 518Q201 570 252 593T353 617Q399 614 418 593T437 548Q437 528 424 514T387 499Q365 499 353 511T338 537V541H328Q275 536 261 494Q260 490 260 460V431H327Q334 431 346 431T364 432Q392 432 404 425T416 393T405 362T365 355H327H260V76H319Q375 76 388 71T401 38Q401 27 400 23T395 12T379 1H58Q47 6 42 12T36 23T35 38Q35 65 53 73Q59 76 117 76H176V355H121H93Q64 355 54 362T43 395Z"></path><path stroke-width="1" id="MJMAIN-36" d="M42 313Q42 476 123 571T303 666Q372 666 402 630T432 550Q432 525 418 510T379 495Q356 495 341 509T326 548Q326 592 373 601Q351 623 311 626Q240 626 194 566Q147 500 147 364L148 360Q153 366 156 373Q197 433 263 433H267Q313 433 348 414Q372 400 396 374T435 317Q456 268 456 210V192Q456 169 451 149Q440 90 387 34T253 -22Q225 -22 199 -14T143 16T92 75T56 172T42 313ZM257 397Q227 397 205 380T171 335T154 278T148 216Q148 133 160 97T198 39Q222 21 251 21Q302 21 329 59Q342 77 347 104T352 209Q352 289 347 316T329 361Q302 397 257 397Z"></path><path stroke-width="1" id="MJMAINB-4C" d="M643 285Q641 280 629 148T612 4V0H39V62H147V624H39V686H51Q75 683 228 683Q415 685 425 686H439V624H304V62H352H378Q492 62 539 138Q551 156 558 178T569 214T576 255T581 289H643V285Z"></path><path stroke-width="1" id="MJMATHI-74" d="M26 385Q19 392 19 395Q19 399 22 411T27 425Q29 430 36 430T87 431H140L159 511Q162 522 166 540T173 566T179 586T187 603T197 615T211 624T229 626Q247 625 254 615T261 596Q261 589 252 549T232 470L222 433Q222 431 272 431H323Q330 424 330 420Q330 398 317 385H210L174 240Q135 80 135 68Q135 26 162 26Q197 26 230 60T283 144Q285 150 288 151T303 153H307Q322 153 322 145Q322 142 319 133Q314 117 301 95T267 48T216 6T155 -11Q125 -11 98 4T59 56Q57 64 57 83V101L92 241Q127 382 128 383Q128 385 77 385H26Z"></path><path stroke-width="1" id="MJMATHI-72" d="M21 287Q22 290 23 295T28 317T38 348T53 381T73 411T99 433T132 442Q161 442 183 430T214 408T225 388Q227 382 228 382T236 389Q284 441 347 441H350Q398 441 422 400Q430 381 430 363Q430 333 417 315T391 292T366 288Q346 288 334 299T322 328Q322 376 378 392Q356 405 342 405Q286 405 239 331Q229 315 224 298T190 165Q156 25 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 114 189T154 366Q154 405 128 405Q107 405 92 377T68 316T57 280Q55 278 41 278H27Q21 284 21 287Z"></path><path stroke-width="1" id="MJMAIN-30" d="M96 585Q152 666 249 666Q297 666 345 640T423 548Q460 465 460 320Q460 165 417 83Q397 41 362 16T301 -15T250 -22Q224 -22 198 -16T137 16T82 83Q39 165 39 320Q39 494 96 585ZM321 597Q291 629 250 629Q208 629 178 597Q153 571 145 525T137 333Q137 175 145 125T181 46Q209 16 250 16Q290 16 318 46Q347 76 354 130T362 333Q362 478 354 524T321 597Z"></path><path stroke-width="1" id="MJMAIN-31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></defs></svg></body></html>

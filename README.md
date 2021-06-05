@@ -24,4 +24,5 @@ It should be executed in the folder containing the lab / project. Then you shoul
   We change the pipeline from ray tracing to rasterization to take advantage of the GPU. We render of the solar system with this new pipeline.
 * [Lab 5 – Texturing and Lighting](./icg_exercise_5):  
   We improve to look of the solar system by implement the phong lighting model and adding textures.
-
+* [Lab 6 - Shadows and Cube Mapping](./icg_exercise_6):  
+  We create shadows using shadow maps. In a 3D scene, six shadow maps are computed per light source in a cube face fashion.
