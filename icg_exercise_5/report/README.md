@@ -1,8 +1,10 @@
-**Task 5.1.0: Copy from Previous Homework**
+# Lab 5 summary
+
+## Task 5.1.0: Copy from Previous Homework
 
 Since we are expert in "copy and paste" this part was trivial for us.
 
-**Task 5.1.1: Compute Billboard’s “model-to-world” matrix**
+## Task 5.1.1: Compute Billboard’s “model-to-world” matrix
 
 In this part we want to scale and rotate the billboard normal toward the camera.
 Since the normal is initially along the z-axis we compute: 
@@ -13,7 +15,7 @@ Finally we multiple a identity matrix by the rotation and then the scaling matri
 
 No problem on that part.
 
-**Task 5.1.2: Billboard Shader**
+## Task 5.1.2: Billboard Shader
 
 In this part we need to decrease the opacity of the billboard exponentially outside the sun.
 We use a negative exponential in that regard. 
@@ -21,13 +23,13 @@ We added the size of the sun to be able to decrease the intensity from the borde
 We had to hardcode it since there no way of obtaining it.
 We added a factor to be able to modify the speed of the decreasing opacity.
 
-**Task 5.1.3: Blending the Color of Billboard and Background**
+## Task 5.1.3: Blending the Color of Billboard and Background
 
 We enabled the blending.
 We set the color and alpha of the destination and source.
 Finnally we choosed the "add" equations for both RGB and alpha.
 
-**Task 5.2: Implement Phong Lighting**
+## Task 5.2: Implement Phong Lighting
 
 In planet.js, we simply computed mat_mvp and mat_model_view using matrix multiplication between the different matrices (projection, view, model) like last week.
 
@@ -41,7 +43,7 @@ In phong.frag.glsl, we use the vectors computed before to implement the phong li
 We first extract M_[a,d,s] from the texture. We then compute l, r and v as we did in the previous week and take care to normalize them. 
 Then, we compute the ambiant term. If nl is bigger than 0 (light in front of the object), we add the diffuse term and if rv is bigger than 0, we also add the specular term to the color.
 
-**Task 5.3.1/2: Specularity & Colors**
+## Task 5.3.1/2: Specularity & Colors
 
 We start by extracting the color from the texture for these 3 textures:
 texture_surface_day
@@ -63,12 +65,6 @@ For the night, we only need to mix the color extracted from texture_surface_nigh
 Finally, in order to get the final color, we mix the day color (which is already a mix of initial day color and cloud color) and the night color. 
 We use the diffuse component coefficient  from the Phong lighting model to determine the amount of daylight. We rely on a mapping (f(nl) = (nl+1)/2) to change the domaine of nl from [-1,1] to [0,1].
 
-**Task 5.4: Custom mesh**
+## Task 5.4: Custom mesh
 
 We created a (beautiful) sculpture from scratch, exported it to the correct format and used it in the project.
-
-Workload:
-
-Zad: 1/3
-Loïc: 1/3
-Jonas: 1/3
