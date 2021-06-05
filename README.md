@@ -8,7 +8,7 @@ Any of the labs / project can be accessed by running a local server with the fol
 $ python3 -m http.server
 ```
 
-It should be executed in the folder containing the lab / project. Then you should be able to view it by open your [localhost](http://localhost:8000/index.html) in your favorite browser
+It should be executed in the folder containing the lab / project. Then you should be able to view it by open your [localhost](http://localhost:8000/index.html) in your favorite browser.
 
 ## Labs
 
