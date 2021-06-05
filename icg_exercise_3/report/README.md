@@ -42,12 +42,3 @@ Then, we make sure t_min <= t_max (component wise), otherwise we swap them.
 At this point, we have three different intervals for t, (one for each component). 
 We make sure that the intersection of these 3 intervals is not empty.
 In other words, that the range of the ray parameter (`t`) values which are included in the bounding box is not empty.
-
-
-The level of reflexion is set to 2 for every screenshot we took.
-
-## Workload:
-
-Zad: 1/3
-Loïc: 1/3
-Jonas: 1/3
