@@ -35,13 +35,3 @@ We compute for each reflexion the color of the intersection point by summing the
 We finally set up the parameters for the next iteration.
 
 We had an hard time understanding the algorithm at first but once it was done it went well.
-
-
-Mirror1 = level 1 reflection
-Mirror2 = level 4 reflection
-
-## Workload:
-
-Zad: 1/3
-Loïc: 1/3
-Jonas: 1/3
