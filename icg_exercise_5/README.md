@@ -7,10 +7,6 @@ In this exercise we improve the solar sytsem of the previous lab by adding light
 
 Here are some screenshots from the final scene:
 
-![result](./report/S1.png)
-![result](./report/S2.png)  
-![result](./report/S3.png)
-![result](./report/S4.png)
-![result](./report/S5.png)
-![result](./report/S6.png)
-
+<img src="report/S1.png" width="450"> <img src="report/S2.png" width="450">
+<img src="report/S3.png" width="450"> <img src="report/S4.png" width="450">
+<img src="report/S5.png" width="450"> <img src="report/S6.png" width="450"> 
