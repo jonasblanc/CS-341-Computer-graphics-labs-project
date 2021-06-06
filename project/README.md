@@ -1,4 +1,4 @@
-# Infinite map generation using marching cube algorithm and perlin noise
+# Infinite map generation using marching cube and perlin noise
 
 **Group 9:**
 
