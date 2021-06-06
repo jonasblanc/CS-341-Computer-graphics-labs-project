@@ -8,10 +8,9 @@ For the normal computation we implemented two startegies. The first one, named f
 [Here](./report/README.md) is a summary of the executed tasks in this lab.
 
 Below is a comparaison between flat shading and phong shading:  
-![result](./report/mesh_shading1_flat.png)
-![result](./report/mesh_shading1_phong.png)
+<img src="report/mesh_shading1_flat.png" width="450"> <img src="report/mesh_shading1_phong.png" width="450">
+
 
 Here we make the bounding box visible by inverting the color inside it:  
-![result](./report/desk3_bb_off.png)
-![result](./report/desk3_bb_on.png)
+<img src="report/desk3_bb_off.png" width="450"> <img src="report/desk3_bb_on.png" width="450">
 
