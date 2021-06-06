@@ -34,7 +34,7 @@ Here is one image per lab to sum up the work effectued through the labs:
 <img src="icg_exercise_0/img/basic-sphere.png" width="180"> <img src="icg_exercise_1/report/cylinders.png" width="180"> <img src="icg_exercise_2/report/mirror2.png" width="180"> <img src="icg_exercise_3/report/desk3_bb_off.png" width="180"> <img src="icg_exercise_7/report/World.png" width="180"> 
 <img src="icg_exercise_4/report/Sun.png" width="300"> <img src="icg_exercise_5/report/S2.png" width="300"> <img src="icg_exercise_6/report/S4.png" width="300"> 
 
-## Project - Infinite map generation using marching cube algorithm and perlin noise
+## Project - Infinite map generation using marching cube and perlin noise
 
 In the [project](./project) we implement a infinte terrain using the marching cube algorithm and 2D/3D perlin noise. 
 
