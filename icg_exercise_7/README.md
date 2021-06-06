@@ -9,16 +9,16 @@ In this exercise we explore perlin noise. First in 1D, we vary the amplitude and
 
 [Here](./report/README.md) is a summary of the executed tasks in this lab.
 
-First in one 1D: top 4 plots depict the Perlin noise function at different frequencies. The bottom plot shows the weighted sum of these octaves (fBm).  
-![result](./report/1D_plot.png)
+First in one 1D, top 4 plots depict the Perlin noise function at different frequencies. The bottom plot shows the weighted sum of these octaves (fBm):  
+<img src="report/1D_plot.png" width="400"> 
 
 Then in 2D. with different textures:  
-![result](./report/FBM.png)  
-![result](./report/Map.png)
-![result](./report/Marble.png)
-![result](./report/Perlin.png)
-![result](./report/Turbulence.png)
-![result](./report/Wood.png)
+<img src="report/FBM.png" width="300"> 
+<img src="report/Map.png" width="300"> 
+<img src="report/Marble.png" width="300"> 
+<img src="report/Perlin.png" width="300"> 
+<img src="report/Turbulence.png" width="300"> 
+<img src="report/Wood.png" width="300"> 
 
 Finally perlin noise generated terrain using height map:  
-![result](./report/World.png)
+<img src="report/World.png"> 
