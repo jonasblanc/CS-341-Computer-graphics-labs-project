@@ -28,3 +28,8 @@ It should be executed in the folder containing the lab / project. Then you shoul
   We create shadows using shadow maps. In a 3D scene, six shadow maps are computed per light source in a cube face fashion.
 * [Lab 7 - Perlin Noise, Procedural Terrain](./icg_exercise_7):  
   We implement 1D and 2D noise functions, then use them to generate textures and terrain.
+
+Here is one image per lab to sum up the work effectued through the labs:
+
+<img src="icg_exercise_0/img/basic-sphere.png" width="180"> <img src="icg_exercise_1/report/cylinders.png" width="180"> <img src="icg_exercise_2/report/mirror2.png" width="180"> <img src="icg_exercise_3/report/desk3_bb_off.png" width="180"> <img src="icg_exercise_7/report/World.png" width="180"> 
+<img src="icg_exercise_4/report/Sun.png" width="300"> <img src="icg_exercise_5/report/S2.png" width="300"> <img src="icg_exercise_6/report/S4.png" width="300"> 
