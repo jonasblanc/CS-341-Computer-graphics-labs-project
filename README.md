@@ -26,3 +26,5 @@ It should be executed in the folder containing the lab / project. Then you shoul
   We improve to look of the solar system by implement the phong lighting model and adding textures.
 * [Lab 6 - Shadows and Cube Mapping](./icg_exercise_6):  
   We create shadows using shadow maps. In a 3D scene, six shadow maps are computed per light source in a cube face fashion.
+* [Lab 7 - Perlin Noise, Procedural Terrain](./icg_exercise_7):  
+  We implement 1D and 2D noise functions, then use them to generate textures and terrain.
