@@ -37,3 +37,5 @@ Here is one image per lab to sum up the work effectued through the labs:
 ## Project - Infinite map generation using marching cube algorithm and perlin noise
 
 In the [project](./project) we implement a infinte terrain using the marching cube algorithm and 2D/3D perlin noise. 
+
+https://user-images.githubusercontent.com/44334351/120927882-b8301700-c6e2-11eb-9836-18ad3c774ff7.mp4
